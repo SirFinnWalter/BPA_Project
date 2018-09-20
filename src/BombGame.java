@@ -70,5 +70,12 @@ public class BombGame extends JFrame implements Runnable {
             render();
             lastTime = now;
         }
+
+    }
+
+    public static void main(String[] args) {
+        BombGame game = new BombGame();
+        Thread gameThread = new Thread(game);
+        gameThread.start();
     }
 }
