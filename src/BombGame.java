@@ -1,21 +1,24 @@
 
 /*
- * =======================================
- * File:             BombGame.java
- * Date Created:     09/14/2018 12:33:28 pm
- * Author:           Dakota Taylor
- * -                 -
- * Last Modified: Thu Sep 20 2018
- * Modified By: Dakota Taylor
- * =======================================
- */
+ @file BombGame.java
+ @author Dakota Taylor
+ @created on Friday, 14 September, 2018
+*/
+
 import java.awt.Canvas;
-import java.awt.Color;
+// import java.awt.Color;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.awt.Graphics;
+
 import java.lang.Runnable;
 import java.lang.Thread;
+
 import javax.swing.JFrame;
+
+import javax.imageio.ImageIO;
+
+import java.io.IOException;
 
 public class BombGame extends JFrame implements Runnable {
 
@@ -24,18 +27,35 @@ public class BombGame extends JFrame implements Runnable {
 
     public BombGame() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         setBounds(0, 0, 1000, 800);
         setLocationRelativeTo(null);
+
         add(canvas);
         setVisible(true);
+
         canvas.createBufferStrategy(3);
 
         renderer = new RenderHandler(getWidth(), getHeight());
 
+        BufferedImage pikachu = loadImage("pikachu.png");
     }
 
     public void update() {
 
+    }
+
+    // TODO 38:00
+    private BufferedImage loadImage(String path) {
+        try {
+            BufferedImage loadedImage = ImageIO.read(BombGame.class.getResource(path));
+            BufferedImage formattedImage = new BufferImage(loadImage.getWidth(), loadImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+            return loadedImage;
+        } catch (IOException e) {
+            // TODO: handle exception
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void render() {
@@ -50,10 +70,6 @@ public class BombGame extends JFrame implements Runnable {
     }
 
     public void run() {
-        BufferStrategy bStrategy = canvas.getBufferStrategy();
-        int i = 0;
-        int x = 0;
-
         long lastTime = System.nanoTime();
         double nanoSecondConversion = 1000000000.0 / 60;
         double changeInSeconds = 0;
