@@ -5,14 +5,18 @@
  @created on Friday, 14 September, 2018
 */
 
+// TODO: 46:15
+
 import java.awt.Canvas;
 // import java.awt.Color;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+// import java.awt.image.DataBufferInt;
 import java.awt.Graphics;
 
 import java.lang.Runnable;
 import java.lang.Thread;
+// import java.nio.Buffer;
 
 import javax.swing.JFrame;
 
@@ -24,6 +28,7 @@ public class BombGame extends JFrame implements Runnable {
 
     private Canvas canvas = new Canvas();
     private RenderHandler renderer;
+    private BufferedImage testImage;
 
     public BombGame() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -38,19 +43,21 @@ public class BombGame extends JFrame implements Runnable {
 
         renderer = new RenderHandler(getWidth(), getHeight());
 
-        BufferedImage pikachu = loadImage("pikachu.png");
+        testImage = loadImage("pikachu.png");
     }
 
     public void update() {
 
     }
 
-    // TODO 38:00
     private BufferedImage loadImage(String path) {
         try {
             BufferedImage loadedImage = ImageIO.read(BombGame.class.getResource(path));
-            BufferedImage formattedImage = new BufferImage(loadImage.getWidth(), loadImage.getHeight(), BufferedImage.TYPE_INT_RGB);
-            return loadedImage;
+            BufferedImage formattedImage = new BufferedImage(loadedImage.getWidth(), loadedImage.getHeight(),
+                    BufferedImage.TYPE_INT_RGB);
+            formattedImage.getGraphics().drawImage(loadedImage, 0, 0, null);
+
+            return formattedImage;
         } catch (IOException e) {
             // TODO: handle exception
             e.printStackTrace();
@@ -63,6 +70,7 @@ public class BombGame extends JFrame implements Runnable {
         Graphics gfx = bStrategy.getDrawGraphics();
         super.paint(gfx);
 
+        renderer.renderImage(testImage, 0, 0);
         renderer.render(gfx);
 
         gfx.dispose();
