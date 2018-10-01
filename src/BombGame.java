@@ -65,12 +65,14 @@ public class BombGame extends JFrame implements Runnable {
         }
     }
 
+    private int xOffset = 0;
+
     public void render() {
         BufferStrategy bStrategy = canvas.getBufferStrategy();
         Graphics gfx = bStrategy.getDrawGraphics();
         super.paint(gfx);
 
-        renderer.renderImage(testImage, 0, 0);
+        renderer.renderImage(testImage, xOffset, 0);
         renderer.render(gfx);
 
         gfx.dispose();
@@ -88,6 +90,7 @@ public class BombGame extends JFrame implements Runnable {
             changeInSeconds += (now = lastTime) / nanoSecondConversion;
             while (changeInSeconds >= 1) {
                 update();
+                xOffset += 1;
                 changeInSeconds = 0;
             }
 
