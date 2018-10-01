@@ -22,6 +22,7 @@ import javax.swing.JFrame;
 
 import javax.imageio.ImageIO;
 
+import java.io.File;
 import java.io.IOException;
 
 public class BombGame extends JFrame implements Runnable {
@@ -43,16 +44,16 @@ public class BombGame extends JFrame implements Runnable {
 
         renderer = new RenderHandler(getWidth(), getHeight());
 
-        testImage = loadImage("pikachu.png");
+        testImage = loadImage(new File("").getAbsolutePath().concat("\\assets\\sprites\\pikachu.png"));
     }
 
     public void update() {
 
     }
 
-    private BufferedImage loadImage(String path) {
+    private BufferedImage loadImage(String filepath) {
         try {
-            BufferedImage loadedImage = ImageIO.read(BombGame.class.getResource(path));
+            BufferedImage loadedImage = ImageIO.read(new File(filepath));
             BufferedImage formattedImage = new BufferedImage(loadedImage.getWidth(), loadedImage.getHeight(),
                     BufferedImage.TYPE_INT_RGB);
             formattedImage.getGraphics().drawImage(loadedImage, 0, 0, null);
