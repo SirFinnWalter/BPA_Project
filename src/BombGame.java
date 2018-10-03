@@ -7,16 +7,13 @@
 
 // TODO: 46:15
 
-import java.awt.Canvas;
-// import java.awt.Color;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-// import java.awt.image.DataBufferInt;
 import java.awt.Graphics;
+import java.awt.Canvas;
 
 import java.lang.Runnable;
 import java.lang.Thread;
-// import java.nio.Buffer;
 
 import javax.swing.JFrame;
 
@@ -31,6 +28,9 @@ public class BombGame extends JFrame implements Runnable {
     private RenderHandler renderer;
     private BufferedImage testImage;
 
+    /**
+     * Creates a default window
+     */
     public BombGame() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -51,6 +51,12 @@ public class BombGame extends JFrame implements Runnable {
 
     }
 
+    /**
+     * 
+     * 
+     * @param filepath Path to the image
+     * @return The formatted image data
+     */
     private BufferedImage loadImage(String filepath) {
         try {
             BufferedImage loadedImage = ImageIO.read(new File(filepath));
@@ -66,35 +72,38 @@ public class BombGame extends JFrame implements Runnable {
         }
     }
 
-    private int xOffset = 0;
-
+    /**
+     * 
+     */
     public void render() {
         BufferStrategy bStrategy = canvas.getBufferStrategy();
+
         Graphics gfx = bStrategy.getDrawGraphics();
+
         super.paint(gfx);
 
-        renderer.renderImage(testImage, xOffset, 0);
+        renderer.renderImage(testImage, 0, 0, 1, 1);
         renderer.render(gfx);
 
         gfx.dispose();
         bStrategy.show();
     }
 
+    /**
+     * 
+     */
     public void run() {
         long lastTime = System.nanoTime();
         double nanoSecondConversion = 1000000000.0 / 60;
         double changeInSeconds = 0;
-
         while (true) {
             long now = System.nanoTime();
 
             changeInSeconds += (now = lastTime) / nanoSecondConversion;
             while (changeInSeconds >= 1) {
                 update();
-                xOffset += 1;
                 changeInSeconds = 0;
             }
-
             render();
             lastTime = now;
         }
