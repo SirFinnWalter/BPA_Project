@@ -1,0 +1,10 @@
+// TileName,SpriteX,SpriteY
+Bonzi,0,0
+BonziBook,2,1
+BonziRead1,4,1
+BonziRead2,6,1
+BonziRead3,3,2
+BonziRead4,5,2
+BonziFlip1,3,3
+BonziFlip2,4,3
+BonziFlip3,5,3
