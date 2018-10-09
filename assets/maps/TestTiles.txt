@@ -1,0 +1,9 @@
+// tilename,x,y
+PlayerWalk0,0,0
+PlayerWalk1,1,0
+PlayerWalk2,2,0
+PlayerWalk3,3,0
+PlayerWalk4,0,1
+PlayerWalk5,1,1
+PlayerWalk6,2,1
+PlayerWalk7,3,1

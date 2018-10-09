@@ -50,7 +50,18 @@ public class Map {
         }
     }
 
-    public void renderMap(RenderHandler renderer, int xZoom, int yZoom) {
+    public void render(RenderHandler renderer, int xZoom, int yZoom) {
+
+        // if (fillTileID > -1) {
+        // Rectangle camera = renderer.getCamera();
+
+        // for (int y = 0; y < camera.height; y++) {
+        // for (int x = 0; x < camera.width; x++) {
+
+        // }
+        // }
+        // }
+
         for (int i = 0; i < mappedTiles.size(); i++) {
             MappedTile mappedTile = mappedTiles.get(i);
             int xIncrement = mappedTile.getTile().sprite.getWidth() * xZoom;

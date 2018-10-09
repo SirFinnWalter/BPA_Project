@@ -71,4 +71,8 @@ public class RenderHandler {
                 pixels[index] = pixel;
         }
     }
+
+    public Rectangle getCamera() {
+        return this.camera;
+    }
 }

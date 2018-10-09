@@ -28,12 +28,17 @@ public class BombGame extends JFrame implements Runnable {
 
     private Canvas canvas = new Canvas();
     private RenderHandler renderer;
-    // private BufferedImage testImage;
-    // private Sprite testSprite;
     private SpriteSheet sheet;
+
+    private Rectangle testRect = new Rectangle(10, 0, 350, 100);
+
     private Tiles tiles;
     private Map map;
-    private Rectangle testRect = new Rectangle(20, 20, 200, 300);
+
+    private GameObject[] objects;
+    private KeyboardListener kListener = new KeyboardListener();
+
+    private Player player;
 
     public BombGame() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -49,20 +54,30 @@ public class BombGame extends JFrame implements Runnable {
         renderer = new RenderHandler(getWidth(), getHeight());
 
         // testRect.generateGraphics(0xFF0000);
-        BufferedImage sheetImage = loadImage(new File("assets\\sprites\\bonzi_buddy.png").getAbsolutePath());
+        BufferedImage sheetImage = loadImage(new File("assets\\sprites\\placeholder.png").getAbsolutePath());
         sheet = new SpriteSheet(sheetImage);
-        sheet.loadSprites(92, 100);
+        sheet.loadSprites(16, 16);
 
-        tiles = new Tiles(new File("assets\\maps\\SpriteTiles.txt"), sheet);
-        map = new Map(new File("assets\\maps\\SpriteMap.txt"), tiles);
+        tiles = new Tiles(new File("assets\\maps\\TestTiles.txt"), sheet);
+        map = new Map(new File("assets\\maps\\TestMap.txt"), tiles);
         // testImage = loadImage(new
         // File("assets\\sprites\\pikachu.png").getAbsolutePath());
         // testSprite = sheet.getSprite(0, 0);
 
-        testRect.generateGraphics(10, 0xFF9900);
+        testRect.generateGraphics(0xFF9900);
+
+        objects = new GameObject[1];
+        player = new Player();
+        objects[0] = player;
+
+        canvas.addKeyListener(kListener);
+        canvas.addFocusListener(kListener);
     }
 
     public void update() {
+        for (int i = 0; i < objects.length; i++) {
+            objects[i].update(this);
+        }
     }
 
     private BufferedImage loadImage(String filepath) {
@@ -81,26 +96,24 @@ public class BombGame extends JFrame implements Runnable {
 
     public void render() {
         BufferStrategy bStrategy = canvas.getBufferStrategy();
-
         Graphics gfx = bStrategy.getDrawGraphics();
 
         super.paint(gfx);
+        renderer.renderRectangle(testRect, 2, 2);
 
-        // renderer.renderImage(testImage, 0, 0, 1, 1);
-        renderer.renderRectangle(testRect, 1, 1);
-        // renderer.renderSprite(testSprite, 0, 0, 1, 1);
-        // tiles.renderTiles(2, renderer, 0, 0, 1, 1);
-        map.renderMap(renderer, 1, 1);
+        map.render(renderer, 2, 2);
+        for (int i = 0; i < objects.length; i++) {
+            objects[i].render(renderer, 2, 2);
+        }
 
         renderer.render(gfx);
-
         gfx.dispose();
         bStrategy.show();
     }
 
     public void run() {
         long lastTime = System.nanoTime();
-        double nanoSecondConversion = 1000000000.0 / 60;
+        double nanoSecondConversion = 1000000000.0 / 60; // 60 fps
         double changeInSeconds = 0;
         while (true) {
             long now = System.nanoTime();
@@ -120,5 +133,9 @@ public class BombGame extends JFrame implements Runnable {
         BombGame game = new BombGame();
         Thread gameThread = new Thread(game);
         gameThread.start();
+    }
+
+    public KeyboardListener getKeyListener() {
+        return this.kListener;
     }
 }

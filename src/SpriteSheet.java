@@ -68,20 +68,18 @@ public class SpriteSheet {
         return null;
     }
 
-    // public Sprite getSprite(int spriteID) {
-    // if (spritesLoaded) {
-    // if (spriteID < loadedSprites.length)
-    // return loadedSprites[spriteID];
-    // else
-    // System.out.println(
-    // "Warning: SpriteID of " + spriteID + " is not in the range of " +
-    // loadedSprites.length + ".");
-    // } else
-    // System.out.println("Warning: SpriteSheet attempted to retrieve sprites before
-    // loading sprites");
+    public Sprite getSprite(int spriteID) {
+        if (spritesLoaded) {
+            if (spriteID < loadedSprites.length)
+                return loadedSprites[spriteID];
+            else
+                System.out.println(
+                        "Warning: SpriteID of " + spriteID + " is not in the range of " + loadedSprites.length + ".");
+        } else
+            System.out.println("Warning: SpriteSheet attempted to retrieve sprites before loading sprites");
 
-    // return null;
-    // }
+        return null;
+    }
 
     public int[] getPixels() {
         return this.pixels;
