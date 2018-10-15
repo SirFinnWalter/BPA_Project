@@ -1,3 +1,5 @@
+package tutorial;
+
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -5,21 +7,21 @@ import java.awt.image.DataBufferInt;
 /**
  * @file RenderHandler.java
  * @author Dakota Taylor
- * @createdOn Sunday, 14 October, 2018
+ * @createdOn Monday, 17 September, 2018
  */
 
 public class RenderHandler {
     private BufferedImage view;
+    private Rectangle camera;
     private int[] pixels;
-    // private Rectangle camera;
-
-    private int width, height;
 
     public RenderHandler(int width, int height) {
-        this.width = width;
-        this.height = height;
+        view = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
-        view = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        camera = new Rectangle(0, 0, width, height);
+        // camera.x = -100;
+        // camera.y = -30;
+
         pixels = ((DataBufferInt) view.getRaster().getDataBuffer()).getData();
     }
 
@@ -37,10 +39,11 @@ public class RenderHandler {
         renderArray(sprite.getPixels(), sprite.getWidth(), sprite.getHeight(), xPos, yPos, xZoom, yZoom);
     }
 
-    public void renderRectangle(Rectangle rect) {
+    public void renderRectangle(Rectangle rect, int xZoom, int yZoom) {
         int[] rectPixels = rect.getPixels();
         if (rectPixels != null)
-            renderArray(rectPixels, rect.getWidth(), rect.getHeight(), rect.x, rect.y, 1, 1);
+            renderArray(rectPixels, rect.width, rect.height, rect.x, rect.y, xZoom, yZoom);
+
     }
 
     public void renderArray(int[] pixels, int width, int height, int xPos, int yPos, int xZoom, int yZoom) {
@@ -55,43 +58,29 @@ public class RenderHandler {
         }
     }
 
-    public int getWidth() {
-        return this.width;
-    }
-
-    public int getHeight() {
-        return this.height;
-    }
-
+    /**
+     * Sets the source pixel to the screen pixel
+     * 
+     * @param pixel The source pixel
+     * @param x     The x position of the screen pixel
+     * @param y     to y position of the screen pixel
+     */
     private void setPixel(int pixel, int x, int y) {
-        // if (x >= camera.x && y >= camera.y && x <= camera.x + camera.getWidth() && y
-        // <= camera.y + camera.getHeight()) {
-        int alpha = ((pixel >> 24) & 0xFF);
-        if (x >= 0 && y >= 0 && x <= width && y <= height && alpha != 0) {
-            int index = x + y * view.getWidth();
-            if (pixels.length > index) {
-                if (alpha == 255) {
-                    pixels[x + y * width] = pixel;
-                    return;
-                }
+        if (x >= camera.x && y >= camera.y && x <= camera.x + camera.width && y <= camera.y + camera.height) {
 
-                int dstPixel = pixels[x + y * width];
-                int outRed = ((dstPixel >> 16) & 0xFF)
-                        - (int) ((((dstPixel >> 16) & 0xFF) - ((pixel >> 16) & 0xFF)) * (alpha / 255f));
-                int outGreen = ((dstPixel >> 8) & 0xFF)
-                        - (int) ((((dstPixel >> 8) & 0xFF) - ((pixel >> 8) & 0xFF)) * (alpha / 255f));
-                int outBlue = ((dstPixel >> 0) & 0xFF)
-                        - (int) ((((dstPixel >> 0) & 0xFF) - ((pixel >> 0) & 0xFF)) * (alpha / 255f));
-
-                pixels[x + y * width] = (255 << 24 | outRed << 16 | outGreen << 8 | outBlue << 0);
-            }
-
+            int index = (x - camera.x) + (y - camera.y) * view.getWidth();
+            if (pixels.length > index && pixel != BombGame.ALPHA)
+                pixels[index] = pixel;
         }
     }
 
-    public void clear(int color) {
+    public Rectangle getCamera() {
+        return this.camera;
+    }
+
+    public void clear() {
         for (int i = 0; i < pixels.length; i++) {
-            pixels[i] = color;
+            pixels[i] = 0;
         }
     }
 }

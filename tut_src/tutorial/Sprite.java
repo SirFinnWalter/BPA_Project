@@ -1,9 +1,11 @@
+package tutorial;
+
 import java.awt.image.BufferedImage;
 
 /**
  * @file Sprite.java
  * @author Dakota Taylor
- * @createdOn Sunday, 14 October, 2018
+ * @created on Saturday, 06 October, 2018
  */
 
 public class Sprite {
@@ -19,8 +21,8 @@ public class Sprite {
     }
 
     public Sprite(BufferedImage image) {
-        this.width = image.getWidth();
-        this.height = image.getHeight();
+        width = image.getWidth();
+        height = image.getHeight();
 
         pixels = new int[width * height];
         image.getRGB(0, 0, width, height, pixels, 0, width);

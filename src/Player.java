@@ -1,44 +1,35 @@
-import javafx.scene.paint.Color;
-
 /**
  * @file Player.java
  * @author Dakota Taylor
- * @createdOn Tuesday, 09 October, 2018
+ * @createdOn Sunday, 14 October, 2018
  */
-// TODO: 3:43:26
-public class Player implements GameObject {
 
+public class Player {
     Rectangle playerRect;
-    int speed = 1;
+    int speed = 5;
 
     public Player() {
-        playerRect = new Rectangle(0, 0, 16, 16);
-        playerRect.generateGraphics(0xFFFF0000);
+        playerRect = new Rectangle(50, 100, 16, 32);
+        playerRect.setColor(0xAAAAFF00);
     }
 
-    public void render(RenderHandler renderer, int xZoom, int yZoom) {
-        renderer.renderRectangle(playerRect, xZoom, yZoom);
+    public void render(RenderHandler renderer) {
+        renderer.renderRectangle(this.playerRect);
     }
 
     public void update(BombGame game) {
-        KeyboardListener kListener = game.getKeyListener();
-
-        if (kListener.up()) {
+        KeyboardListener listener = game.getListener();
+        if (listener.up()) {
             playerRect.y -= speed;
         }
-
-        if (kListener.down()) {
+        if (listener.down()) {
             playerRect.y += speed;
         }
-
-        if (kListener.left()) {
+        if (listener.left()) {
             playerRect.x -= speed;
         }
-
-        if (kListener.right()) {
+        if (listener.right()) {
             playerRect.x += speed;
         }
-
     }
-
 }

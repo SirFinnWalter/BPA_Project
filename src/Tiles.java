@@ -6,39 +6,33 @@ import java.util.ArrayList;
 /**
  * @file Tiles.java
  * @author Dakota Taylor
- * @createdOn Saturday, 06 October, 2018
+ * @createdOn Sunday, 14 October, 2018
  */
-
 public class Tiles {
-
-    private SpriteSheet spriteSheet;
+    private SpriteSheet sheet;
     private ArrayList<Tile> tilesList = new ArrayList<Tile>();
 
-    // Sprites in spritesheet must be loaded
-    public Tiles(File tilesFile, SpriteSheet spriteSheet) {
-        this.spriteSheet = spriteSheet;
+    public Tiles(File file, SpriteSheet sheet) {
+        this.sheet = sheet;
         BufferedReader reader;
         try {
-            reader = new BufferedReader(new FileReader(tilesFile));
+            reader = new BufferedReader(new FileReader(file));
 
             String s = reader.readLine();
             while (s != null) {
                 if (!s.trim().startsWith("//")) {
                     String[] data = s.split(",");
-                    if (data.length >= 3) {
-                        String tileName = data[0];
-                        Integer spriteX = Integer.parseInt(data[1]);
-                        Integer spriteY = Integer.parseInt(data[2]);
-
-                        Tile tile = new Tile(tileName, this.spriteSheet.getSprite(spriteX, spriteY));
+                    if (data.length >= 4) {
+                        int x = Integer.parseInt(data[0]);
+                        int y = Integer.parseInt(data[1]);
+                        int collisionType = parseCollision(data[2]);
+                        boolean breakable = Boolean.parseBoolean(data[3]);
+                        Tile tile = new Tile(this.sheet.getSprite(x, y), collisionType, breakable);
                         tilesList.add(tile);
                     }
-
                 }
-
                 s = reader.readLine();
             }
-
             reader.close();
         } catch (Exception e) {
             // TODO: handle exception
@@ -46,25 +40,63 @@ public class Tiles {
         }
     }
 
-    public void renderTiles(int tileID, RenderHandler renderer, int xPos, int yPos, int xZoom, int yZoom) {
+    public void renderTiles(RenderHandler renderer, int tileID, int xPos, int yPos, int xZoom, int yZoom) {
         if (tileID < tilesList.size())
             renderer.renderSprite(tilesList.get(tileID).sprite, xPos, yPos, xZoom, yZoom);
         else
             System.out.println("Warning: TileID of " + tileID + " is not in the range of " + tilesList.size() + ".");
-
     }
 
     public Tile getTile(int tileID) {
         return this.tilesList.get(tileID);
     }
 
+    public static int parseCollision(String s) {
+        if (!s.contains("|")) {
+            switch (s.trim().toUpperCase()) {
+            case "LEFT":
+                return CollisionConstants.LEFT;
+            case "RIGHT":
+                return CollisionConstants.RIGHT;
+            case "TOP":
+                return CollisionConstants.TOP;
+            case "BOTTOM":
+                return CollisionConstants.BOTTOM;
+            case "ALL":
+                return CollisionConstants.ALL;
+            case "NONE":
+                return CollisionConstants.NONE;
+            default:
+                return 0;
+            }
+        } else {
+            int bitwise = 0;
+            for (String c : s.split("\\|")) {
+                bitwise = bitwise | parseCollision(c);
+            }
+            return bitwise;
+        }
+    }
+
     class Tile {
-        public String tileName;
+        private int collisionType;
+        private boolean breakable;
         public Sprite sprite;
 
-        public Tile(String tileName, Sprite sprite) {
-            this.tileName = tileName;
+        public Tile(Sprite sprite, int collisionType, boolean breakable) {
             this.sprite = sprite;
+            this.collisionType = collisionType;
+            this.breakable = breakable;
         }
+
+    }
+
+    public final class CollisionConstants {
+        public static final int LEFT = 0b0001;
+        public static final int RIGHT = 0b0010;
+        public static final int TOP = 0b0100;
+        public static final int BOTTOM = 0b1000;
+        public static final int ALL = 0b1111;
+        public static final int NONE = 0b0000;
     }
 }

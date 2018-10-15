@@ -1,3 +1,11 @@
+package tutorial;
+
+/**
+ * @file GameObject.java
+ * @author Dakota Taylor
+ * @createdOn Sunday, 14 October, 2018
+ */
+
 public interface GameObject {
 
     // Called whenever possibles

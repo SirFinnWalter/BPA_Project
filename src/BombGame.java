@@ -1,132 +1,128 @@
+import java.awt.Canvas;
+import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.awt.Graphics;
-import java.awt.Canvas;
-
-import java.lang.Runnable;
-import java.lang.Thread;
-
-import javax.swing.JFrame;
+import java.io.File;
 
 import javax.imageio.ImageIO;
-
-import java.io.File;
-import java.io.IOException;
+import javax.swing.JFrame;
 
 /**
  * @file BombGame.java
  * @author Dakota Taylor
- * @createdOn Friday, 14 September, 2018
+ * @createdOn Sunday, 14 October, 2018
  */
 
-// TODO: 3:09:03
 public class BombGame extends JFrame implements Runnable {
+    private static final long serialVersionUID = 1L;
+    private final int TICKSPERSECOND = 30;
+    private final double NANOSECONDS = 1000000000.0 / TICKSPERSECOND;
 
-    // NOTE: Any pixel that equal 0xFF00DC will show up as
-    // transparent when rendering, even in images
-    public static final int ALPHA = 0xFFFF00DC;
-
-    private Canvas canvas = new Canvas();
+    private boolean running = false;
     private RenderHandler renderer;
+    private Canvas canvas = new Canvas();
+    private Player player = new Player();
+    private KeyboardListener listener = new KeyboardListener();
+
     private SpriteSheet sheet;
-
-    private Rectangle testRect = new Rectangle(10, 0, 350, 100);
-
     private Tiles tiles;
     private Map map;
 
-    private GameObject[] objects;
-    private KeyboardListener kListener = new KeyboardListener();
-
-    private Player player;
-
     public BombGame() {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // TODO: add a custom exit function (close running)
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        setBounds(0, 0, 1000, 800);
-        setLocationRelativeTo(null);
+        this.setBounds(0, 0, 800, 600);
+        this.setLocationRelativeTo(null);
 
-        add(canvas);
-        setVisible(true);
+        this.add(canvas);
+        this.setVisible(true);
 
-        canvas.createBufferStrategy(3);
+        BufferedImage image = loadImage(new File("assets\\sprites\\tileset1.png"));
+        sheet = new SpriteSheet(image);
+        sheet.loadSprites(32, 32);
+
+        tiles = new Tiles(new File("assets\\maps\\tileset1.bt"), sheet);
+        map = new Map(new File("assets\\maps\\map1.bm"), tiles);
 
         renderer = new RenderHandler(getWidth(), getHeight());
-
-        // testRect.generateGraphics(0xFF0000);
-        BufferedImage sheetImage = loadImage(new File("assets\\sprites\\placeholder.png").getAbsolutePath());
-        sheet = new SpriteSheet(sheetImage);
-        sheet.loadSprites(16, 16);
-
-        tiles = new Tiles(new File("assets\\maps\\TestTiles.txt"), sheet);
-        map = new Map(new File("assets\\maps\\TestMap.txt"), tiles);
-        // testImage = loadImage(new
-        // File("assets\\sprites\\pikachu.png").getAbsolutePath());
-        // testSprite = sheet.getSprite(0, 0);
-
-        testRect.generateGraphics(0xFF9900);
-
-        objects = new GameObject[1];
-        player = new Player();
-        objects[0] = player;
-
-        canvas.addKeyListener(kListener);
-        canvas.addFocusListener(kListener);
+        canvas.createBufferStrategy(3);
+        canvas.addKeyListener(listener);
+        canvas.addFocusListener(listener);
     }
 
-    public void update() {
-        for (int i = 0; i < objects.length; i++) {
-            objects[i].update(this);
+    public void run() {
+
+        running = true;
+        // int frames = 0;
+        double delta = 0;
+
+        long lastTime = System.nanoTime();
+        long timer = System.currentTimeMillis();
+        while (running) {
+            long now = System.nanoTime();
+            delta += (now - lastTime) / NANOSECONDS;
+            lastTime = now;
+            while (delta >= 1) {
+                update();
+                delta--;
+            }
+            render();
+
+            // frames++;
+            if (System.currentTimeMillis() - timer > 1000) {
+                timer += 1000;
+                // System.out.println(frames);
+                // frames = 0;
+            }
         }
     }
 
-    private BufferedImage loadImage(String filepath) {
+    private void update() {
+        player.update(this);
+    }
+
+    private void render() {
+        BufferStrategy bStrategy = canvas.getBufferStrategy();
+        Graphics gfx = bStrategy.getDrawGraphics();
+        super.paint(gfx);
+        map.render(renderer, 1, 1);
+        // renderer.renderImage(testImage, 300, 100, 1, 1);
+        player.render(renderer);
+        renderer.render(gfx);
+        gfx.dispose();
+        bStrategy.show();
+        renderer.clear(0xFF0000FF);
+    }
+
+    // private BufferedImage loadImage(String filepath) {
+    // return loadImage(new File(filepath));
+    // }
+
+    private BufferedImage loadImage(File file) {
         try {
-            BufferedImage loadedImage = ImageIO.read(new File(filepath));
+            BufferedImage loadedImage = ImageIO.read(file);
             BufferedImage formattedImage = new BufferedImage(loadedImage.getWidth(), loadedImage.getHeight(),
-                    BufferedImage.TYPE_INT_RGB);
+                    BufferedImage.TYPE_INT_ARGB);
             formattedImage.getGraphics().drawImage(loadedImage, 0, 0, null);
 
             return formattedImage;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public void render() {
-        BufferStrategy bStrategy = canvas.getBufferStrategy();
-        Graphics gfx = bStrategy.getDrawGraphics();
-
-        super.paint(gfx);
-        renderer.renderRectangle(testRect, 2, 2);
-
-        map.render(renderer, 2, 2);
-        for (int i = 0; i < objects.length; i++) {
-            objects[i].render(renderer, 2, 2);
-        }
-
-        renderer.render(gfx);
-        gfx.dispose();
-        bStrategy.show();
+    public boolean isRunning() {
+        return running;
     }
 
-    public void run() {
-        long lastTime = System.nanoTime();
-        double nanoSecondConversion = 1000000000.0 / 60; // 60 fps
-        double changeInSeconds = 0;
-        while (true) {
-            long now = System.nanoTime();
+    public KeyboardListener getListener() {
+        return this.listener;
+    }
 
-            changeInSeconds += (now = lastTime) / nanoSecondConversion;
-            while (changeInSeconds >= 1) {
-                update();
-                changeInSeconds = 0;
-            }
-            render();
-            lastTime = now;
-        }
-
+    public void setRunning(boolean running) {
+        this.running = running;
     }
 
     public static void main(String[] args) {
@@ -135,7 +131,4 @@ public class BombGame extends JFrame implements Runnable {
         gameThread.start();
     }
 
-    public KeyboardListener getKeyListener() {
-        return this.kListener;
-    }
 }
