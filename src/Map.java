@@ -14,7 +14,7 @@ public class Map {
     private int fillTileID = -1;
     private int width, height;
 
-    private ArrayList<MappedTile> mappedTiles = new ArrayList<MappedTile>();
+    public ArrayList<MappedTile> mappedTiles = new ArrayList<MappedTile>();
 
     public Map(File file, Tiles tileset) {
         this.tileset = tileset;
@@ -36,6 +36,13 @@ public class Map {
                     }
                     case "Fill": {
                         this.fillTileID = Integer.parseInt(data[1]);
+
+                        for (int y = 0; y < height; y++) {
+                            for (int x = 0; x < width; x++) {
+                                MappedTile mappedTile = new MappedTile(fillTileID, x, y);
+                                mappedTiles.add(mappedTile);
+                            }
+                        }
                         break;
                     }
                     case "Tiles": {
@@ -57,7 +64,9 @@ public class Map {
                                                 + "} is outside the map size of [" + width + ", " + height + "]");
                                     } else {
                                         MappedTile mappedTile = new MappedTile(tileID, x, y);
-                                        mappedTiles.add(mappedTile);
+                                        // mappedTiles.add(mappedTile);
+                                        // mappedTiles.add(mappedTile.getID(), mappedTile);
+                                        mappedTiles.set(mappedTile.getID(), mappedTile);
                                     }
                                 } else {
                                     String[] coords = c.replaceAll("[^,\\-\\d]", "").split("[,-]");
@@ -74,7 +83,10 @@ public class Map {
 
                                             } else {
                                                 MappedTile mappedTile = new MappedTile(tileID, x, y);
-                                                mappedTiles.add(mappedTile);
+                                                // mappedTiles.add(mappedTile);
+                                                // mappedTiles.add(mappedTile.getID(), mappedTile);
+                                                mappedTiles.set(mappedTile.getID(), mappedTile);
+
                                             }
                                         }
                                     }
@@ -100,17 +112,19 @@ public class Map {
     }
 
     public void render(RenderHandler renderer, int xZoom, int yZoom) {
-        if (fillTileID > -1) {
-            Tiles.Tile fillTile = tileset.getTile(fillTileID);
+        // if (fillTileID > -1) {
+        // Tiles.Tile fillTile = tileset.getTile(fillTileID);
 
-            for (int y = 0; y < this.height * fillTile.sprite.getHeight() * yZoom; y += fillTile.sprite.getHeight()
-                    * yZoom) {
-                for (int x = 0; x < this.width * fillTile.sprite.getWidth() * xZoom; x += fillTile.sprite.getWidth()
-                        * xZoom) {
-                    tileset.renderTiles(renderer, fillTileID, x, y, xZoom, yZoom);
-                }
-            }
-        }
+        // for (int y = 0; y < this.height * fillTile.sprite.getHeight() * yZoom; y +=
+        // fillTile.sprite.getHeight()
+        // * yZoom) {
+        // for (int x = 0; x < this.width * fillTile.sprite.getWidth() * xZoom; x +=
+        // fillTile.sprite.getWidth()
+        // * xZoom) {
+        // tileset.renderTiles(renderer, fillTileID, x, y, xZoom, yZoom);
+        // }
+        // }
+        // }
 
         for (int i = 0; i < mappedTiles.size(); i++) {
             MappedTile mappedTile = mappedTiles.get(i);
@@ -123,10 +137,31 @@ public class Map {
 
     }
 
+    public MappedTile getTile(int x, int y) {
+        return mappedTiles.get(x + (y * width));
+    }
+
+    // public MappedTile getTileAbove(MappedTile tile) {
+    // return getTile(tile.x, tile.y - 1);
+    // }
+
+    // public MappedTile getTileBelow(MappedTile tile) {
+    // return getTile(tile.x, tile.y + 1);
+    // }
+
+    // public MappedTile getTileLeft(MappedTile tile) {
+    // return getTile(tile.x - 1, tile.y);
+    // }
+
+    // public MappedTile getTileRight(MappedTile tile) {
+    // return getTile(tile.x + 1, tile.y);
+    // }
+
     class MappedTile {
-        public int tileID, x, y;
+        public int mappedTileID, tileID, x, y;
 
         public MappedTile(int tileID, int x, int y) {
+            mappedTileID = x + (y * width);
             this.tileID = tileID;
             this.x = x;
             this.y = y;
@@ -134,6 +169,30 @@ public class Map {
 
         public Tiles.Tile getTile() {
             return tileset.getTile(tileID);
+        }
+
+        public int getID() {
+            return this.mappedTileID;
+        }
+
+        public int[] getInfo() {
+            return new int[] { mappedTileID, tileID, x, y };
+        }
+
+        public MappedTile getTileAbove() {
+            return Map.this.getTile(x, y - 1);
+        }
+
+        public MappedTile getTileBelow() {
+            return Map.this.getTile(x, y + 1);
+        }
+
+        public MappedTile getTileLeft() {
+            return Map.this.getTile(x - 1, y);
+        }
+
+        public MappedTile getTileRight() {
+            return Map.this.getTile(x + 1, y);
         }
     }
 }

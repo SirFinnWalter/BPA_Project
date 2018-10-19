@@ -74,7 +74,7 @@ public class RenderHandler {
                     pixels[x + y * width] = pixel;
                     return;
                 }
-
+                // 0xAARRGGBB
                 int dstPixel = pixels[x + y * width];
                 int outRed = ((dstPixel >> 16) & 0xFF)
                         - (int) ((((dstPixel >> 16) & 0xFF) - ((pixel >> 16) & 0xFF)) * (alpha / 255f));

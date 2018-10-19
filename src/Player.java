@@ -9,7 +9,7 @@ public class Player {
     int speed = 5;
 
     public Player() {
-        playerRect = new Rectangle(50, 100, 16, 32);
+        playerRect = new Rectangle(50, 100, 99, 55);
         playerRect.setColor(0xAAAAFF00);
     }
 

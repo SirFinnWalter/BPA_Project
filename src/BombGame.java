@@ -38,12 +38,12 @@ public class BombGame extends JFrame implements Runnable {
         this.add(canvas);
         this.setVisible(true);
 
-        BufferedImage image = loadImage(new File("assets\\sprites\\tileset1.png"));
+        BufferedImage image = loadImage(new File("assets\\sprites\\16bitmap.png"));
         sheet = new SpriteSheet(image);
-        sheet.loadSprites(32, 32);
+        sheet.loadSprites(16, 16);
 
         tiles = new Tiles(new File("assets\\maps\\tileset1.bt"), sheet);
-        map = new Map(new File("assets\\maps\\map1.bm"), tiles);
+        map = new Map(new File("assets\\maps\\map3.bm"), tiles);
 
         renderer = new RenderHandler(getWidth(), getHeight());
         canvas.createBufferStrategy(3);
@@ -52,7 +52,23 @@ public class BombGame extends JFrame implements Runnable {
     }
 
     public void run() {
+        Map.MappedTile test = map.getTile(1, 1);
 
+        int[] result = test.getTileAbove().getInfo();
+        System.out.println(
+                "map id: " + result[0] + ", tile id: " + result[1] + ", x: " + result[2] + ", y: " + result[3]);
+        result = test.getTileBelow().getInfo();
+        System.out.println(
+                "map id: " + result[0] + ", tile id: " + result[1] + ", x: " + result[2] + ", y: " + result[3]);
+        result = test.getTileLeft().getInfo();
+        System.out.println(
+                "map id: " + result[0] + ", tile id: " + result[1] + ", x: " + result[2] + ", y: " + result[3]);
+        result = test.getTileRight().getInfo();
+        System.out.println(
+                "map id: " + result[0] + ", tile id: " + result[1] + ", x: " + result[2] + ", y: " + result[3]);
+        result = test.getTileRight().getTileRight().getTileRight().getTileRight().getTileBelow().getInfo();
+        System.out.println(
+                "map id: " + result[0] + ", tile id: " + result[1] + ", x: " + result[2] + ", y: " + result[3]);
         running = true;
         // int frames = 0;
         double delta = 0;
@@ -86,7 +102,7 @@ public class BombGame extends JFrame implements Runnable {
         BufferStrategy bStrategy = canvas.getBufferStrategy();
         Graphics gfx = bStrategy.getDrawGraphics();
         super.paint(gfx);
-        map.render(renderer, 1, 1);
+        map.render(renderer, 2, 2);
         // renderer.renderImage(testImage, 300, 100, 1, 1);
         player.render(renderer);
         renderer.render(gfx);
