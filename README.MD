@@ -1,1 +1,2 @@
-Programming and Software Design BPA Team Project 2018
+Programming and Software Design
+BPA Competition Project - (V03) Software Engineering Team
