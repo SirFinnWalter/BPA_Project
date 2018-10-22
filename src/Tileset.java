@@ -58,7 +58,6 @@ public class Tileset {
     }
 
     class Tile {
-        // private int collisionType;
         private boolean collision;
         private boolean breakable;
         public Sprite sprite;

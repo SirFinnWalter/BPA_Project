@@ -39,7 +39,7 @@ public class Player {
             playerRect.x += speed;
             direction = FacingDirection.right;
         }
-        // TODO: Map player's location based on center instead of x,y (top-right)
+        // TODO: Map player's location based on center instead of top-right
         int mapMaxX = game.getMap().getWidth() - 1;
         int tileWidth = game.getMap().getTileWidth();
         mappedX = (int) Math.floor((double) (playerRect.x * mapMaxX) / (mapMaxX * tileWidth));

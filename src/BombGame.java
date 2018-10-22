@@ -94,7 +94,7 @@ public class BombGame extends JFrame implements Runnable {
         BufferStrategy bStrategy = canvas.getBufferStrategy();
         Graphics gfx = bStrategy.getDrawGraphics();
         super.paint(gfx);
-        // renderer.renderImage(testImage, 300, 100, 1, 1);
+
         map.render(renderer, 2, 2);
         player.render(renderer, 2, 2);
         renderer.render(gfx);

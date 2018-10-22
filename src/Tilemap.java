@@ -59,9 +59,6 @@ public class Tilemap {
                                                 + "} is outside the map size of [" + width + ", " + height + "]");
                                     } else {
                                         MappedTile mappedTile = new MappedTile(tileID, x, y);
-                                        // mappedTiles.add(mappedTile);
-                                        // mappedTiles.add(mappedTile.getID(), mappedTile);
-                                        // mappedTiles.set(mappedTile.getID(), mappedTile);
                                         mappedTiles.put(mappedTile.getID(), mappedTile);
                                     }
                                 } else {
@@ -79,9 +76,6 @@ public class Tilemap {
 
                                             } else {
                                                 MappedTile mappedTile = new MappedTile(tileID, x, y);
-                                                // mappedTiles.add(mappedTile);
-                                                // mappedTiles.add(mappedTile.getID(), mappedTile);
-                                                // mappedTiles.set(mappedTile.getID(), mappedTile);
                                                 mappedTiles.put(mappedTile.getID(), mappedTile);
 
                                             }
