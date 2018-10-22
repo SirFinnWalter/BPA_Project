@@ -37,10 +37,10 @@ public class RenderHandler {
         renderArray(sprite.getPixels(), sprite.getWidth(), sprite.getHeight(), xPos, yPos, xZoom, yZoom);
     }
 
-    public void renderRectangle(Rectangle rect) {
+    public void renderRectangle(Rectangle rect, int xZoom, int yZoom) {
         int[] rectPixels = rect.getPixels();
         if (rectPixels != null)
-            renderArray(rectPixels, rect.getWidth(), rect.getHeight(), rect.x, rect.y, 1, 1);
+            renderArray(rectPixels, rect.getWidth(), rect.getHeight(), rect.x, rect.y, xZoom, yZoom);
     }
 
     public void renderArray(int[] pixels, int width, int height, int xPos, int yPos, int xZoom, int yZoom) {

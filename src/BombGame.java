@@ -1,5 +1,8 @@
 import java.awt.Canvas;
 import java.awt.Graphics;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -25,12 +28,18 @@ public class BombGame extends JFrame implements Runnable {
     private KeyboardListener listener = new KeyboardListener();
 
     private SpriteSheet sheet;
-    private Tiles tiles;
-    private Map map;
+    private Tileset tiles;
+    private Tilemap map;
 
     public BombGame() {
-        // TODO: add a custom exit function (close running)
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                running = false;
+                System.exit(0);
+            }
+        });
 
         this.setBounds(0, 0, 800, 600);
         this.setLocationRelativeTo(null);
@@ -42,8 +51,8 @@ public class BombGame extends JFrame implements Runnable {
         sheet = new SpriteSheet(image);
         sheet.loadSprites(16, 16);
 
-        tiles = new Tiles(new File("assets\\maps\\tileset1.bt"), sheet);
-        map = new Map(new File("assets\\maps\\map3.bm"), tiles);
+        tiles = new Tileset(new File("assets\\maps\\tileset1.bt"), sheet);
+        map = new Tilemap(new File("assets\\maps\\map3.bm"), tiles);
 
         renderer = new RenderHandler(getWidth(), getHeight());
         canvas.createBufferStrategy(3);
@@ -52,23 +61,6 @@ public class BombGame extends JFrame implements Runnable {
     }
 
     public void run() {
-        Map.MappedTile test = map.getTile(1, 1);
-
-        int[] result = test.getTileAbove().getInfo();
-        System.out.println(
-                "map id: " + result[0] + ", tile id: " + result[1] + ", x: " + result[2] + ", y: " + result[3]);
-        result = test.getTileBelow().getInfo();
-        System.out.println(
-                "map id: " + result[0] + ", tile id: " + result[1] + ", x: " + result[2] + ", y: " + result[3]);
-        result = test.getTileLeft().getInfo();
-        System.out.println(
-                "map id: " + result[0] + ", tile id: " + result[1] + ", x: " + result[2] + ", y: " + result[3]);
-        result = test.getTileRight().getInfo();
-        System.out.println(
-                "map id: " + result[0] + ", tile id: " + result[1] + ", x: " + result[2] + ", y: " + result[3]);
-        result = test.getTileRight().getTileRight().getTileRight().getTileRight().getTileBelow().getInfo();
-        System.out.println(
-                "map id: " + result[0] + ", tile id: " + result[1] + ", x: " + result[2] + ", y: " + result[3]);
         running = true;
         // int frames = 0;
         double delta = 0;
@@ -102,9 +94,9 @@ public class BombGame extends JFrame implements Runnable {
         BufferStrategy bStrategy = canvas.getBufferStrategy();
         Graphics gfx = bStrategy.getDrawGraphics();
         super.paint(gfx);
-        map.render(renderer, 2, 2);
         // renderer.renderImage(testImage, 300, 100, 1, 1);
-        player.render(renderer);
+        map.render(renderer, 2, 2);
+        player.render(renderer, 2, 2);
         renderer.render(gfx);
         gfx.dispose();
         bStrategy.show();
@@ -135,6 +127,10 @@ public class BombGame extends JFrame implements Runnable {
 
     public KeyboardListener getListener() {
         return this.listener;
+    }
+
+    public Tilemap getMap() {
+        return map;
     }
 
     public void setRunning(boolean running) {
