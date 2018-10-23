@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class Tileset {
     private SpriteSheet sheet;
     private ArrayList<Tile> tilesList = new ArrayList<Tile>();
-    public final Tile voidTile = new Tile(null, true, false);
+    public final Tile voidTile = new Tile(null, false, false);
 
     public Tileset(File file, SpriteSheet sheet) {
         this.sheet = sheet;
@@ -53,8 +53,9 @@ public class Tileset {
     public Tile getTile(int tileID) {
         if (tileID != -1)
             return this.tilesList.get(tileID);
-        else
+        else {
             return voidTile;
+        }
     }
 
     class Tile {

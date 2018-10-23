@@ -120,6 +120,26 @@ public class Tilemap {
         });
     }
 
+    public boolean checkCollision(Player player, Rectangle rect) {
+        int x1 = mapPosition(rect.x);
+        int x2 = mapPosition(rect.x + player.width);
+        int y1 = mapPosition(rect.y);
+        int y2 = mapPosition(rect.y + player.height);
+        return (getTile(x1, y1).getTile().getCollision() || getTile(x2, y1).getTile().getCollision()
+                || getTile(x1, y2).getTile().getCollision() || getTile(x2, y2).getTile().getCollision());
+        // if()
+
+        // return false;
+    }
+
+    public int mapPosition(int screenPos) {
+        return ((screenPos * (width - 1)) / ((width - 1) * tileWidth));
+    }
+    // public double mapPosition(int screenPos, int length) {
+    // return ((screenPos + (length / 2.0)) * (width - 1)) / ((width - 1) *
+    // tileWidth);
+    // }
+
     public MappedTile getTile(int x, int y) {
         int key = x + (y * width);
 

@@ -52,7 +52,7 @@ public class BombGame extends JFrame implements Runnable {
         sheet.loadSprites(16, 16);
 
         tiles = new Tileset(new File("assets\\maps\\tileset1.bt"), sheet);
-        map = new Tilemap(new File("assets\\maps\\map3.bm"), tiles);
+        map = new Tilemap(new File("assets\\maps\\map2.bm"), tiles);
 
         renderer = new RenderHandler(getWidth(), getHeight());
         canvas.createBufferStrategy(3);
@@ -88,6 +88,7 @@ public class BombGame extends JFrame implements Runnable {
 
     private void update() {
         player.update(this);
+        // System.out.println(player.mappedX + ", " + player.mappedY);
     }
 
     private void render() {
