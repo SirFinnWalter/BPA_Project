@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class Tileset {
     private SpriteSheet sheet;
     private ArrayList<Tile> tilesList = new ArrayList<Tile>();
-    public final Tile voidTile = new Tile(null, false, false);
+    public final Tile voidTile = new Tile(null, true, false);
 
     public Tileset(File file, SpriteSheet sheet) {
         this.sheet = sheet;

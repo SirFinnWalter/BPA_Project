@@ -1,3 +1,4 @@
+import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -121,24 +122,58 @@ public class Tilemap {
     }
 
     public boolean checkCollision(Player player, Rectangle rect) {
-        int x1 = mapPosition(rect.x);
-        int x2 = mapPosition(rect.x + player.width);
-        int y1 = mapPosition(rect.y);
-        int y2 = mapPosition(rect.y + player.height);
-        return (getTile(x1, y1).getTile().getCollision() || getTile(x2, y1).getTile().getCollision()
-                || getTile(x1, y2).getTile().getCollision() || getTile(x2, y2).getTile().getCollision());
+        // TODO: Implement our own Point class
+        Point playerPoint = mapPointToTilemap(new Point(player.playerBox.x, player.playerBox.y));
+
+        if (getTile(playerPoint.x, playerPoint.y).getTile().getCollision()) {
+            System.out.println("Player is in block");
+            return false;
+        }
+
+        for (int w = 0; w < player.width; w += player.width - 1) {
+            Point p = mapPointToTilemap(new Point(rect.x + w, rect.y));
+            if (getTile(p.x, p.y) != getTile(playerPoint.x, playerPoint.y)
+                    && getTile(p.x, p.y).getTile().getCollision()) {
+                return true;
+            }
+        }
+        for (int h = 0; h < player.height; h += player.height - 1) {
+            Point p = mapPointToTilemap(new Point(rect.x, rect.y + h));
+            if (getTile(p.x, p.y) != getTile(playerPoint.x, playerPoint.y)
+                    && getTile(p.x, p.y).getTile().getCollision()) {
+                return true;
+            }
+        }
+
+        Point p = mapPointToTilemap(new Point(rect.x + player.width - 1, rect.y + player.height - 1));
+        if (getTile(p.x, p.y) != getTile(playerPoint.x, playerPoint.y) && getTile(p.x, p.y).getTile().getCollision()) {
+            return true;
+        }
+        return false;
         // if()
 
         // return false;
     }
 
-    public int mapPosition(int screenPos) {
-        return ((screenPos * (width - 1)) / ((width - 1) * tileWidth));
+    public Point mapPointToTilemap(Point p) {
+        int x = ((p.x * (width - 1)) / ((width - 1) * tileWidth));
+        int y = ((p.y * (height - 1)) / ((height - 1) * tileHeight));
+        if (x > width)
+            x = -1;
+        if (y > height)
+            y = -1;
+        return new Point(x, y);
     }
+
     // public double mapPosition(int screenPos, int length) {
     // return ((screenPos + (length / 2.0)) * (width - 1)) / ((width - 1) *
     // tileWidth);
     // }
+    public Point mapPointToScreen(Point p) {
+        int x = p.x * tileWidth;
+        int y = p.y * tileHeight;
+        return new Point(x, y);
+    }
 
     public MappedTile getTile(int x, int y) {
         int key = x + (y * width);

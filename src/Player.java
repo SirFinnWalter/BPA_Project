@@ -1,3 +1,4 @@
+
 /**
  * @file Player.java
  * @author Dakota Taylor
@@ -14,13 +15,14 @@ public class Player {
     int width, height;
     FacingDirection direction;
 
-    public Player() {
+    public Player(int x, int y) {
         // NOTE: player sprite will be larger than collision box (also hitbox?)
         // playerRect = new Rectangle(50, 100, 28, 28);
-        playerBox = new Rectangle(50, 100, 14, 14);
+        playerBox = new Rectangle(x, y, 14, 14);
         // collisionBox = playerBox;
-        collisionBox = new Rectangle(50, 100, 14, 14);
-        playerBox.setColor(0xAAAAFF00);
+        collisionBox = new Rectangle(x, y, 14, 14);
+        playerBox.setColor(0xAAAA88FF);
+        collisionBox.setBorder(1, 0xFF000000);
     }
 
     public void render(RenderHandler renderer, int xZoom, int yZoom) {
@@ -28,52 +30,43 @@ public class Player {
         height = playerBox.getHeight() * yZoom;
 
         renderer.renderRectangle(this.playerBox, xZoom, yZoom);
+        renderer.renderRectangle(this.collisionBox, xZoom, yZoom);
     }
 
     public void update(BombGame game) {
         KeyboardListener listener = game.getListener();
+
+        // TODO: Fix collision checks when player is inside a wall
         if (listener.up()) {
-            // playerBox.y -= speed;
             collisionBox.y -= speed;
             direction = FacingDirection.up;
+            while (game.getMap().checkCollision(this, collisionBox)) {
+                collisionBox.y++;
+            }
         }
         if (listener.down()) {
             collisionBox.y += speed;
             direction = FacingDirection.down;
+            while (game.getMap().checkCollision(this, collisionBox)) {
+                collisionBox.y--;
+            }
         }
         if (listener.left()) {
             collisionBox.x -= speed;
             direction = FacingDirection.left;
+            while (game.getMap().checkCollision(this, collisionBox)) {
+                collisionBox.x++;
+            }
         }
         if (listener.right()) {
             collisionBox.x += speed;
             direction = FacingDirection.right;
+            while (game.getMap().checkCollision(this, collisionBox)) {
+                collisionBox.x--;
+            }
         }
-
-        // int mapMaxX = game.getMap().getWidth() - 1;
-        // int tileWidth = game.getMap().getTileWidth();
-        // mappedX = (int) Math.floor((double) ((playerBox.x + (width / 2.0)) * mapMaxX)
-        // / (mapMaxX * tileWidth));
-        mappedX = game.getMap().mapPosition(playerBox.x);
-
-        // int mapMaxY = game.getMap().getHeight() - 1;
-        // int tileHeight = game.getMap().getTileHeight();
-        // mappedY = (int) Math.floor((double) ((playerBox.y + (height / 2.0)) *
-        // mapMaxY) / (mapMaxY * tileHeight));
-        mappedY = game.getMap().mapPosition(playerBox.y);
-
-        // TODO: Fix and improve collision
-        if (!game.getMap().checkCollision(this, collisionBox)) {
-            playerBox.x = collisionBox.x;
-            playerBox.y = collisionBox.y;
-        } else {
-            collisionBox.x = playerBox.x;
-            collisionBox.y = playerBox.y;
-        }
-        // if (!game.getMap().checkCollision(collisionBox)) {
-        // } else {
-        // // System.out.println("test");
-        // }
+        playerBox.x = collisionBox.x;
+        playerBox.y = collisionBox.y;
     }
 
     enum FacingDirection {

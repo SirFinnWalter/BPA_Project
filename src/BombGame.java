@@ -2,7 +2,6 @@ import java.awt.Canvas;
 import java.awt.Graphics;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -24,7 +23,7 @@ public class BombGame extends JFrame implements Runnable {
     private boolean running = false;
     private RenderHandler renderer;
     private Canvas canvas = new Canvas();
-    private Player player = new Player();
+    private Player player = new Player(50, 80);
     private KeyboardListener listener = new KeyboardListener();
 
     private SpriteSheet sheet;
@@ -62,7 +61,7 @@ public class BombGame extends JFrame implements Runnable {
 
     public void run() {
         running = true;
-        // int frames = 0;
+        int frames = 0;
         double delta = 0;
 
         long lastTime = System.nanoTime();
@@ -77,18 +76,17 @@ public class BombGame extends JFrame implements Runnable {
             }
             render();
 
-            // frames++;
+            frames++;
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
-                // System.out.println(frames);
-                // frames = 0;
+                System.out.println(frames);
+                frames = 0;
             }
         }
     }
 
     private void update() {
         player.update(this);
-        // System.out.println(player.mappedX + ", " + player.mappedY);
     }
 
     private void render() {
@@ -103,10 +101,6 @@ public class BombGame extends JFrame implements Runnable {
         bStrategy.show();
         renderer.clear(0xFF0000FF);
     }
-
-    // private BufferedImage loadImage(String filepath) {
-    // return loadImage(new File(filepath));
-    // }
 
     private BufferedImage loadImage(File file) {
         try {

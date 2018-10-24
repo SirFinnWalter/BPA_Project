@@ -51,4 +51,20 @@ public class Rectangle {
             }
         }
     }
+
+    public void setBorder(int borderWidth, int color) {
+        // int[] prevPixels;
+        if (pixels == null)
+            this.setColor(0x00000000);
+        // prevPixels = this.getPixels();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (y < borderWidth || x < borderWidth || y >= height - borderWidth || x >= width - borderWidth)
+                    pixels[x + y * width] = color;
+                // else
+                // pixels[x + y * width] = prevPixels[x + y * width];
+            }
+        }
+    }
 }
