@@ -23,7 +23,7 @@ public class BombGame extends JFrame implements Runnable {
     private boolean running = false;
     private RenderHandler renderer;
     private Canvas canvas = new Canvas();
-    private Player player = new Player(50, 80);
+    private Player player = new Player(80, 100);
     private KeyboardListener listener = new KeyboardListener();
 
     private SpriteSheet sheet;
@@ -79,7 +79,7 @@ public class BombGame extends JFrame implements Runnable {
             frames++;
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
-                System.out.println(frames);
+                // System.out.println(frames);
                 frames = 0;
             }
         }

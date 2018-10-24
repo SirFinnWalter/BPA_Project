@@ -26,8 +26,8 @@ public class Player {
     }
 
     public void render(RenderHandler renderer, int xZoom, int yZoom) {
-        width = playerBox.getWidth() * xZoom;
-        height = playerBox.getHeight() * yZoom;
+        width = (int) playerBox.getWidth() * xZoom;
+        height = (int) playerBox.getHeight() * yZoom;
 
         renderer.renderRectangle(this.playerBox, xZoom, yZoom);
         renderer.renderRectangle(this.collisionBox, xZoom, yZoom);

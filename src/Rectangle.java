@@ -3,29 +3,35 @@
  * @author Dakota Taylor
  * @createdOn Sunday, 14 October, 2018
  */
-public class Rectangle {
-    private int[] pixels;
-    private int width, height;
-    public int x, y;
+public class Rectangle extends java.awt.Rectangle {
+    int pixels[];
 
     public Rectangle(int x, int y, int width, int height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        super(x, y, width, height);
     }
 
     public Rectangle() {
-        this(0, 0, 0, 0);
+        super();
     }
 
-    public int getWidth() {
-        return width;
-    }
+    // // @Override
+    // public Rectangle intersection(Rectangle rect) {
+    // return this.intersection(rect);
+    // }
+    // private int[] pixels;
+    // private int width, height;
+    // public int x, y;
 
-    public int getHeight() {
-        return height;
-    }
+    // public Rectangle(int x, int y, int width, int height) {
+    // this.x = x;
+    // this.y = y;
+    // this.width = width;
+    // this.height = height;
+    // }
+
+    // public Rectangle() {
+    // this(0, 0, 0, 0);
+    // }
 
     public int[] getPixels() {
         if (pixels != null)
@@ -35,13 +41,13 @@ public class Rectangle {
         return null;
     }
 
-    public void setHeight(int height) {
-        this.height = height;
-    }
+    // public void setHeight(int height) {
+    // this.height = height;
+    // }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
+    // public void setWidth(int width) {
+    // this.width = width;
+    // }
 
     public void setColor(int color) {
         pixels = new int[width * height];

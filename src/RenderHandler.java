@@ -40,7 +40,7 @@ public class RenderHandler {
     public void renderRectangle(Rectangle rect, int xZoom, int yZoom) {
         int[] rectPixels = rect.getPixels();
         if (rectPixels != null)
-            renderArray(rectPixels, rect.getWidth(), rect.getHeight(), rect.x, rect.y, xZoom, yZoom);
+            renderArray(rectPixels, (int) rect.getWidth(), (int) rect.getHeight(), rect.x, rect.y, xZoom, yZoom);
     }
 
     public void renderArray(int[] pixels, int width, int height, int xPos, int yPos, int xZoom, int yZoom) {
