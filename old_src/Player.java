@@ -9,7 +9,7 @@ public class Player {
     Rectangle playerBox;
     Rectangle collisionBox;
     // Rectangle hitBox;
-    int speed = 4;
+    int speed = 1;
     // int x, y;
     double mappedX, mappedY;
     int width, height;
@@ -40,31 +40,20 @@ public class Player {
         if (listener.up()) {
             collisionBox.y -= speed;
             direction = FacingDirection.up;
-            while (game.getMap().checkCollision(this, collisionBox)) {
-                collisionBox.y++;
-            }
         }
         if (listener.down()) {
             collisionBox.y += speed;
             direction = FacingDirection.down;
-            while (game.getMap().checkCollision(this, collisionBox)) {
-                collisionBox.y--;
-            }
         }
         if (listener.left()) {
             collisionBox.x -= speed;
             direction = FacingDirection.left;
-            while (game.getMap().checkCollision(this, collisionBox)) {
-                collisionBox.x++;
-            }
         }
         if (listener.right()) {
             collisionBox.x += speed;
             direction = FacingDirection.right;
-            while (game.getMap().checkCollision(this, collisionBox)) {
-                collisionBox.x--;
-            }
         }
+        game.getMap().checkCollision(this, collisionBox);
         playerBox.x = collisionBox.x;
         playerBox.y = collisionBox.y;
     }

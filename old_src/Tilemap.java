@@ -17,10 +17,12 @@ public class Tilemap {
     private int fillTileID = -1;
     private int width, height;
     private int tileWidth, tileHeight;
+    private RenderHandler TESTRENDERER;
     // public ArrayList<MappedTile> mappedTiles = new ArrayList<MappedTile>();
     public Map<Integer, MappedTile> mappedTiles = new HashMap<Integer, MappedTile>();
 
-    public Tilemap(File file, Tileset tileset) {
+    public Tilemap(File file, Tileset tileset, RenderHandler TESTRENDERER) {
+        this.TESTRENDERER = TESTRENDERER;
         this.tileset = tileset;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -120,9 +122,13 @@ public class Tilemap {
             tileHeight = v.getTile().sprite.getHeight() * xZoom;
             tileset.renderTiles(renderer, v.tileID, v.x * tileWidth, v.y * tileHeight, xZoom, yZoom);
         });
+
     }
 
+    Rectangle pcrIsForPlayerCollisionRectangle = null;
+
     public boolean checkCollision(Player player, Rectangle rect) {
+        // pcrIsForPlayerCollisionRectangle = rect;
         Point p = mapPointToTilemap(player.playerBox.x, player.playerBox.y);
         // if (getTile(p.x, p.y).getTile().getCollision()) {
         // System.out.println("Player is in block");
@@ -145,18 +151,32 @@ public class Tilemap {
                 tiles.add(tile);
             }
         }
-        Point t1 = mapPointToTilemap(rect.x, rect.y);
-        Point t2 = mapPointToTilemap(rect.x + player.width, rect.y);
-        Point t3 = mapPointToTilemap(rect.x, rect.y + player.height);
-        Point t4 = mapPointToTilemap(rect.x + player.width, rect.y + player.height);
-        if (getTile(t1.x, t1.y).getTile().getCollision() || getTile(t2.x, t2.y).getTile().getCollision()
-                || getTile(t3.x, t3.y).getTile().getCollision() || getTile(t4.x, t4.y).getTile().getCollision()) {
-
-            Point r = mapPointToScreen(t1);
-            Rectangle tileCollider = new Rectangle(r.x, r.y, tileWidth, tileHeight);
-            System.out.println("T: " + t1.x + ", " + t1.y);
-            System.out.println("R: " + r.x + ", " + r.y);
+        for (MappedTile tile : tiles) {
+            if (tile.getTile().getCollision()) {
+                Point r = mapPointToScreen(new Point(tile.x, tile.y));
+                Rectangle tileCollider = new Rectangle(r.x, r.y, tileWidth, tileHeight);
+                if (rect.intersects(tileCollider) || tileCollider.intersects(rect)) {
+                    System.out.println(tileCollider.x);
+                    return false;
+                } else {
+                }
+            }
         }
+
+        // Point t1 = mapPointToTilemap(rect.x, rect.y);
+        // Point t2 = mapPointToTilemap(rect.x + player.width, rect.y);
+        // Point t3 = mapPointToTilemap(rect.x, rect.y + player.height);
+        // Point t4 = mapPointToTilemap(rect.x + player.width, rect.y + player.height);
+        // if (getTile(t1.x, t1.y).getTile().getCollision() || getTile(t2.x,
+        // t2.y).getTile().getCollision()
+        // || getTile(t3.x, t3.y).getTile().getCollision() || getTile(t4.x,
+        // t4.y).getTile().getCollision()) {
+
+        // Point r = mapPointToScreen(t1);
+        // Rectangle tileCollider = new Rectangle(r.x, r.y, tileWidth, tileHeight);
+        // System.out.println("T: " + t1.x + ", " + t1.y);
+        // System.out.println("R: " + r.x + ", " + r.y);
+        // }
 
         // return rect.intersects(tileCollider);
         return false;
@@ -165,7 +185,6 @@ public class Tilemap {
     }
 
     public boolean checkCollisionA(Player player, Rectangle rect) {
-        // TODO: Implement our own Point class
         Point playerPoint = mapPointToTilemap(new Point(player.playerBox.x, player.playerBox.y));
 
         if (getTile(playerPoint.x, playerPoint.y).getTile().getCollision()) {

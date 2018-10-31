@@ -46,14 +46,13 @@ public class BombGame extends JFrame implements Runnable {
         this.add(canvas);
         this.setVisible(true);
 
-        BufferedImage image = loadImage(new File("assets\\sprites\\16bitmap.png"));
+        BufferedImage image = loadImage(new File("assets\\sprites\\tileset2.png"));
         sheet = new SpriteSheet(image);
         sheet.loadSprites(16, 16);
-
         tiles = new Tileset(new File("assets\\maps\\tileset1.bt"), sheet);
-        map = new Tilemap(new File("assets\\maps\\map2.bm"), tiles);
 
         renderer = new RenderHandler(getWidth(), getHeight());
+        map = new Tilemap(new File("assets\\maps\\map2.bm"), tiles, renderer);
         canvas.createBufferStrategy(3);
         canvas.addKeyListener(listener);
         canvas.addFocusListener(listener);
@@ -94,8 +93,8 @@ public class BombGame extends JFrame implements Runnable {
         Graphics gfx = bStrategy.getDrawGraphics();
         super.paint(gfx);
 
-        map.render(renderer, 2, 2);
-        player.render(renderer, 2, 2);
+        map.render(renderer, 1, 1);
+        player.render(renderer, 1, 1);
         renderer.render(gfx);
         gfx.dispose();
         bStrategy.show();
