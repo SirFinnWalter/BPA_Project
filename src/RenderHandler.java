@@ -31,6 +31,9 @@ public class RenderHandler {
         renderArray(imgPixels, image.getWidth(), image.getHeight(), xPos, yPos, xZoom, yZoom);
     }
 
+    public void renderRectangle(Rectangle rect, int xZoom, int yZoom) {
+        renderImage(rect.image, rect.x, rect.y, xZoom, yZoom);
+    }
     // public void renderSprite(Sprite sprite, int xPos, int yPos, int xZoom, int
     // yZoom) {
     // renderArray(sprite.getPixels(), sprite.getWidth(), sprite.getHeight(), xPos,
