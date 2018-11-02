@@ -10,10 +10,8 @@ import java.awt.image.DataBufferInt;
 
 public class RenderHandler {
     private BufferedImage view;
-    private int[] pixels;
-    // private Rectangle camera;
-
     private int width, height;
+    private int[] pixels;
 
     public RenderHandler(int width, int height) {
         this.width = width;
@@ -33,15 +31,21 @@ public class RenderHandler {
         renderArray(imgPixels, image.getWidth(), image.getHeight(), xPos, yPos, xZoom, yZoom);
     }
 
-    public void renderSprite(Sprite sprite, int xPos, int yPos, int xZoom, int yZoom) {
-        renderArray(sprite.getPixels(), sprite.getWidth(), sprite.getHeight(), xPos, yPos, xZoom, yZoom);
-    }
-
     public void renderRectangle(Rectangle rect, int xZoom, int yZoom) {
-        int[] rectPixels = rect.getPixels();
-        if (rectPixels != null)
-            renderArray(rectPixels, (int) rect.getWidth(), (int) rect.getHeight(), rect.x, rect.y, xZoom, yZoom);
+        renderImage(rect.image, rect.x, rect.y, xZoom, yZoom);
     }
+    // public void renderSprite(Sprite sprite, int xPos, int yPos, int xZoom, int
+    // yZoom) {
+    // renderArray(sprite.getPixels(), sprite.getWidth(), sprite.getHeight(), xPos,
+    // yPos, xZoom, yZoom);
+    // }
+
+    // public void renderRectangle(Rectangle rect, int xZoom, int yZoom) {
+    // int[] rectPixels = rect.getPixels();
+    // if (rectPixels != null)
+    // renderArray(rectPixels, (int) rect.getWidth(), (int) rect.getHeight(),
+    // rect.x, rect.y, xZoom, yZoom);
+    // }
 
     public void renderArray(int[] pixels, int width, int height, int xPos, int yPos, int xZoom, int yZoom) {
         for (int y = 0; y < height; y++) {
@@ -64,8 +68,6 @@ public class RenderHandler {
     }
 
     private void setPixel(int pixel, int x, int y) {
-        // if (x >= camera.x && y >= camera.y && x <= camera.x + camera.getWidth() && y
-        // <= camera.y + camera.getHeight()) {
         int alpha = ((pixel >> 24) & 0xFF);
         if (x >= 0 && y >= 0 && x <= width && y <= height && alpha != 0) {
             int index = x + y * view.getWidth();

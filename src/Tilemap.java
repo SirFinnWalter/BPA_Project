@@ -122,96 +122,40 @@ public class Tilemap {
             tileHeight = v.getTile().sprite.getHeight() * xZoom;
             tileset.renderTiles(renderer, v.tileID, v.x * tileWidth, v.y * tileHeight, xZoom, yZoom);
         });
-
     }
 
-    Rectangle pcrIsForPlayerCollisionRectangle = null;
-
-    public boolean checkCollision(Player player, Rectangle rect) {
-        // pcrIsForPlayerCollisionRectangle = rect;
-        Point p = mapPointToTilemap(player.playerBox.x, player.playerBox.y);
-        // if (getTile(p.x, p.y).getTile().getCollision()) {
-        // System.out.println("Player is in block");
-        // return false;
+    public int checkCollision(Player player, Rectangle rect) {
+        rect = new Rectangle(rect.x, rect.y, rect.width * BombGame.XZOOM, rect.height * BombGame.YZOOM);
+        ArrayList<MappedTile> tiles = new ArrayList<MappedTile>();
+        for (Point corners : rect.getCorners()) {
+            Point mappedCorner = mapPointToTilemap(corners);
+            MappedTile tile = getTile(mappedCorner.x, mappedCorner.y);
+            // if (!tiles.contains(tile)) {
+            tiles.add(tile);
+            // }
+        }
+        // for (int i = 0; i < tiles.size(); i++) {
+        // if (tiles.get(i).getTile().getCollision()) {
+        // Point p = mapPointToScreen(new Point(tiles.get(i).x, tiles.get(i).y));
+        // Rectangle tileCollider = new Rectangle(p.x, p.y, tileWidth, tileHeight);
+        // if (rect.intersects(tileCollider) || tileCollider.intersects(rect))
+        // return i;
+        // }
         // }
 
-        ArrayList<MappedTile> tiles = new ArrayList<MappedTile>();
-        for (int i = 0; i < 4; i++) {
-            int w = 0;
-            int h = 0;
-            if (i == 1)
-                w = player.width - 1;
-            if (i == 2)
-                h = player.height - 1;
-            if (i == 3)
-                w = 0;
-            p = mapPointToTilemap(rect.x + w, rect.y + h);
-            MappedTile tile = getTile(p.x, p.y);
-            if (!tiles.contains(tile)) {
-                tiles.add(tile);
-            }
-        }
         for (MappedTile tile : tiles) {
             if (tile.getTile().getCollision()) {
                 Point r = mapPointToScreen(new Point(tile.x, tile.y));
                 Rectangle tileCollider = new Rectangle(r.x, r.y, tileWidth, tileHeight);
-                if (rect.intersects(tileCollider) || tileCollider.intersects(rect)) {
-                    System.out.println(tileCollider.x);
-                    return false;
-                } else {
+                if (tileCollider.intersects(rect) || rect.intersects(tileCollider)) {
+                    // System.out.println(tileCollider.x);
+                    return 0;
+                    // return true;
                 }
             }
         }
+        return -1;
 
-        // Point t1 = mapPointToTilemap(rect.x, rect.y);
-        // Point t2 = mapPointToTilemap(rect.x + player.width, rect.y);
-        // Point t3 = mapPointToTilemap(rect.x, rect.y + player.height);
-        // Point t4 = mapPointToTilemap(rect.x + player.width, rect.y + player.height);
-        // if (getTile(t1.x, t1.y).getTile().getCollision() || getTile(t2.x,
-        // t2.y).getTile().getCollision()
-        // || getTile(t3.x, t3.y).getTile().getCollision() || getTile(t4.x,
-        // t4.y).getTile().getCollision()) {
-
-        // Point r = mapPointToScreen(t1);
-        // Rectangle tileCollider = new Rectangle(r.x, r.y, tileWidth, tileHeight);
-        // System.out.println("T: " + t1.x + ", " + t1.y);
-        // System.out.println("R: " + r.x + ", " + r.y);
-        // }
-
-        // return rect.intersects(tileCollider);
-        return false;
-        // Rectangle crossSection = rect.intersection(tileCollision);
-
-    }
-
-    public boolean checkCollisionA(Player player, Rectangle rect) {
-        Point playerPoint = mapPointToTilemap(new Point(player.playerBox.x, player.playerBox.y));
-
-        if (getTile(playerPoint.x, playerPoint.y).getTile().getCollision()) {
-            System.out.println("Player is in block");
-            return false;
-        }
-
-        Point p = mapPointToTilemap(rect.x, rect.y);
-        if (getTile(p.x, p.y) != getTile(playerPoint.x, playerPoint.y) && getTile(p.x, p.y).getTile().getCollision()) {
-            return true;
-        }
-        p = mapPointToTilemap(rect.x + player.width - 1, rect.y);
-        if (getTile(p.x, p.y) != getTile(playerPoint.x, playerPoint.y) && getTile(p.x, p.y).getTile().getCollision()) {
-            return true;
-        }
-        p = mapPointToTilemap(rect.x, rect.y + player.height - 1);
-        if (getTile(p.x, p.y) != getTile(playerPoint.x, playerPoint.y) && getTile(p.x, p.y).getTile().getCollision()) {
-            return true;
-        }
-        p = mapPointToTilemap(rect.x + player.width - 1, rect.y + player.height - 1);
-        if (getTile(p.x, p.y) != getTile(playerPoint.x, playerPoint.y) && getTile(p.x, p.y).getTile().getCollision()) {
-            return true;
-        }
-        return false;
-        // if()
-
-        // return false;
     }
 
     public Point mapPointToTilemap(int x, int y) {

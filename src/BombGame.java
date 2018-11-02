@@ -17,9 +17,11 @@ import javax.swing.JFrame;
 
 public class BombGame extends JFrame implements Runnable {
     private static final long serialVersionUID = 1L;
+    public static final int XZOOM = 2;
+    public static final int YZOOM = 2;
+
     private final int TICKSPERSECOND = 30;
     private final double NANOSECONDS = 1000000000.0 / TICKSPERSECOND;
-
     private boolean running = false;
     private RenderHandler renderer;
     private Canvas canvas = new Canvas();
@@ -93,8 +95,8 @@ public class BombGame extends JFrame implements Runnable {
         Graphics gfx = bStrategy.getDrawGraphics();
         super.paint(gfx);
 
-        map.render(renderer, 1, 1);
-        player.render(renderer, 1, 1);
+        map.render(renderer, XZOOM, YZOOM);
+        player.render(renderer, XZOOM, YZOOM);
         renderer.render(gfx);
         gfx.dispose();
         bStrategy.show();

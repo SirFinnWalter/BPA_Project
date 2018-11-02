@@ -1,64 +1,86 @@
-import java.awt.*;
-import java.awt.image.*;
+import java.awt.Point;
 
 /**
  * @file Rectangle.java
  * @author Dakota Taylor
- * @createdOn Wednesday, 31 October, 2018
+ * @createdOn Sunday, 14 October, 2018
  */
-
 public class Rectangle extends java.awt.Rectangle {
-    public BufferedImage image;
-    private int borderWidth = 0;
+    int pixels[];
 
     public Rectangle(int x, int y, int width, int height) {
         super(x, y, width, height);
     }
 
-    public Point[] getCorners() {
-        Point[] corners = new Point[4];
-        corners[0] = new Point(x, y);
-        corners[1] = new Point(x + width, y);
-        corners[2] = new Point(x, y + height);
-        corners[3] = new Point(x + width, y + height);
-        return corners;
-    }
-
     public Rectangle() {
-        this(0, 0, 0, 0);
+        super();
     }
 
-    public void setImage(BufferedImage image) {
-        if (this.image == null)
-            this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics gfx = this.image.createGraphics();
-        gfx.setClip(0, 0, this.image.getWidth(), this.image.getHeight());
-        gfx.drawImage(image, 0, 0, null);
-        gfx.dispose();
+    // // @Override
+    // public Rectangle intersection(Rectangle rect) {
+    // return this.intersection(rect);
+    // }
+    // private int[] pixels;
+    // private int width, height;
+    // public int x, y;
+
+    // public Rectangle(int x, int y, int width, int height) {
+    // this.x = x;
+    // this.y = y;
+    // this.width = width;
+    // this.height = height;
+    // }
+
+    // public Rectangle() {
+    // this(0, 0, 0, 0);
+    // }
+
+    public int[] getPixels() {
+        if (pixels != null)
+            return pixels;
+        else
+            System.out.println("Warning: attempted to retrieve Rectangle pixels without setting a color");
+        return null;
     }
 
-    public void setColor(Color c) {
-        // Color c = new Color(color);
-        if (image == null)
-            image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D gfx = image.createGraphics();
-        gfx.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, c.getAlpha() / 255.0f));
-        gfx.setColor(c);
-        gfx.fillRect(borderWidth, borderWidth, image.getWidth() - 2 * borderWidth, image.getHeight() - 2 * borderWidth);
-        gfx.dispose();
+    public Point[] getCorners() {
+        Point[] p = new Point[4];
+        p[0] = new Point(this.x, this.y);
+        p[1] = new Point(this.x + this.width, this.y);
+        p[2] = new Point(this.x, this.y + this.height);
+        p[3] = new Point(this.x + this.width, this.y + this.height);
+        return p;
+    }
+    // public void setHeight(int height) {
+    // this.height = height;
+    // }
+
+    // public void setWidth(int width) {
+    // this.width = width;
+    // }
+
+    public void setColor(int color) {
+        pixels = new int[width * height];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                pixels[x + (y * width)] = color;
+            }
+        }
     }
 
-    public void setBorder(int width, Color c) {
-        if (image == null)
-            setColor(new Color(255, 255, 255, 0));
-        borderWidth = width;
-        // Color c = new Color(color);
-        Graphics2D gfx = image.createGraphics();
-        gfx.setColor(c);
-        gfx.fillRect(0, width, width, image.getHeight() - 2 * width);
-        gfx.fillRect(0, 0, image.getWidth(), width);
-        gfx.fillRect(image.getWidth() - width, width, width, image.getHeight() - 2 * width);
-        gfx.fillRect(0, image.getHeight() - width, image.getWidth(), width);
-        gfx.dispose();
+    public void setBorder(int borderWidth, int color) {
+        // int[] prevPixels;
+        if (pixels == null)
+            this.setColor(0x00000000);
+        // prevPixels = this.getPixels();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (y < borderWidth || x < borderWidth || y >= height - borderWidth || x >= width - borderWidth)
+                    pixels[x + y * width] = color;
+                // else
+                // pixels[x + y * width] = prevPixels[x + y * width];
+            }
+        }
     }
 }
