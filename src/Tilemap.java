@@ -16,13 +16,9 @@ public class Tilemap {
     private Tileset tileset;
     private int fillTileID = -1;
     private int width, height;
-    private int tileWidth, tileHeight;
-    private RenderHandler TESTRENDERER;
-    // public ArrayList<MappedTile> mappedTiles = new ArrayList<MappedTile>();
     public Map<Integer, MappedTile> mappedTiles = new HashMap<Integer, MappedTile>();
 
-    public Tilemap(File file, Tileset tileset, RenderHandler TESTRENDERER) {
-        this.TESTRENDERER = TESTRENDERER;
+    public Tilemap(File file, Tileset tileset) {
         this.tileset = tileset;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -48,40 +44,66 @@ public class Tilemap {
                         s = reader.readLine();
 
                         while (!s.equals("]") && s != null) {
-                            String[] line = s.trim().split(":");
-                            int tileID = Integer.parseInt(line[0]);
-                            String[] coordsSet = line[1].split(",(?=(?:[^\\}]*\\{[^\\}]*\\})*[^\\}]*$)");
-                            for (String c : coordsSet) {
-                                // parseCoords(c);
-                                if (!c.contains("-")) {
-                                    String[] coords = c.replaceAll("[^,\\d]", "").split(",");
-                                    int x = Integer.parseInt(coords[0]);
-                                    int y = Integer.parseInt(coords[1]);
+                            if (!s.trim().startsWith("//")) {
+                                String[] line = s.trim().split(":");
+                                int tileID = Integer.parseInt(line[0]);
+                                String[] coordsSet = line[1].split(",(?=(?:[^\\}]*\\{[^\\}]*\\})*[^\\}]*$)");
+                                for (String c : coordsSet) {
+                                    // parseCoords(c);
+                                    if (!c.contains("-")) {
+                                        String[] coords = c.replaceAll("[^,\\d]", "").split(",");
+                                        int x = Integer.parseInt(coords[0]);
+                                        int y = Integer.parseInt(coords[1]);
 
-                                    if (x + 1 > width || y + 1 > height) {
-                                        System.out.println("Warning: tile at {" + x + ", " + y
-                                                + "} is outside the map size of [" + width + ", " + height + "]");
+                                        if (x + 1 > width || y + 1 > height) {
+                                            System.out.println("Warning: tile at {" + x + ", " + y
+                                                    + "} is outside the map size of [" + width + ", " + height + "]");
+                                        } else {
+                                            MappedTile mappedTile = new MappedTile(tileID, x, y);
+                                            mappedTiles.put(mappedTile.getID(), mappedTile);
+                                        }
+                                    } else if (!c.contains("%")) {
+                                        String[] coords = c.replaceAll("[^,\\-\\d]", "").split("[,-]");
+                                        int x1 = Integer.parseInt(coords[0]);
+                                        int y1 = Integer.parseInt(coords[1]);
+                                        int x2 = Integer.parseInt(coords[2]);
+                                        int y2 = Integer.parseInt(coords[3]);
+                                        for (int y = y1; y <= y2; y++) {
+                                            for (int x = x1; x <= x2; x++) {
+                                                if (x + 1 > width || y + 1 > height) {
+                                                    System.out.println("Warning: tile at {" + x + ", " + y
+                                                            + "} is outside the map size of [" + width + ", " + height
+                                                            + "]");
+
+                                                } else {
+                                                    MappedTile mappedTile = new MappedTile(tileID, x, y);
+                                                    mappedTiles.put(mappedTile.getID(), mappedTile);
+
+                                                }
+                                            }
+                                        }
                                     } else {
-                                        MappedTile mappedTile = new MappedTile(tileID, x, y);
-                                        mappedTiles.put(mappedTile.getID(), mappedTile);
-                                    }
-                                } else {
-                                    String[] coords = c.replaceAll("[^,\\-\\d]", "").split("[,-]");
-                                    int x1 = Integer.parseInt(coords[0]);
-                                    int y1 = Integer.parseInt(coords[1]);
-                                    int x2 = Integer.parseInt(coords[2]);
-                                    int y2 = Integer.parseInt(coords[3]);
-                                    for (int y = y1; y <= y2; y++) {
-                                        for (int x = x1; x <= x2; x++) {
-                                            if (x + 1 > width || y + 1 > height) {
-                                                System.out.println("Warning: tile at {" + x + ", " + y
-                                                        + "} is outside the map size of [" + width + ", " + height
-                                                        + "]");
-
-                                            } else {
-                                                MappedTile mappedTile = new MappedTile(tileID, x, y);
-                                                mappedTiles.put(mappedTile.getID(), mappedTile);
-
+                                        String[] coords = c.replaceAll("[^,\\-\\d\\%]", "").split("[%,-]");
+                                        int x1 = Integer.parseInt(coords[0]);
+                                        int y1 = Integer.parseInt(coords[1]);
+                                        int x2 = Integer.parseInt(coords[2]);
+                                        int y2 = Integer.parseInt(coords[3]);
+                                        int xMod = Integer.parseInt(coords[4]);
+                                        int yMod;
+                                        if (coords.length >= 6)
+                                            yMod = Integer.parseInt(coords[5]);
+                                        else
+                                            yMod = xMod;
+                                        for (int y = y1; y <= y2; y += yMod) {
+                                            for (int x = x1; x <= x2; x += xMod) {
+                                                if (x + 1 > width || y + 1 > height) {
+                                                    System.out.println("Warning: tile at {" + x + ", " + y
+                                                            + "} is outside the map size of [" + width + ", " + height
+                                                            + "]");
+                                                } else {
+                                                    MappedTile mappedTile = new MappedTile(tileID, x, y);
+                                                    mappedTiles.put(mappedTile.getID(), mappedTile);
+                                                }
                                             }
                                         }
                                     }
@@ -118,44 +140,34 @@ public class Tilemap {
             }
         }
         mappedTiles.forEach((k, v) -> {
-            tileWidth = v.getTile().sprite.getWidth() * xZoom;
-            tileHeight = v.getTile().sprite.getHeight() * xZoom;
-            tileset.renderTiles(renderer, v.tileID, v.x * tileWidth, v.y * tileHeight, xZoom, yZoom);
+            int width = v.getTile().sprite.getWidth();
+            int height = v.getTile().sprite.getHeight();
+            // tileWidth = v.getTile().sprite.getWidth() * xZoom;
+            // tileHeight = v.getTile().sprite.getHeight() * xZoom;
+            tileset.renderTiles(renderer, v.tileID, v.x * width * BombGame.XZOOM, v.y * height * BombGame.YZOOM, xZoom,
+                    yZoom);
         });
     }
 
-    public int checkCollision(Player player, Rectangle rect) {
+    public Rectangle getTileCollision(Rectangle rect) {
         rect = new Rectangle(rect.x, rect.y, rect.width * BombGame.XZOOM, rect.height * BombGame.YZOOM);
         ArrayList<MappedTile> tiles = new ArrayList<MappedTile>();
         for (Point corners : rect.getCorners()) {
             Point mappedCorner = mapPointToTilemap(corners);
             MappedTile tile = getTile(mappedCorner.x, mappedCorner.y);
-            // if (!tiles.contains(tile)) {
-            tiles.add(tile);
-            // }
+            if (!tiles.contains(tile)) {
+                tiles.add(tile);
+            }
         }
-        // for (int i = 0; i < tiles.size(); i++) {
-        // if (tiles.get(i).getTile().getCollision()) {
-        // Point p = mapPointToScreen(new Point(tiles.get(i).x, tiles.get(i).y));
-        // Rectangle tileCollider = new Rectangle(p.x, p.y, tileWidth, tileHeight);
-        // if (rect.intersects(tileCollider) || tileCollider.intersects(rect))
-        // return i;
-        // }
-        // }
 
         for (MappedTile tile : tiles) {
-            if (tile.getTile().getCollision()) {
-                Point r = mapPointToScreen(new Point(tile.x, tile.y));
-                Rectangle tileCollider = new Rectangle(r.x, r.y, tileWidth, tileHeight);
-                if (tileCollider.intersects(rect) || rect.intersects(tileCollider)) {
-                    // System.out.println(tileCollider.x);
-                    return 0;
-                    // return true;
+            if (tile.isCollidable()) {
+                if (rect.intersects(tile.collisionBox)) {
+                    return rect.intersection(tile.collisionBox);
                 }
             }
         }
-        return -1;
-
+        return null;
     }
 
     public Point mapPointToTilemap(int x, int y) {
@@ -163,8 +175,8 @@ public class Tilemap {
     }
 
     public Point mapPointToTilemap(Point p) {
-        int x = ((p.x * (width - 1)) / ((width - 1) * tileWidth));
-        int y = ((p.y * (height - 1)) / ((height - 1) * tileHeight));
+        int x = ((p.x * (width - 1)) / ((width - 1) * 16 * BombGame.XZOOM));
+        int y = ((p.y * (height - 1)) / ((height - 1) * 16 * BombGame.YZOOM));
         if (x > width)
             x = -1;
         if (y > height)
@@ -177,8 +189,8 @@ public class Tilemap {
     // tileWidth);
     // }
     public Point mapPointToScreen(Point p) {
-        int x = p.x * tileWidth;
-        int y = p.y * tileHeight;
+        int x = p.x * 16 * BombGame.XZOOM;
+        int y = p.y * 16 * BombGame.YZOOM;
         return new Point(x, y);
     }
 
@@ -202,22 +214,22 @@ public class Tilemap {
         return height;
     }
 
-    public int getTileWidth() {
-        return tileWidth;
-    }
-
-    public int getTileHeight() {
-        return tileHeight;
-    }
-
     class MappedTile {
         public int mappedTileID, tileID, x, y;
+        private boolean collidable;
+        private Rectangle collisionBox;
 
         public MappedTile(int tileID, int x, int y) {
             mappedTileID = x + (y * width);
             this.tileID = tileID;
             this.x = x;
             this.y = y;
+            this.collidable = this.getTile().getCollision();
+            if (collidable) {
+                Point p = mapPointToScreen(new Point(this.x, this.y));
+                collisionBox = new Rectangle(p.x, p.y, this.getWidth() * BombGame.XZOOM,
+                        this.getHeight() * BombGame.YZOOM);
+            }
         }
 
         public Tileset.Tile getTile() {
@@ -226,6 +238,22 @@ public class Tilemap {
 
         public int getID() {
             return this.mappedTileID;
+        }
+
+        public boolean isCollidable() {
+            return this.collidable;
+        }
+
+        public int getWidth() {
+            if (this.getTile().sprite != null)
+                return this.getTile().sprite.getWidth();
+            return 0;
+        }
+
+        public int getHeight() {
+            if (this.getTile().sprite != null)
+                return this.getTile().sprite.getHeight();
+            return 0;
         }
 
         public int[] getInfo() {

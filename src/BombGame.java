@@ -1,4 +1,5 @@
 import java.awt.Canvas;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -8,6 +9,7 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  * @file BombGame.java
@@ -16,23 +18,31 @@ import javax.swing.JFrame;
  */
 
 public class BombGame extends JFrame implements Runnable {
-    private static final long serialVersionUID = 1L;
+
+    public static void main(String[] args) {
+        BombGame game = new BombGame();
+        Thread gameThread = new Thread(game);
+        gameThread.start();
+    }
+
+    private static final long serialVersionUID = -6739119519499662176L;
     public static final int XZOOM = 2;
     public static final int YZOOM = 2;
-
-    private final int TICKSPERSECOND = 30;
+    private final int TICKSPERSECOND = 60;
     private final double NANOSECONDS = 1000000000.0 / TICKSPERSECOND;
+
     private boolean running = false;
-    private RenderHandler renderer;
     private Canvas canvas = new Canvas();
-    private Player player = new Player(80, 100);
     private KeyboardListener listener = new KeyboardListener();
 
+    private RenderHandler renderer;
     private SpriteSheet sheet;
+    private Player player;
     private Tileset tiles;
     private Tilemap map;
 
     public BombGame() {
+        this.setTitle("DynoMite");
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
             @Override
@@ -42,22 +52,38 @@ public class BombGame extends JFrame implements Runnable {
             }
         });
 
-        this.setBounds(0, 0, 800, 600);
+        BufferedImage image = loadImage(new File("assets\\sprites\\ethanTileset1.png"));
+        sheet = new SpriteSheet(image);
+        sheet.loadSprites(16, 16);
+        tiles = new Tileset(new File("assets\\maps\\ethanTileset1.bt"), sheet);
+
+        BufferedImage image2 = loadImage(new File("assets\\sprites\\clintwalk.png"));
+        SpriteSheet sheet2 = new SpriteSheet(image2);
+        sheet2.loadSprites(16, 32);
+
+        AnimatedSprite playerAnimation = new AnimatedSprite(sheet2, 15);
+        map = new Tilemap(new File("assets\\maps\\ethanMap1.bm"), tiles);
+        player = new Player(18, 18, playerAnimation);
+        Dimension size = new Dimension(map.getWidth() * 16 * XZOOM, map.getHeight() * 16 * YZOOM);
+
+        this.setBounds(0, 0, size.width, size.height);
+        this.setPreferredSize(size);
+        this.pack();
+        size.width = size.width + (getWidth() - getContentPane().getWidth());
+        size.height = size.height + (getHeight() - getContentPane().getHeight());
+
+        this.setPreferredSize(size);
+        this.pack();
+
         this.setLocationRelativeTo(null);
 
         this.add(canvas);
         this.setVisible(true);
-
-        BufferedImage image = loadImage(new File("assets\\sprites\\tileset2.png"));
-        sheet = new SpriteSheet(image);
-        sheet.loadSprites(16, 16);
-        tiles = new Tileset(new File("assets\\maps\\tileset1.bt"), sheet);
-
-        renderer = new RenderHandler(getWidth(), getHeight());
-        map = new Tilemap(new File("assets\\maps\\map2.bm"), tiles, renderer);
         canvas.createBufferStrategy(3);
         canvas.addKeyListener(listener);
         canvas.addFocusListener(listener);
+
+        renderer = new RenderHandler(getWidth(), getHeight());
     }
 
     public void run() {
@@ -91,16 +117,22 @@ public class BombGame extends JFrame implements Runnable {
     }
 
     private void render() {
-        BufferStrategy bStrategy = canvas.getBufferStrategy();
-        Graphics gfx = bStrategy.getDrawGraphics();
-        super.paint(gfx);
+        try {
+            BufferStrategy bStrategy = canvas.getBufferStrategy();
+            Graphics gfx = bStrategy.getDrawGraphics();
+            super.paint(gfx);
 
-        map.render(renderer, XZOOM, YZOOM);
-        player.render(renderer, XZOOM, YZOOM);
-        renderer.render(gfx);
-        gfx.dispose();
-        bStrategy.show();
-        renderer.clear(0xFF0000FF);
+            map.render(renderer, XZOOM, YZOOM);
+            player.render(renderer, XZOOM, YZOOM);
+            renderer.render(gfx);
+            gfx.dispose();
+            bStrategy.show();
+            renderer.clear(0xFF0000FF);
+        } catch (IllegalStateException e) {
+            JOptionPane.showMessageDialog(null, "Game preformed an illegal operation.\nClosing...", "Uh oh!",
+                    JOptionPane.WARNING_MESSAGE);
+            System.exit(0);
+        }
     }
 
     private BufferedImage loadImage(File file) {
@@ -132,11 +164,4 @@ public class BombGame extends JFrame implements Runnable {
     public void setRunning(boolean running) {
         this.running = running;
     }
-
-    public static void main(String[] args) {
-        BombGame game = new BombGame();
-        Thread gameThread = new Thread(game);
-        gameThread.start();
-    }
-
 }

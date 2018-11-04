@@ -59,4 +59,8 @@ public class KeyboardListener implements KeyListener, FocusListener {
         return (keys[KeyEvent.VK_RIGHT] || keys[KeyEvent.VK_D]);
     }
 
+    public boolean action() {
+        return (keys[KeyEvent.VK_Z] || keys[KeyEvent.VK_CONTROL]);
+    }
+
 }

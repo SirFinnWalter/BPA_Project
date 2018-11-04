@@ -5,15 +5,25 @@ import java.awt.Point;
  * @author Dakota Taylor
  * @createdOn Sunday, 14 October, 2018
  */
+
 public class Rectangle extends java.awt.Rectangle {
+    private static final long serialVersionUID = -8044325233882769813L;
     int pixels[];
 
     public Rectangle(int x, int y, int width, int height) {
         super(x, y, width, height);
     }
 
+    public Rectangle(java.awt.Rectangle r) {
+        super(r.x, r.y, r.width, r.height);
+    }
+
     public Rectangle() {
         super();
+    }
+
+    public Rectangle intersection(Rectangle r) {
+        return new Rectangle(super.intersection(r));
     }
 
     // // @Override
@@ -46,9 +56,9 @@ public class Rectangle extends java.awt.Rectangle {
     public Point[] getCorners() {
         Point[] p = new Point[4];
         p[0] = new Point(this.x, this.y);
-        p[1] = new Point(this.x + this.width, this.y);
-        p[2] = new Point(this.x, this.y + this.height);
-        p[3] = new Point(this.x + this.width, this.y + this.height);
+        p[1] = new Point(this.x + this.width-1, this.y);
+        p[2] = new Point(this.x, this.y + this.height-1);
+        p[3] = new Point(this.x + this.width-1 , this.y + this.height-1);
         return p;
     }
     // public void setHeight(int height) {

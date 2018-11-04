@@ -1,3 +1,5 @@
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @file Player.java
@@ -8,62 +10,124 @@
 public class Player {
     Rectangle playerBox;
     Rectangle collisionBox;
-    // Rectangle hitBox;
-    int speedX = 2 * BombGame.XZOOM;
-    int speedY = 2 * BombGame.YZOOM;
-    // int x, y;
+    int speedX = 1 * BombGame.XZOOM;
+    int speedY = 1 * BombGame.YZOOM;
     double mappedX, mappedY;
-    // int width, height;
-    FacingDirection direction;
+    FacingDirection fd = FacingDirection.up;
+    private Sprite sprite;
+    private AnimatedSprite animatedSprite = null;
 
-    public Player(int x, int y) {
-        // NOTE: player sprite will be larger than collision box (also hitbox?)
-        // playerRect = new Rectangle(50, 100, 28, 28);
-        playerBox = new Rectangle(x, y, 14, 14);
-        // collisionBox = playerBox;
-        collisionBox = new Rectangle(x, y, 14, 14);
-        playerBox.setColor(0xAAAA88FF);
-        collisionBox.setBorder(1, 0xFF000000);
+    public Player(int x, int y, Sprite sprite) {
+        this.sprite = sprite;
+        if (sprite != null && sprite instanceof AnimatedSprite)
+            this.animatedSprite = (AnimatedSprite) sprite;
+
+        updateDirection();
+        playerBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, 16, 32);
+        collisionBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, 16, 16);
+        playerBox.setColor(0x88FFFFFF);
+        collisionBox.setBorder(1, 0xFFFF0000);
     }
 
     public void render(RenderHandler renderer, int xZoom, int yZoom) {
-        // width = (int) playerBox.getWidth() * xZoom;
-        // height = (int) playerBox.getHeight() * yZoom;
+        if (animatedSprite != null)
+            renderer.renderSprite(animatedSprite, playerBox.x, playerBox.y, xZoom, yZoom);
+        else if (sprite != null)
+            renderer.renderSprite(sprite, playerBox.x, playerBox.y, xZoom, yZoom);
+        // else
+        // renderer.renderRectangle(this.playerBox, xZoom, yZoom);
 
-        renderer.renderRectangle(this.playerBox, xZoom, yZoom);
-        renderer.renderRectangle(this.collisionBox, xZoom, yZoom);
+        // renderer.renderRectangle(this.playerBox, xZoom, yZoom);
+        // renderer.renderRectangle(this.collisionBox, xZoom, yZoom);
+    }
+
+    private void updateDirection() {
+        if (animatedSprite != null) {
+            animatedSprite.setAnimationRange(fd.getValue() * 4, fd.getValue() * 4 + 3);
+        }
     }
 
     public void update(BombGame game) {
         KeyboardListener listener = game.getListener();
-        // TODO: Fix collision checks when player is inside a wall
-        if (listener.up()) {
-            collisionBox.y -= speedY;
-            direction = FacingDirection.up;
-        }
-        if (listener.down()) {
-            collisionBox.y += speedY;
-            direction = FacingDirection.down;
-        }
+        boolean moving = false;
+        FacingDirection fd = this.fd;
+        Rectangle collision = null;
+
         if (listener.left()) {
             collisionBox.x -= speedX;
-            direction = FacingDirection.left;
+            collision = game.getMap().getTileCollision(collisionBox);
+            if (collision != null) {
+                collisionBox.x += collision.width;
+            }
+            fd = FacingDirection.left;
+            moving = true;
         }
         if (listener.right()) {
             collisionBox.x += speedX;
-            direction = FacingDirection.right;
+            collision = game.getMap().getTileCollision(collisionBox);
+            if (collision != null) {
+                collisionBox.x -= collision.width;
+            }
+            fd = FacingDirection.right;
+            moving = true;
         }
-        int collision = game.getMap().checkCollision(this, collisionBox);
-        if (collision == -1) {
-            playerBox.x = collisionBox.x;
-            playerBox.y = collisionBox.y;
+        if (listener.up()) {
+            collisionBox.y -= speedY;
+            collision = game.getMap().getTileCollision(collisionBox);
+            if (collision != null) {
+                collisionBox.y += collision.height;
+            }
+            fd = FacingDirection.up;
+            moving = true;
+        }
+        if (listener.down()) {
+            collisionBox.y += speedY;
+            collision = game.getMap().getTileCollision(collisionBox);
+            if (collision != null) {
+                collisionBox.y -= collision.height;
+            }
+            fd = FacingDirection.down;
+            moving = true;
+        }
+        playerBox.x = collisionBox.x - ((playerBox.width - collisionBox.width) * BombGame.XZOOM);
+        playerBox.y = collisionBox.y - ((playerBox.height - collisionBox.height) * BombGame.YZOOM);
+
+        if (this.fd != fd) {
+            this.fd = fd;
+            updateDirection();
+        }
+        if (moving) {
+            animatedSprite.update(game);
         } else {
-            collisionBox.x = playerBox.x;
-            collisionBox.y = playerBox.y;
+            animatedSprite.reset();
         }
+        if (listener.action())
+            System.out.println("bomb has been planted");
+
     }
 
-    enum FacingDirection {
-        up, down, left, right
+    public enum FacingDirection {
+        up(0), down(1), left(2), right(3);
+
+        private int value;
+        private static Map<Integer, FacingDirection> map = new HashMap<>();
+
+        private FacingDirection(int value) {
+            this.value = value;
+        }
+
+        static {
+            for (FacingDirection fd : FacingDirection.values()) {
+                map.put(fd.value, fd);
+            }
+        }
+
+        public static FacingDirection valueOf(int fd) {
+            return (FacingDirection) map.get(fd);
+        }
+
+        public int getValue() {
+            return value;
+        }
     }
 }

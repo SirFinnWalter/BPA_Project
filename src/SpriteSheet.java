@@ -31,7 +31,6 @@ public class SpriteSheet {
     public void loadSprites(int width, int height, int xPad, int yPad) {
         this.spriteWidth = width;
         sprites = new Sprite[(WIDTH / width) * (HEIGHT / height)];
-
         int spriteID = 0;
         for (int y = 0; y < HEIGHT; y += height + yPad) {
             for (int x = 0; x < WIDTH; x += width + xPad) {
@@ -54,6 +53,14 @@ public class SpriteSheet {
         } else
             System.out.println("Warning: SpriteSheet attempted to retrieve sprites before loading sprites");
 
+        return null;
+    }
+
+    public Sprite[] getSprites() {
+        if (sprites != null)
+            return this.sprites;
+        else
+            System.out.println("Warning: SpriteSheet attempted to retrieve sprites before loading sprites");
         return null;
     }
 

@@ -59,18 +59,18 @@ public class Tileset {
     }
 
     class Tile {
-        private boolean collision;
-        private boolean breakable;
+        private boolean collidable;
+        // private boolean breakable;
         public Sprite sprite;
 
-        public Tile(Sprite sprite, boolean collision, boolean breakable) {
+        public Tile(Sprite sprite, boolean collidable, boolean breakable) {
             this.sprite = sprite;
-            this.collision = collision;
-            this.breakable = breakable;
+            this.collidable = collidable;
+            // this.breakable = breakable;
         }
 
         public boolean getCollision() {
-            return collision;
+            return collidable;
         }
     }
 }
