@@ -7,11 +7,11 @@ import java.util.Map;
  * @createdOn Sunday, 14 October, 2018
  */
 
-public class Player {
+public class Player implements GameObject {
     Rectangle playerBox;
     Rectangle collisionBox;
-    int speedX = 1 * BombGame.XZOOM;
-    int speedY = 1 * BombGame.YZOOM;
+    double speedX = 1 * BombGame.XZOOM;
+    double speedY = 1 * BombGame.YZOOM;
     double mappedX, mappedY;
     FacingDirection fd = FacingDirection.up;
     private Sprite sprite;
@@ -23,7 +23,7 @@ public class Player {
             this.animatedSprite = (AnimatedSprite) sprite;
 
         updateDirection();
-        playerBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, 16, 32);
+        playerBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, 16, 16);
         collisionBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, 16, 16);
         playerBox.setColor(0x88FFFFFF);
         collisionBox.setBorder(1, 0xFFFF0000);
@@ -42,9 +42,9 @@ public class Player {
     }
 
     private void updateDirection() {
-        if (animatedSprite != null) {
-            animatedSprite.setAnimationRange(fd.getValue() * 4, fd.getValue() * 4 + 3);
-        }
+        // if (animatedSprite != null) {
+        // animatedSprite.setAnimationRange(fd.getValue() * 4, fd.getValue() * 4 + 3);
+        // }
     }
 
     public void update(BombGame game) {
@@ -101,8 +101,9 @@ public class Player {
         } else {
             animatedSprite.reset();
         }
-        if (listener.action())
+        if (listener.action()) {
             System.out.println("bomb has been planted");
+        }
 
     }
 

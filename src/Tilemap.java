@@ -42,7 +42,7 @@ public class Tilemap {
                     }
                     case "Tiles": {
                         s = reader.readLine();
-
+                        // TODO: extract into methods
                         while (!s.equals("]") && s != null) {
                             if (!s.trim().startsWith("//")) {
                                 String[] line = s.trim().split(":");

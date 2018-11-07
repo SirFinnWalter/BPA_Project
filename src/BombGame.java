@@ -38,6 +38,8 @@ public class BombGame extends JFrame implements Runnable {
     private RenderHandler renderer;
     private SpriteSheet sheet;
     private Player player;
+    // private Player player2;
+    // private Player player3;
     private Tileset tiles;
     private Tilemap map;
 
@@ -57,13 +59,19 @@ public class BombGame extends JFrame implements Runnable {
         sheet.loadSprites(16, 16);
         tiles = new Tileset(new File("assets\\maps\\ethanTileset1.bt"), sheet);
 
-        BufferedImage image2 = loadImage(new File("assets\\sprites\\clintwalk.png"));
+        BufferedImage image2 = loadImage(new File("assets\\sprites\\bomb.png"));
         SpriteSheet sheet2 = new SpriteSheet(image2);
-        sheet2.loadSprites(16, 32);
+        sheet2.loadSprites(16, 16);
 
         AnimatedSprite playerAnimation = new AnimatedSprite(sheet2, 15);
         map = new Tilemap(new File("assets\\maps\\ethanMap1.bm"), tiles);
         player = new Player(18, 18, playerAnimation);
+        // player2 = new Player(18, 18, playerAnimation);
+        // player2.speedX = 1.5 * BombGame.XZOOM;
+        // player2.speedY = 1.5 * BombGame.YZOOM;
+        // player3 = new Player(18, 18, playerAnimation);
+        // player3.speedX = 2 * BombGame.XZOOM;
+        // player3.speedY = 2 * BombGame.YZOOM;
         Dimension size = new Dimension(map.getWidth() * 16 * XZOOM, map.getHeight() * 16 * YZOOM);
 
         this.setBounds(0, 0, size.width, size.height);
@@ -114,6 +122,8 @@ public class BombGame extends JFrame implements Runnable {
 
     private void update() {
         player.update(this);
+        // player2.update(this);
+        // player3.update(this);
     }
 
     private void render() {
@@ -124,6 +134,8 @@ public class BombGame extends JFrame implements Runnable {
 
             map.render(renderer, XZOOM, YZOOM);
             player.render(renderer, XZOOM, YZOOM);
+            // player2.render(renderer, XZOOM, YZOOM);
+            // player3.render(renderer, XZOOM, YZOOM);
             renderer.render(gfx);
             gfx.dispose();
             bStrategy.show();
