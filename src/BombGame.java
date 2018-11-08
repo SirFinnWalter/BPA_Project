@@ -42,6 +42,7 @@ public class BombGame extends JFrame implements Runnable {
     // private Player player3;
     private Tileset tiles;
     private Tilemap map;
+    private Bomb bomb;
 
     public BombGame() {
         this.setTitle("DynoMite");
@@ -54,7 +55,7 @@ public class BombGame extends JFrame implements Runnable {
             }
         });
 
-        BufferedImage image = loadImage(new File("assets\\sprites\\ethanTileset1.png"));
+        BufferedImage image = loadImage(new File("assets\\sprites\\RuinsTileset.png"));
         sheet = new SpriteSheet(image);
         sheet.loadSprites(16, 16);
         tiles = new Tileset(new File("assets\\maps\\ethanTileset1.bt"), sheet);
@@ -66,6 +67,8 @@ public class BombGame extends JFrame implements Runnable {
         AnimatedSprite playerAnimation = new AnimatedSprite(sheet2, 15);
         map = new Tilemap(new File("assets\\maps\\ethanMap1.bm"), tiles);
         player = new Player(18, 18, playerAnimation);
+
+        bomb = new Bomb();
         // player2 = new Player(18, 18, playerAnimation);
         // player2.speedX = 1.5 * BombGame.XZOOM;
         // player2.speedY = 1.5 * BombGame.YZOOM;
@@ -122,6 +125,7 @@ public class BombGame extends JFrame implements Runnable {
 
     private void update() {
         player.update(this);
+        bomb.update(this);
         // player2.update(this);
         // player3.update(this);
     }
@@ -134,6 +138,7 @@ public class BombGame extends JFrame implements Runnable {
 
             map.render(renderer, XZOOM, YZOOM);
             player.render(renderer, XZOOM, YZOOM);
+            bomb.render(renderer, XZOOM, YZOOM);
             // player2.render(renderer, XZOOM, YZOOM);
             // player3.render(renderer, XZOOM, YZOOM);
             renderer.render(gfx);
@@ -147,7 +152,7 @@ public class BombGame extends JFrame implements Runnable {
         }
     }
 
-    private BufferedImage loadImage(File file) {
+    public static BufferedImage loadImage(File file) {
         try {
             BufferedImage loadedImage = ImageIO.read(file);
             BufferedImage formattedImage = new BufferedImage(loadedImage.getWidth(), loadedImage.getHeight(),

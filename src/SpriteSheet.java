@@ -24,6 +24,11 @@ public class SpriteSheet {
         image.getRGB(0, 0, WIDTH, HEIGHT, pixels, 0, WIDTH);
     }
 
+    public SpriteSheet(BufferedImage image, int sWidth, int sHeight) {
+        this(image);
+        loadSprites(sWidth, sHeight);
+    }
+
     public void loadSprites(int width, int height) {
         loadSprites(width, height, 0, 0);
     }

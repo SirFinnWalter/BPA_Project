@@ -58,7 +58,7 @@ public class AnimatedSprite extends Sprite {
     }
 
     public void render(RenderHandler renderer, int xZoom, int yZoom) {
-
+        System.out.println("DONT CALL THIS - AnimatedSprite.render");
     }
 
     public void update(BombGame game) {
@@ -75,11 +75,16 @@ public class AnimatedSprite extends Sprite {
     }
 
     public void incrementSprite() {
+        // if (currentSprite >= 0)
         currentSprite++;
         if (currentSprite > end) {
             switch (animationType) {
             case pause: {
                 currentSprite = end;
+            }
+                break;
+            case destroy: {
+                currentSprite = -6;
             }
                 break;
             case looping:
@@ -94,20 +99,26 @@ public class AnimatedSprite extends Sprite {
 
     @Override
     public int getWidth() {
-        return sprites[currentSprite].getWidth();
+        if (currentSprite >= 0)
+            return sprites[currentSprite].getWidth();
+        return 0;
     }
 
     @Override
     public int getHeight() {
-        return sprites[currentSprite].getHeight();
+        if (currentSprite >= 0)
+            return sprites[currentSprite].getHeight();
+        return 0;
     }
 
     @Override
     public int[] getPixels() {
-        return sprites[currentSprite].getPixels();
+        if (currentSprite >= 0)
+            return sprites[currentSprite].getPixels();
+        return null;
     }
 
     public enum AnimationType {
-        looping, pause;
+        looping, pause, destroy;
     }
 }
