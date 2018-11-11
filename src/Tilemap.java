@@ -142,32 +142,23 @@ public class Tilemap {
         mappedTiles.forEach((k, v) -> {
             int width = v.getTile().sprite.getWidth();
             int height = v.getTile().sprite.getHeight();
-            // tileWidth = v.getTile().sprite.getWidth() * xZoom;
-            // tileHeight = v.getTile().sprite.getHeight() * xZoom;
             tileset.renderTiles(renderer, v.tileID, v.x * width * BombGame.XZOOM, v.y * height * BombGame.YZOOM, xZoom,
                     yZoom);
         });
     }
 
-    public Rectangle getTileCollision(Rectangle rect) {
-        rect = new Rectangle(rect.x, rect.y, rect.width * BombGame.XZOOM, rect.height * BombGame.YZOOM);
+    public void checkCollision(Collider col) {
         ArrayList<MappedTile> tiles = new ArrayList<MappedTile>();
-        for (Point corners : rect.getCorners()) {
+        for (Point corners : col.getCorners()) {
             Point mappedCorner = mapPointToTilemap(corners);
             MappedTile tile = getTile(mappedCorner.x, mappedCorner.y);
-            if (!tiles.contains(tile)) {
+            if (!tiles.contains(tile) && tile.isCollidable()) {
                 tiles.add(tile);
             }
         }
-
         for (MappedTile tile : tiles) {
-            if (tile.isCollidable()) {
-                if (rect.intersects(tile.collisionBox)) {
-                    return rect.intersection(tile.collisionBox);
-                }
-            }
+            tile.collider.checkCollision(col);
         }
-        return null;
     }
 
     public Point mapPointToTilemap(int x, int y) {
@@ -184,10 +175,10 @@ public class Tilemap {
         return new Point(x, y);
     }
 
-    // public double mapPosition(int screenPos, int length) {
-    // return ((screenPos + (length / 2.0)) * (width - 1)) / ((width - 1) *
-    // tileWidth);
-    // }
+    public Point mapPointToScreen(int x, int y) {
+        return mapPointToScreen(new Point(x, y));
+    }
+
     public Point mapPointToScreen(Point p) {
         int x = p.x * 16 * BombGame.XZOOM;
         int y = p.y * 16 * BombGame.YZOOM;
@@ -214,10 +205,11 @@ public class Tilemap {
         return height;
     }
 
-    class MappedTile {
+    class MappedTile implements CollisionListener {
         public int mappedTileID, tileID, x, y;
         private boolean collidable;
-        private Rectangle collisionBox;
+        public Collider collider;
+        // private Rectangle collisionBox;
 
         public MappedTile(int tileID, int x, int y) {
             mappedTileID = x + (y * width);
@@ -226,9 +218,8 @@ public class Tilemap {
             this.y = y;
             this.collidable = this.getTile().getCollision();
             if (collidable) {
-                Point p = mapPointToScreen(new Point(this.x, this.y));
-                collisionBox = new Rectangle(p.x, p.y, this.getWidth() * BombGame.XZOOM,
-                        this.getHeight() * BombGame.YZOOM);
+                Point p = mapPointToScreen(x, y);
+                collider = new Collider(p.x, p.y, this.getWidth() * BombGame.XZOOM, this.getHeight() * BombGame.YZOOM);
             }
         }
 
@@ -274,6 +265,11 @@ public class Tilemap {
 
         public MappedTile getTileRight() {
             return Tilemap.this.getTile(x + 1, y);
+        }
+
+        @Override
+        public void onCollision(CollisionEvent e) {
+
         }
     }
 }

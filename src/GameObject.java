@@ -1,5 +1,9 @@
 public interface GameObject {
-    void render(RenderHandler renderer, int xZoom, int yZoom);
+    public Collider getCollider();
 
-    void update(BombGame game);
+    public void render(RenderHandler renderer, int xZoom, int yZoom);
+
+    public void update(BombGame game);
+
+    public void init(BombGame game);
 }

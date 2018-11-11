@@ -6,13 +6,17 @@ import java.awt.image.BufferedImage;
  * @createdOn Saturday, 03 November, 2018
  */
 
-public class AnimatedSprite extends Sprite {
+public class AnimatedSprite extends Sprite implements Cloneable {
     private Sprite[] sprites;
     private int currentSprite = 0;
     private int counter = 0;
     private int flipFrame;
     private int start, end;
     private AnimationType animationType = AnimationType.looping;
+
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
     public AnimatedSprite(SpriteSheet sheet, Rectangle[] range, int flipFrame) {
         sprites = new Sprite[range.length];
@@ -75,8 +79,8 @@ public class AnimatedSprite extends Sprite {
     }
 
     public void incrementSprite() {
-        // if (currentSprite >= 0)
-        currentSprite++;
+        if (currentSprite >= 0)
+            currentSprite++;
         if (currentSprite > end) {
             switch (animationType) {
             case pause: {
@@ -84,7 +88,7 @@ public class AnimatedSprite extends Sprite {
             }
                 break;
             case destroy: {
-                currentSprite = -6;
+                currentSprite = -1;
             }
                 break;
             case looping:
@@ -116,6 +120,10 @@ public class AnimatedSprite extends Sprite {
         if (currentSprite >= 0)
             return sprites[currentSprite].getPixels();
         return null;
+    }
+
+    public boolean isDestroyed() {
+        return (currentSprite == -1);
     }
 
     public enum AnimationType {

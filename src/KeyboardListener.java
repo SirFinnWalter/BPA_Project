@@ -59,8 +59,17 @@ public class KeyboardListener implements KeyListener, FocusListener {
         return (keys[KeyEvent.VK_RIGHT] || keys[KeyEvent.VK_D]);
     }
 
+    private int counter = 120;
+    private int cooldown = 120;
+
     public boolean action() {
-        return (keys[KeyEvent.VK_Z] || keys[KeyEvent.VK_CONTROL]);
+        counter++;
+        if (keys[KeyEvent.VK_Z] || keys[KeyEvent.VK_CONTROL])
+            if (counter >= cooldown) {
+                counter = 0;
+                return true;
+            }
+        return false;
     }
 
 }

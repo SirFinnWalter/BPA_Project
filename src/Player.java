@@ -7,13 +7,12 @@ import java.util.Map;
  * @createdOn Sunday, 14 October, 2018
  */
 
-public class Player implements GameObject {
-    Rectangle playerBox;
-    Rectangle collisionBox;
+public class Player implements GameObject, CollisionListener {
+    private Rectangle playerBox;
+    private Collider collider;
     double speedX = 1 * BombGame.XZOOM;
     double speedY = 1 * BombGame.YZOOM;
-    double mappedX, mappedY;
-    FacingDirection fd = FacingDirection.up;
+    FacingDirection fd1, fd2;
     private Sprite sprite;
     private AnimatedSprite animatedSprite = null;
 
@@ -21,12 +20,14 @@ public class Player implements GameObject {
         this.sprite = sprite;
         if (sprite != null && sprite instanceof AnimatedSprite)
             this.animatedSprite = (AnimatedSprite) sprite;
-
+        fd1 = FacingDirection.up;
+        fd2 = FacingDirection.up;
         updateDirection();
         playerBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, 16, 16);
-        collisionBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, 16, 16);
+        collider = new Collider(x * BombGame.XZOOM, y * BombGame.YZOOM, 16 * BombGame.XZOOM, 16 * BombGame.YZOOM);
         playerBox.setColor(0x88FFFFFF);
-        collisionBox.setBorder(1, 0xFFFF0000);
+        collider.setBorder(1, 0xFF0000FF);
+
     }
 
     public void render(RenderHandler renderer, int xZoom, int yZoom) {
@@ -34,66 +35,57 @@ public class Player implements GameObject {
             renderer.renderSprite(animatedSprite, playerBox.x, playerBox.y, xZoom, yZoom);
         else if (sprite != null)
             renderer.renderSprite(sprite, playerBox.x, playerBox.y, xZoom, yZoom);
-        // else
-        // renderer.renderRectangle(this.playerBox, xZoom, yZoom);
-
-        // renderer.renderRectangle(this.playerBox, xZoom, yZoom);
-        // renderer.renderRectangle(this.collisionBox, xZoom, yZoom);
+        // renderer.renderRectangle(collider, 1, 1);
+        // renderer.renderRectangle(playerBox, xZoom, yZoom);
     }
 
     private void updateDirection() {
-        // if (animatedSprite != null) {
-        // animatedSprite.setAnimationRange(fd.getValue() * 4, fd.getValue() * 4 + 3);
-        // }
+        if (animatedSprite != null) {
+            animatedSprite.setAnimationRange(fd1.getValue() * 7, fd1.getValue() * 7 + 6);
+        }
     }
 
-    public void update(BombGame game) {
+    public void init(BombGame game) {
+        game.getMap().mappedTiles.forEach((k, v) -> {
+            if (v.collider != null)
+                v.collider.addCollisionListener(this);
+        });
+    }
+
+    public synchronized void update(BombGame game) {
         KeyboardListener listener = game.getListener();
         boolean moving = false;
-        FacingDirection fd = this.fd;
-        Rectangle collision = null;
 
         if (listener.left()) {
-            collisionBox.x -= speedX;
-            collision = game.getMap().getTileCollision(collisionBox);
-            if (collision != null) {
-                collisionBox.x += collision.width;
-            }
-            fd = FacingDirection.left;
+            collider.x -= speedX;
+            fd2 = FacingDirection.left;
             moving = true;
+            game.checkCollision();
         }
         if (listener.right()) {
-            collisionBox.x += speedX;
-            collision = game.getMap().getTileCollision(collisionBox);
-            if (collision != null) {
-                collisionBox.x -= collision.width;
-            }
-            fd = FacingDirection.right;
+            collider.x += speedX;
+            fd2 = FacingDirection.right;
             moving = true;
+            game.checkCollision();
         }
         if (listener.up()) {
-            collisionBox.y -= speedY;
-            collision = game.getMap().getTileCollision(collisionBox);
-            if (collision != null) {
-                collisionBox.y += collision.height;
-            }
-            fd = FacingDirection.up;
+            collider.y -= speedY;
+            fd2 = FacingDirection.up;
             moving = true;
+            game.checkCollision();
         }
         if (listener.down()) {
-            collisionBox.y += speedY;
-            collision = game.getMap().getTileCollision(collisionBox);
-            if (collision != null) {
-                collisionBox.y -= collision.height;
-            }
-            fd = FacingDirection.down;
+            collider.y += speedY;
+            fd2 = FacingDirection.down;
             moving = true;
+            game.checkCollision();
         }
-        playerBox.x = collisionBox.x - ((playerBox.width - collisionBox.width) * BombGame.XZOOM);
-        playerBox.y = collisionBox.y - ((playerBox.height - collisionBox.height) * BombGame.YZOOM);
 
-        if (this.fd != fd) {
-            this.fd = fd;
+        playerBox.x = collider.x;
+        playerBox.y = collider.y;
+
+        if (this.fd1 != fd2) {
+            this.fd1 = fd2;
             updateDirection();
         }
         if (moving) {
@@ -103,8 +95,38 @@ public class Player implements GameObject {
         }
         if (listener.action()) {
             System.out.println("bomb has been planted");
+            // TODO: Create bomb on map tile
+            game.addGameObject(new Bomb(this, collider.x, collider.y));
+
         }
 
+    }
+
+    @Override
+    public Collider getCollider() {
+        return collider;
+    }
+
+    @Override
+    public synchronized void onCollision(CollisionEvent e) {
+        switch (fd2) {
+        case up:
+            collider.y += e.intersection(collider).height;
+            break;
+        case down:
+            collider.y -= e.intersection(collider).height;
+            break;
+        case left:
+            collider.x += e.intersection(collider).width;
+            break;
+        case right:
+            collider.x -= e.intersection(collider).width;
+            break;
+        default:
+            collider.x = playerBox.x;
+            collider.y = playerBox.y;
+            break;
+        }
     }
 
     public enum FacingDirection {

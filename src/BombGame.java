@@ -6,6 +6,8 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -34,15 +36,12 @@ public class BombGame extends JFrame implements Runnable {
     private boolean running = false;
     private Canvas canvas = new Canvas();
     private KeyboardListener listener = new KeyboardListener();
+    private Set<GameObject> objects = new HashSet<GameObject>();
+    private Set<GameObject> objectsBuffer = new HashSet<GameObject>();
+    private Set<Player> players = new HashSet<Player>();
 
     private RenderHandler renderer;
-    private SpriteSheet sheet;
-    private Player player;
-    // private Player player2;
-    // private Player player3;
-    private Tileset tiles;
     private Tilemap map;
-    private Bomb bomb;
 
     public BombGame() {
         this.setTitle("DynoMite");
@@ -55,26 +54,11 @@ public class BombGame extends JFrame implements Runnable {
             }
         });
 
-        BufferedImage image = loadImage(new File("assets\\sprites\\RuinsTileset.png"));
-        sheet = new SpriteSheet(image);
-        sheet.loadSprites(16, 16);
-        tiles = new Tileset(new File("assets\\maps\\ethanTileset1.bt"), sheet);
+        BufferedImage image = loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
+        SpriteSheet sheet = new SpriteSheet(image, 16, 16);
+        Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
+        map = new Tilemap(new File("assets\\maps\\RuinMap.bm"), tiles);
 
-        BufferedImage image2 = loadImage(new File("assets\\sprites\\bomb.png"));
-        SpriteSheet sheet2 = new SpriteSheet(image2);
-        sheet2.loadSprites(16, 16);
-
-        AnimatedSprite playerAnimation = new AnimatedSprite(sheet2, 15);
-        map = new Tilemap(new File("assets\\maps\\ethanMap1.bm"), tiles);
-        player = new Player(18, 18, playerAnimation);
-
-        bomb = new Bomb();
-        // player2 = new Player(18, 18, playerAnimation);
-        // player2.speedX = 1.5 * BombGame.XZOOM;
-        // player2.speedY = 1.5 * BombGame.YZOOM;
-        // player3 = new Player(18, 18, playerAnimation);
-        // player3.speedX = 2 * BombGame.XZOOM;
-        // player3.speedY = 2 * BombGame.YZOOM;
         Dimension size = new Dimension(map.getWidth() * 16 * XZOOM, map.getHeight() * 16 * YZOOM);
 
         this.setBounds(0, 0, size.width, size.height);
@@ -95,12 +79,27 @@ public class BombGame extends JFrame implements Runnable {
         canvas.addFocusListener(listener);
 
         renderer = new RenderHandler(getWidth(), getHeight());
+
+        image = loadImage(new File("assets\\sprites\\ghostygoosterwalk.png"));
+        sheet = new SpriteSheet(image, 16, 16);
+
+        AnimatedSprite playerAnimation = new AnimatedSprite(sheet, 10);
+        Player player = new Player(16, 16, playerAnimation);
+
+        objects.add(player);
+        objects.forEach(object -> {
+            if (object instanceof Player)
+                players.add((Player) object);
+        });
+        objectsBuffer.addAll(objects);
+
     }
 
     public void run() {
         running = true;
         int frames = 0;
         double delta = 0;
+        init();
 
         long lastTime = System.nanoTime();
         long timer = System.currentTimeMillis();
@@ -113,21 +112,28 @@ public class BombGame extends JFrame implements Runnable {
                 delta--;
             }
             render();
+            objects.removeAll(objects);
+            objects.addAll(objectsBuffer);
 
             frames++;
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
-                // System.out.println(frames);
+                System.out.println(frames + " fps");
                 frames = 0;
             }
         }
     }
 
+    private void init() {
+        objects.forEach(object -> {
+            object.init(this);
+        });
+    }
+
     private void update() {
-        player.update(this);
-        bomb.update(this);
-        // player2.update(this);
-        // player3.update(this);
+        objects.forEach(object -> {
+            object.update(this);
+        });
     }
 
     private void render() {
@@ -137,8 +143,11 @@ public class BombGame extends JFrame implements Runnable {
             super.paint(gfx);
 
             map.render(renderer, XZOOM, YZOOM);
-            player.render(renderer, XZOOM, YZOOM);
-            bomb.render(renderer, XZOOM, YZOOM);
+            objects.forEach(object -> {
+                object.render(renderer, XZOOM, YZOOM);
+            });
+            // player.render(renderer, XZOOM, YZOOM);
+            // bomb.render(renderer, XZOOM, YZOOM);
             // player2.render(renderer, XZOOM, YZOOM);
             // player3.render(renderer, XZOOM, YZOOM);
             renderer.render(gfx);
@@ -150,6 +159,27 @@ public class BombGame extends JFrame implements Runnable {
                     JOptionPane.WARNING_MESSAGE);
             System.exit(0);
         }
+    }
+
+    public void addGameObject(GameObject object) {
+        objectsBuffer.add(object);
+    }
+
+    public void removeGameObject(GameObject object) {
+        objectsBuffer.remove(object);
+    }
+
+    public void checkCollision() {
+        objects.forEach(object -> {
+            if (object.getCollider() != null) {
+                map.checkCollision(object.getCollider());
+                if (!(object instanceof Player)) {
+                    players.forEach(player -> {
+                        object.getCollider().checkCollision(player.getCollider());
+                    });
+                }
+            }
+        });
     }
 
     public static BufferedImage loadImage(File file) {
@@ -168,6 +198,10 @@ public class BombGame extends JFrame implements Runnable {
 
     public boolean isRunning() {
         return running;
+    }
+
+    public Set<Player> getPlayers() {
+        return this.players;
     }
 
     public KeyboardListener getListener() {
