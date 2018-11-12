@@ -27,7 +27,7 @@ public class Bomb implements GameObject, CollisionListener {
 
         animatedSprite.setAnimationType(AnimatedSprite.AnimationType.destroy);
         this.owner = player;
-        collider = new Collider(x, y, 16 * BombGame.XZOOM, 16 * BombGame.YZOOM);
+        collider = new Collider(x, y, 16 * BombGame.XZOOM, 16 * BombGame.YZOOM, "bomb");
         collider.setBorder(1, 0xFFFF0000);
         init = true;
     }

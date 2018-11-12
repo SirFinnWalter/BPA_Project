@@ -1,6 +1,7 @@
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
@@ -35,7 +36,7 @@ public class BombGame extends JFrame implements Runnable {
 
     private boolean running = false;
     private Canvas canvas = new Canvas();
-    private KeyboardListener listener = new KeyboardListener();
+    // private KeyboardListener listener = new KeyboardListener();
     private Set<GameObject> objects = new HashSet<GameObject>();
     private Set<GameObject> objectsBuffer = new HashSet<GameObject>();
     private Set<Player> players = new HashSet<Player>();
@@ -54,7 +55,7 @@ public class BombGame extends JFrame implements Runnable {
             }
         });
 
-        BufferedImage image = loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
+        BufferedImage image = loadImage(new File("assets\\tilesets\\FireTileset.png"));
         SpriteSheet sheet = new SpriteSheet(image, 16, 16);
         Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
         map = new Tilemap(new File("assets\\maps\\RuinMap.bm"), tiles);
@@ -75,8 +76,6 @@ public class BombGame extends JFrame implements Runnable {
         this.add(canvas);
         this.setVisible(true);
         canvas.createBufferStrategy(3);
-        canvas.addKeyListener(listener);
-        canvas.addFocusListener(listener);
 
         renderer = new RenderHandler(getWidth(), getHeight());
 
@@ -84,15 +83,30 @@ public class BombGame extends JFrame implements Runnable {
         sheet = new SpriteSheet(image, 16, 16);
 
         AnimatedSprite playerAnimation = new AnimatedSprite(sheet, 10);
-        Player player = new Player(16, 16, playerAnimation);
+
+        KeyboardListener listener = new KeyboardListener();
+        Player player = new Player(16 * 8, 32, playerAnimation, listener, "player1");
+        canvas.addKeyListener(listener);
+        canvas.addFocusListener(listener);
+
+        KeyboardListener listener2 = new KeyboardListener(KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT,
+                KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER);
+
+        Player player2 = null;
+        try {
+            player2 = new Player(16 * 16, 32, (AnimatedSprite) playerAnimation.clone(), listener2, "player2");
+        } catch (Exception e) {
+        }
+        canvas.addKeyListener(listener2);
+        canvas.addFocusListener(listener2);
 
         objects.add(player);
+        objects.add(player2);
         objects.forEach(object -> {
             if (object instanceof Player)
                 players.add((Player) object);
         });
         objectsBuffer.addAll(objects);
-
     }
 
     public void run() {
@@ -161,6 +175,10 @@ public class BombGame extends JFrame implements Runnable {
         }
     }
 
+    public Set<GameObject> getGameObjects() {
+        return this.objectsBuffer;
+    }
+
     public void addGameObject(GameObject object) {
         objectsBuffer.add(object);
     }
@@ -173,11 +191,10 @@ public class BombGame extends JFrame implements Runnable {
         objects.forEach(object -> {
             if (object.getCollider() != null) {
                 map.checkCollision(object.getCollider());
-                if (!(object instanceof Player)) {
-                    players.forEach(player -> {
-                        object.getCollider().checkCollision(player.getCollider());
-                    });
-                }
+                players.forEach(player -> {
+                    // object.getCollider().checkCollision(player.getCollider());
+                    player.getCollider().checkCollision(object.getCollider());
+                });
             }
         });
     }
@@ -204,9 +221,9 @@ public class BombGame extends JFrame implements Runnable {
         return this.players;
     }
 
-    public KeyboardListener getListener() {
-        return this.listener;
-    }
+    // public KeyboardListener getListener() {
+    // return this.listener;
+    // }
 
     public Tilemap getMap() {
         return map;

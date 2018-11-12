@@ -12,22 +12,27 @@ public class Player implements GameObject, CollisionListener {
     private Collider collider;
     double speedX = 1 * BombGame.XZOOM;
     double speedY = 1 * BombGame.YZOOM;
-    FacingDirection fd1, fd2;
+    FacingDirection currentFD, newFD;
     private Sprite sprite;
     private AnimatedSprite animatedSprite = null;
+    private KeyboardListener listener = null;
+    private String tempName;
 
-    public Player(int x, int y, Sprite sprite) {
+    public Player(int x, int y, Sprite sprite, KeyboardListener listener, String tempName) {
+        this.tempName = tempName;
         this.sprite = sprite;
         if (sprite != null && sprite instanceof AnimatedSprite)
             this.animatedSprite = (AnimatedSprite) sprite;
-        fd1 = FacingDirection.up;
-        fd2 = FacingDirection.up;
+        currentFD = FacingDirection.up;
+        newFD = FacingDirection.up;
         updateDirection();
         playerBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, 16, 16);
-        collider = new Collider(x * BombGame.XZOOM, y * BombGame.YZOOM, 16 * BombGame.XZOOM, 16 * BombGame.YZOOM);
+        collider = new Collider(x * BombGame.XZOOM, y * BombGame.YZOOM, 16 * BombGame.XZOOM, 16 * BombGame.YZOOM,
+                tempName);
         playerBox.setColor(0x88FFFFFF);
         collider.setBorder(1, 0xFF0000FF);
 
+        this.listener = listener;
     }
 
     public void render(RenderHandler renderer, int xZoom, int yZoom) {
@@ -41,7 +46,7 @@ public class Player implements GameObject, CollisionListener {
 
     private void updateDirection() {
         if (animatedSprite != null) {
-            animatedSprite.setAnimationRange(fd1.getValue() * 7, fd1.getValue() * 7 + 6);
+            animatedSprite.setAnimationRange(currentFD.getValue() * 7, currentFD.getValue() * 7 + 6);
         }
     }
 
@@ -50,33 +55,39 @@ public class Player implements GameObject, CollisionListener {
             if (v.collider != null)
                 v.collider.addCollisionListener(this);
         });
+        game.getPlayers().forEach(object -> {
+            if (object != this) {
+                // object.getCollider().addCollisionListener(this);
+                collider.addCollisionListener((Player) object);
+            }
+        });
     }
 
     public synchronized void update(BombGame game) {
-        KeyboardListener listener = game.getListener();
+        // KeyboardListener listener = game.getListener();
         boolean moving = false;
 
         if (listener.left()) {
             collider.x -= speedX;
-            fd2 = FacingDirection.left;
+            newFD = FacingDirection.left;
             moving = true;
             game.checkCollision();
         }
         if (listener.right()) {
             collider.x += speedX;
-            fd2 = FacingDirection.right;
+            newFD = FacingDirection.right;
             moving = true;
             game.checkCollision();
         }
         if (listener.up()) {
             collider.y -= speedY;
-            fd2 = FacingDirection.up;
+            newFD = FacingDirection.up;
             moving = true;
             game.checkCollision();
         }
         if (listener.down()) {
             collider.y += speedY;
-            fd2 = FacingDirection.down;
+            newFD = FacingDirection.down;
             moving = true;
             game.checkCollision();
         }
@@ -84,8 +95,8 @@ public class Player implements GameObject, CollisionListener {
         playerBox.x = collider.x;
         playerBox.y = collider.y;
 
-        if (this.fd1 != fd2) {
-            this.fd1 = fd2;
+        if (this.currentFD != newFD) {
+            this.currentFD = newFD;
             updateDirection();
         }
         if (moving) {
@@ -109,7 +120,9 @@ public class Player implements GameObject, CollisionListener {
 
     @Override
     public synchronized void onCollision(CollisionEvent e) {
-        switch (fd2) {
+        // System.out.println("c");
+        // if (e.getTrigger() == this.collider) {
+        switch (newFD) {
         case up:
             collider.y += e.intersection(collider).height;
             break;
@@ -127,6 +140,7 @@ public class Player implements GameObject, CollisionListener {
             collider.y = playerBox.y;
             break;
         }
+        // }
     }
 
     public enum FacingDirection {

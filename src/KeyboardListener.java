@@ -11,6 +11,20 @@ import java.awt.event.KeyListener;
 
 public class KeyboardListener implements KeyListener, FocusListener {
     public boolean[] keys = new boolean[128];
+    int upKey, downKey, leftKey, rightKey, actionKey;
+
+    public KeyboardListener() {
+        this(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_Z);
+    }
+
+    public KeyboardListener(int upKey, int downKey, int leftKey, int rightKey, int actionKey) {
+        // TODO: make sure key is in key boolean array
+        this.upKey = upKey;
+        this.downKey = downKey;
+        this.leftKey = leftKey;
+        this.rightKey = rightKey;
+        this.actionKey = actionKey;
+    }
 
     @Override
     public void focusGained(FocusEvent e) {
@@ -44,19 +58,19 @@ public class KeyboardListener implements KeyListener, FocusListener {
     }
 
     public boolean up() {
-        return (keys[KeyEvent.VK_UP] || keys[KeyEvent.VK_W]);
+        return (keys[upKey]);
     }
 
     public boolean down() {
-        return (keys[KeyEvent.VK_DOWN] || keys[KeyEvent.VK_S]);
+        return (keys[downKey]);
     }
 
     public boolean left() {
-        return (keys[KeyEvent.VK_LEFT] || keys[KeyEvent.VK_A]);
+        return (keys[leftKey]);
     }
 
     public boolean right() {
-        return (keys[KeyEvent.VK_RIGHT] || keys[KeyEvent.VK_D]);
+        return (keys[rightKey]);
     }
 
     private int counter = 120;
@@ -64,7 +78,7 @@ public class KeyboardListener implements KeyListener, FocusListener {
 
     public boolean action() {
         counter++;
-        if (keys[KeyEvent.VK_Z] || keys[KeyEvent.VK_CONTROL])
+        if (keys[actionKey])
             if (counter >= cooldown) {
                 counter = 0;
                 return true;

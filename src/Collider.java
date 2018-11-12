@@ -13,16 +13,20 @@ public class Collider extends Rectangle {
 
     public Collider() {
         super();
+        this.tempName = "???";
     }
 
-    public Collider(int x, int y, int width, int height) {
+    String tempName;
+
+    public Collider(int x, int y, int width, int height, String tempName) {
         super(x, y, width, height);
+        this.tempName = tempName;
     }
 
     public boolean checkCollision(Collider col) {
         boolean collision = this.intersects(col);
         if (collision) {
-            this.fireCollision();
+            this.fireCollision(col);
         }
         return this.intersects(col);
     }
@@ -35,11 +39,13 @@ public class Collider extends Rectangle {
         listeners.remove(listener);
     }
 
-    public void fireCollision() {
+    public void fireCollision(Collider col) {
         // System.out.println("fired");
-        CollisionEvent e = new CollisionEvent(this);
+        CollisionEvent e = new CollisionEvent(this, col);
         for (CollisionListener listener : listeners) {
-            listener.onCollision(e);
+            if (listener.getCollider() == col) {
+                listener.onCollision(e);
+            }
         }
     }
 }

@@ -219,7 +219,8 @@ public class Tilemap {
             this.collidable = this.getTile().getCollision();
             if (collidable) {
                 Point p = mapPointToScreen(x, y);
-                collider = new Collider(p.x, p.y, this.getWidth() * BombGame.XZOOM, this.getHeight() * BombGame.YZOOM);
+                collider = new Collider(p.x, p.y, this.getWidth() * BombGame.XZOOM, this.getHeight() * BombGame.YZOOM,
+                        "tile");
             }
         }
 
@@ -270,6 +271,11 @@ public class Tilemap {
         @Override
         public void onCollision(CollisionEvent e) {
 
+        }
+
+        @Override
+        public Collider getCollider() {
+            return this.collider;
         }
     }
 }
