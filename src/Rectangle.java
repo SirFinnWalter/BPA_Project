@@ -56,9 +56,9 @@ public class Rectangle extends java.awt.Rectangle {
     public Point[] getCorners() {
         Point[] p = new Point[4];
         p[0] = new Point(this.x, this.y);
-        p[1] = new Point(this.x + this.width-1, this.y);
-        p[2] = new Point(this.x, this.y + this.height-1);
-        p[3] = new Point(this.x + this.width-1 , this.y + this.height-1);
+        p[1] = new Point(this.x + this.width - 1, this.y);
+        p[2] = new Point(this.x, this.y + this.height - 1);
+        p[3] = new Point(this.x + this.width - 1, this.y + this.height - 1);
         return p;
     }
     // public void setHeight(int height) {
@@ -88,8 +88,6 @@ public class Rectangle extends java.awt.Rectangle {
             for (int x = 0; x < width; x++) {
                 if (y < borderWidth || x < borderWidth || y >= height - borderWidth || x >= width - borderWidth)
                     pixels[x + y * width] = color;
-                // else
-                // pixels[x + y * width] = prevPixels[x + y * width];
             }
         }
     }

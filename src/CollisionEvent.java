@@ -6,22 +6,18 @@
 
 public class CollisionEvent {
 
-    private Collider source, trigger;
+    private Collider trigger;
 
-    public CollisionEvent(Collider source, Collider trigger) {
-        this.source = source;
+    public CollisionEvent(Collider trigger) {
         this.trigger = trigger;
     }
 
     public Rectangle intersection(Collider col) {
-        return source.intersection(col);
+        return trigger.intersection(col);
     }
 
     public Collider getSource() {
-        return source;
-    }
-
-    public Collider getTrigger() {
         return trigger;
     }
+
 }

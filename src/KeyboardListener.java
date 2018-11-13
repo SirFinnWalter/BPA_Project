@@ -2,6 +2,10 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @file KeyboardListener.java
@@ -10,8 +14,10 @@ import java.awt.event.KeyListener;
  */
 
 public class KeyboardListener implements KeyListener, FocusListener {
-    public boolean[] keys = new boolean[128];
-    int upKey, downKey, leftKey, rightKey, actionKey;
+    // public boolean[] keys = new boolean[128];
+    // public ArrayList<Boolean> keys = new ArrayList<Boolean>();
+    int[] keys;
+    boolean[] keyStates;
 
     public KeyboardListener() {
         this(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_Z);
@@ -19,11 +25,9 @@ public class KeyboardListener implements KeyListener, FocusListener {
 
     public KeyboardListener(int upKey, int downKey, int leftKey, int rightKey, int actionKey) {
         // TODO: make sure key is in key boolean array
-        this.upKey = upKey;
-        this.downKey = downKey;
-        this.leftKey = leftKey;
-        this.rightKey = rightKey;
-        this.actionKey = actionKey;
+        keys = new int[] { upKey, downKey, leftKey, rightKey, actionKey };
+        keyStates = new boolean[5];
+        Arrays.fill(keyStates, false);
     }
 
     @Override
@@ -38,39 +42,45 @@ public class KeyboardListener implements KeyListener, FocusListener {
 
     @Override
     public void focusLost(FocusEvent e) {
-        for (int i = 0; i < keys.length; i++) {
-            keys[i] = false;
+        for (int i = 0; i < 5; i++) {
+            keyStates[i] = false;
         }
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
-        if (keyCode < keys.length)
-            keys[keyCode] = true;
+        for (int i = 0; i < 5; i++) {
+            if (keyCode == keys[i])
+                keyStates[i] = true;
+        }
+        // if (keyCode < keys.length)
+        // keys[keyCode] = true;
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         int keyCode = e.getKeyCode();
-        if (keyCode < keys.length)
-            keys[keyCode] = false;
+        for (int i = 0; i < 5; i++) {
+            if (keyCode == keys[i])
+                keyStates[i] = false;
+        }
     }
 
     public boolean up() {
-        return (keys[upKey]);
+        return (keyStates[0]);
     }
 
     public boolean down() {
-        return (keys[downKey]);
+        return (keyStates[1]);
     }
 
     public boolean left() {
-        return (keys[leftKey]);
+        return (keyStates[2]);
     }
 
     public boolean right() {
-        return (keys[rightKey]);
+        return (keyStates[3]);
     }
 
     private int counter = 120;
@@ -78,7 +88,7 @@ public class KeyboardListener implements KeyListener, FocusListener {
 
     public boolean action() {
         counter++;
-        if (keys[actionKey])
+        if (keyStates[4])
             if (counter >= cooldown) {
                 counter = 0;
                 return true;

@@ -16,10 +16,8 @@ public class Player implements GameObject, CollisionListener {
     private Sprite sprite;
     private AnimatedSprite animatedSprite = null;
     private KeyboardListener listener = null;
-    private String tempName;
 
-    public Player(int x, int y, Sprite sprite, KeyboardListener listener, String tempName) {
-        this.tempName = tempName;
+    public Player(int x, int y, Sprite sprite, KeyboardListener listener) {
         this.sprite = sprite;
         if (sprite != null && sprite instanceof AnimatedSprite)
             this.animatedSprite = (AnimatedSprite) sprite;
@@ -27,8 +25,7 @@ public class Player implements GameObject, CollisionListener {
         newFD = FacingDirection.up;
         updateDirection();
         playerBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, 16, 16);
-        collider = new Collider(x * BombGame.XZOOM, y * BombGame.YZOOM, 16 * BombGame.XZOOM, 16 * BombGame.YZOOM,
-                tempName);
+        collider = new Collider(this, x * BombGame.XZOOM, y * BombGame.YZOOM, 16 * BombGame.XZOOM, 16 * BombGame.YZOOM);
         playerBox.setColor(0x88FFFFFF);
         collider.setBorder(1, 0xFF0000FF);
 
@@ -71,25 +68,25 @@ public class Player implements GameObject, CollisionListener {
             collider.x -= speedX;
             newFD = FacingDirection.left;
             moving = true;
-            game.checkCollision();
+            game.checkCollision(collider);
         }
         if (listener.right()) {
             collider.x += speedX;
             newFD = FacingDirection.right;
             moving = true;
-            game.checkCollision();
+            game.checkCollision(collider);
         }
         if (listener.up()) {
             collider.y -= speedY;
             newFD = FacingDirection.up;
             moving = true;
-            game.checkCollision();
+            game.checkCollision(collider);
         }
         if (listener.down()) {
             collider.y += speedY;
             newFD = FacingDirection.down;
             moving = true;
-            game.checkCollision();
+            game.checkCollision(collider);
         }
 
         playerBox.x = collider.x;

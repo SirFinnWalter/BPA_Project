@@ -10,25 +10,37 @@ import java.util.Set;
 public class Collider extends Rectangle {
     private static final long serialVersionUID = 1630374324558026943L;
     private Set<CollisionListener> listeners = new HashSet<CollisionListener>();
+    CollisionListener listener;
 
-    public Collider() {
+    public Collider(CollisionListener listener) {
         super();
-        this.tempName = "???";
+        this.listener = listener;
     }
 
-    String tempName;
-
-    public Collider(int x, int y, int width, int height, String tempName) {
+    public Collider(CollisionListener listener, int x, int y, int width, int height) {
         super(x, y, width, height);
-        this.tempName = tempName;
+        this.listener = listener;
     }
 
-    public boolean checkCollision(Collider col) {
+    public void checkCollision(Collider col) {
         boolean collision = this.intersects(col);
         if (collision) {
-            this.fireCollision(col);
+            // System.out.println("collision");
+            if (col.getCollisionListener() instanceof Tilemap.MappedTile || col.getCollisionListener() == null) {
+                this.fireCollision(col);
+                return;
+            }
+
+            listeners.forEach(listener -> {
+                if (col == listener.getCollider()) {
+                    this.fireCollision(col);
+                }
+            });
         }
-        return this.intersects(col);
+    }
+
+    public CollisionListener getCollisionListener() {
+        return this.listener;
     }
 
     public void addCollisionListener(CollisionListener listener) {
@@ -41,11 +53,10 @@ public class Collider extends Rectangle {
 
     public void fireCollision(Collider col) {
         // System.out.println("fired");
-        CollisionEvent e = new CollisionEvent(this, col);
-        for (CollisionListener listener : listeners) {
-            if (listener.getCollider() == col) {
-                listener.onCollision(e);
-            }
-        }
+        CollisionEvent e = new CollisionEvent(col);
+        listener.onCollision(e);
+        // for (CollisionListener listener : listeners) {
+        // listener.onCollision(e);
+        // }
     }
 }
