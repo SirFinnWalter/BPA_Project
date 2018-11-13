@@ -206,7 +206,7 @@ public class Tilemap {
         return height;
     }
 
-    class MappedTile implements CollisionListener {
+    class MappedTile {
         public int mappedTileID, tileID, x, y;
         private boolean collidable;
         public Collider collider;
@@ -220,7 +220,7 @@ public class Tilemap {
             this.collidable = this.getTile().getCollision();
             if (collidable) {
                 Point p = mapPointToScreen(x, y);
-                collider = new Collider(this, p.x, p.y, this.getWidth() * BombGame.XZOOM,
+                collider = new Collider(null, p.x, p.y, this.getWidth() * BombGame.XZOOM,
                         this.getHeight() * BombGame.YZOOM);
             }
         }
@@ -269,11 +269,6 @@ public class Tilemap {
             return Tilemap.this.getTile(x + 1, y);
         }
 
-        @Override
-        public void onCollision(CollisionEvent e) {
-        }
-
-        @Override
         public Collider getCollider() {
             return this.collider;
         }

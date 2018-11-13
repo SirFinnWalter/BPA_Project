@@ -6,7 +6,7 @@ import java.io.File;
  * @createdOn Wednesday, 07 November, 2018
  */
 
-public class Bomb implements GameObject, CollisionListener {
+public class Bomb implements GameObject {
     private static final AnimatedSprite BOMB_ANIMATED_SPRITE = new AnimatedSprite(
             new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\bomb.png")), 16, 16), 5);
 
@@ -17,6 +17,13 @@ public class Bomb implements GameObject, CollisionListener {
     private Player owner;
     private boolean init;
 
+    /**
+     * Creates a new bomb.
+     * 
+     * @param player The player that created the bomb.
+     * @param x      The x position on the screen.
+     * @param y      The y position on the screen.
+     */
     public Bomb(Player player, int x, int y) {
         try {
             animatedSprite = (AnimatedSprite) BOMB_ANIMATED_SPRITE.clone();
@@ -31,16 +38,20 @@ public class Bomb implements GameObject, CollisionListener {
         init = true;
     }
 
+    // TODO: finish commenting
+    /**
+     * Renders the bomb to the screen
+     */
     public void render(RenderHandler renderer, int xZoom, int yZoom) {
         // animatedSprite.render(renderer, xZoom, yZoom);
         renderer.renderSprite(animatedSprite, collider.x, collider.y, xZoom, yZoom);
-        renderer.renderRectangle(collider, 1, 1);
+        // renderer.renderRectangle(collider, 1, 1);
     }
 
     public void init(BombGame game) {
         game.getPlayers().forEach(player -> {
             if (player != owner)
-                player.getCollider().addCollisionListener(this);
+                player.getCollider().addGameObject(this);
 
         });
     }
@@ -53,7 +64,7 @@ public class Bomb implements GameObject, CollisionListener {
         }
 
         if (init && !owner.getCollider().intersects(this.collider)) {
-            owner.getCollider().addCollisionListener(this);
+            owner.getCollider().addGameObject(this);
             init = false;
         }
     }
@@ -63,8 +74,8 @@ public class Bomb implements GameObject, CollisionListener {
         return collider;
     }
 
-    @Override
-    public void onCollision(CollisionEvent e) {
+    // @Override
+    // public void onCollision(CollisionEvent e) {
 
-    }
+    // }
 }

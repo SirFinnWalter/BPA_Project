@@ -36,7 +36,6 @@ public class BombGame extends JFrame implements Runnable {
 
     private boolean running = false;
     private Canvas canvas = new Canvas();
-    // private KeyboardListener listener = new KeyboardListener();
     private Set<GameObject> objects = new HashSet<GameObject>();
     private Set<GameObject> objectsBuffer = new HashSet<GameObject>();
     private Set<Player> players = new HashSet<Player>();
@@ -44,6 +43,9 @@ public class BombGame extends JFrame implements Runnable {
     private RenderHandler renderer;
     private Tilemap map;
 
+    /**
+     * Creates a default window with a canvas then loads the remaining game files.
+     */
     public BombGame() {
         this.setTitle("DynoMite");
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -123,6 +125,9 @@ public class BombGame extends JFrame implements Runnable {
         objectsBuffer.addAll(objects);
     }
 
+    /**
+     * Game loop - variable frame rate, fixed update rate
+     */
     public void run() {
         running = true;
         int frames = 0;
@@ -147,24 +152,33 @@ public class BombGame extends JFrame implements Runnable {
             frames++;
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
-                // System.out.println(frames + " fps");
+                System.out.println(frames + " fps");
                 frames = 0;
             }
         }
     }
 
+    /**
+     * Initalizes every game object
+     */
     private void init() {
         objects.forEach(object -> {
             object.init(this);
         });
     }
 
+    /**
+     * Updates every game object state
+     */
     private void update() {
         objects.forEach(object -> {
             object.update(this);
         });
     }
 
+    /**
+     * Renders map and game objects to screen
+     */
     private void render() {
         try {
             BufferStrategy bStrategy = canvas.getBufferStrategy();
@@ -175,10 +189,6 @@ public class BombGame extends JFrame implements Runnable {
             objects.forEach(object -> {
                 object.render(renderer, XZOOM, YZOOM);
             });
-            // player.render(renderer, XZOOM, YZOOM);
-            // bomb.render(renderer, XZOOM, YZOOM);
-            // player2.render(renderer, XZOOM, YZOOM);
-            // player3.render(renderer, XZOOM, YZOOM);
             renderer.render(gfx);
             gfx.dispose();
             bStrategy.show();
@@ -190,37 +200,60 @@ public class BombGame extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Returns the game objects buffer
+     */
     public Set<GameObject> getGameObjects() {
         return this.objectsBuffer;
     }
 
+    /**
+     * Adds a new game object to the game objects buffer. Objects in the buffer are
+     * added into the game objects pool after the current update and render is
+     * finished.
+     * 
+     * @param object The game object to be add
+     */
     public void addGameObject(GameObject object) {
         objectsBuffer.add(object);
         object.init(this);
     }
 
+    /**
+     * Removes a game object from the game objects buffer if present. Objects in the
+     * buffer are removed from the game object pool after the current update and
+     * render is finished.
+     * 
+     * @param object The game object to be removed
+     */
     public void removeGameObject(GameObject object) {
         objectsBuffer.remove(object);
     }
 
+    /**
+     * Checks a collider with the map tiles and other colliders defined in the
+     * collider game object pool.
+     * 
+     * @param source The collider to check.
+     */
     public void checkCollision(Collider source) {
         map.checkCollision(source);
         objects.forEach(object -> {
-            if (object.getCollider() != null && object.getCollider() != source) {
+            if (source.getGameObjects().contains(object)) {
                 source.checkCollision(object.getCollider());
             }
+            // if (object.getCollider() != null && object.getCollider() != source) {
+            // source.checkCollision(object.getCollider());
+            // }
         });
-        // objects.forEach(object -> {
-        // if (object.getCollider() != null) {
-        // map.checkCollision(object.getCollider());
-        // players.forEach(player -> {
-        // // object.getCollider().checkCollision(player.getCollider());
-        // player.getCollider().checkCollision(object.getCollider());
-        // });
-        // }
-        // });
     }
 
+    /**
+     * Formats a file into a BufferedImage TYPE_INT_ARGB.
+     * 
+     * @param file The image to format.
+     * @return The formatted image.
+     */
     public static BufferedImage loadImage(File file) {
         try {
             BufferedImage loadedImage = ImageIO.read(file);
@@ -235,22 +268,39 @@ public class BombGame extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Returns the running state.
+     * 
+     * @return The running state.
+     */
     public boolean isRunning() {
         return running;
     }
 
+    /**
+     * Returns the set of players.
+     * 
+     * @return The set of players.
+     */
     public Set<Player> getPlayers() {
         return this.players;
     }
 
-    // public KeyboardListener getListener() {
-    // return this.listener;
-    // }
-
+    /**
+     * Returns the map.
+     * 
+     * @return the map.
+     */
     public Tilemap getMap() {
         return map;
     }
 
+    /**
+     * Sets the state of the game. Setting the game state to false will close the
+     * game.
+     * 
+     * @param running The state to set the game to.
+     */
     public void setRunning(boolean running) {
         this.running = running;
     }

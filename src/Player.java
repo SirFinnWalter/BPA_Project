@@ -50,18 +50,17 @@ public class Player implements GameObject, CollisionListener {
     public void init(BombGame game) {
         game.getMap().mappedTiles.forEach((k, v) -> {
             if (v.collider != null)
-                v.collider.addCollisionListener(this);
+                v.collider.addGameObject(this);
         });
         game.getPlayers().forEach(object -> {
             if (object != this) {
                 // object.getCollider().addCollisionListener(this);
-                collider.addCollisionListener((Player) object);
+                collider.addGameObject((Player) object);
             }
         });
     }
 
     public synchronized void update(BombGame game) {
-        // KeyboardListener listener = game.getListener();
         boolean moving = false;
 
         if (listener.left()) {
