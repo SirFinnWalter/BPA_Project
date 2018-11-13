@@ -7,6 +7,17 @@ import java.util.Map;
  * @createdOn Sunday, 14 October, 2018
  */
 
+/**
+ * A <code>Player</code> is instance of <code>GameObject</code> and
+ * <code>CollisionListener</code> that the user controls. The contructor allows
+ * you to set the keys to control the player once.
+ * <p>
+ * The <code>Player</code> can take in an instance of <code>Sprite</code> to
+ * render in place of the player box. If no instance of <code>Sprite</code> is
+ * passed, then the renderer will default to rendering the <code>Player</code>
+ * player box. The <code>Player</code> will not allow movement on collision with
+ * its collider.
+ */
 public class Player implements GameObject, CollisionListener {
     private Rectangle playerBox;
     private Collider collider;
@@ -17,6 +28,21 @@ public class Player implements GameObject, CollisionListener {
     private AnimatedSprite animatedSprite = null;
     private KeyboardListener listener = null;
 
+    /**
+     * Constructs a <code>Player</code> at the upper-left bound of
+     * <code>(x,y)</code> and whose sprite and listener is specified by the argument
+     * with the same name.
+     * <p>
+     * If the sprite passed is an instance of <code>AnimatedSprite</code>, then sets
+     * the animatedSprite of the <code>Player</code> to the sprite and renders the
+     * animatedSprite instead. If the sprite passed is <code>null</code>, renders a
+     * transparent white box at the upper-left bound of <code>(x,y)</code>.
+     * 
+     * @param x        The specified X coordinate
+     * @param y        The specified Y coordinate
+     * @param sprite   The sprite render at the <code>Player<code> location
+     * @param listener The listener to control the player movement
+     */
     public Player(int x, int y, Sprite sprite, KeyboardListener listener) {
         this.sprite = sprite;
         if (sprite != null && sprite instanceof AnimatedSprite)
@@ -37,8 +63,9 @@ public class Player implements GameObject, CollisionListener {
             renderer.renderSprite(animatedSprite, playerBox.x, playerBox.y, xZoom, yZoom);
         else if (sprite != null)
             renderer.renderSprite(sprite, playerBox.x, playerBox.y, xZoom, yZoom);
+        else
+            renderer.renderRectangle(playerBox, xZoom, yZoom);
         // renderer.renderRectangle(collider, 1, 1);
-        // renderer.renderRectangle(playerBox, xZoom, yZoom);
     }
 
     private void updateDirection() {
@@ -101,7 +128,7 @@ public class Player implements GameObject, CollisionListener {
             animatedSprite.reset();
         }
         if (listener.action()) {
-            System.out.println("bomb has been planted");
+            // System.out.println("bomb has been planted");
             // TODO: Create bomb on map tile
             game.addGameObject(new Bomb(this, collider.x, collider.y));
 

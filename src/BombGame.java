@@ -57,7 +57,7 @@ public class BombGame extends JFrame implements Runnable {
             }
         });
 
-        BufferedImage image = loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
+        BufferedImage image = loadImage(new File("assets\\tilesets\\FireTileset.png"));
         SpriteSheet sheet = new SpriteSheet(image, 16, 16);
         Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
         map = new Tilemap(new File("assets\\maps\\RuinMap.bm"), tiles);
@@ -67,12 +67,14 @@ public class BombGame extends JFrame implements Runnable {
         this.setBounds(0, 0, size.width, size.height);
         this.setPreferredSize(size);
         this.pack();
+
+        // Sets the size of the window again because the content pane/title bar takes up
+        // space from the size. We want the contents of the window to be exactly the
+        // width and height.
         size.width = size.width + (getWidth() - getContentPane().getWidth());
         size.height = size.height + (getHeight() - getContentPane().getHeight());
-
         this.setPreferredSize(size);
         this.pack();
-
         this.setLocationRelativeTo(null);
 
         this.add(canvas);
@@ -84,45 +86,43 @@ public class BombGame extends JFrame implements Runnable {
         image = loadImage(new File("assets\\sprites\\ghostygoosterwalk.png"));
         sheet = new SpriteSheet(image, 16, 16);
 
-        AnimatedSprite playerAnimation = new AnimatedSprite(sheet, 10);
-
-        KeyboardListener listener = new KeyboardListener();
-        Player player = new Player(16 * 8, 32, playerAnimation, listener);
-        canvas.addKeyListener(listener);
-        canvas.addFocusListener(listener);
-
-        KeyboardListener listener2 = new KeyboardListener(KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT,
-                KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER);
-        KeyboardListener listener3 = new KeyboardListener(KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H,
-                KeyEvent.VK_C);
-        KeyboardListener listener4 = new KeyboardListener(KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L,
-                KeyEvent.VK_PERIOD);
-        Player player2 = null;
-        Player player3 = null;
-        Player player4 = null;
+        // TODO: make keylistener require keys
         try {
-            player2 = new Player(16 * 16, 32, (AnimatedSprite) playerAnimation.clone(), listener2);
-            player3 = new Player(16 * 8, 16 * 14, (AnimatedSprite) playerAnimation.clone(), listener3);
-            player4 = new Player(16 * 16, 16 * 14, (AnimatedSprite) playerAnimation.clone(), listener4);
-        } catch (Exception e) {
+            AnimatedSprite playerAnimation = new AnimatedSprite(sheet, 10);
+            createPlayer(16 * 8, 16 * 2, (AnimatedSprite) playerAnimation.clone(),
+                    new int[] { KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_Z });
+            createPlayer(16 * 16, 16 * 2, (AnimatedSprite) playerAnimation.clone(), new int[] { KeyEvent.VK_UP,
+                    KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER });
+            createPlayer(16 * 8, 16 * 14, (AnimatedSprite) playerAnimation.clone(),
+                    new int[] { KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H, KeyEvent.VK_C });
+            createPlayer(16 * 16, 16 * 14, (AnimatedSprite) playerAnimation.clone(),
+                    new int[] { KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L, KeyEvent.VK_PERIOD });
+        } catch (CloneNotSupportedException e) {
+            System.out.println("Clone not supported exception for playerAnimation.");
         }
 
-        canvas.addKeyListener(listener2);
-        canvas.addFocusListener(listener2);
-        canvas.addKeyListener(listener3);
-        canvas.addFocusListener(listener3);
-        canvas.addKeyListener(listener4);
-        canvas.addFocusListener(listener4);
-        objects.add(player2);
-        objects.add(player3);
-        objects.add(player4);
-
-        objects.add(player);
         objects.forEach(object -> {
             if (object instanceof Player)
                 players.add((Player) object);
         });
         objectsBuffer.addAll(objects);
+    }
+
+    public void createPlayer(int x, int y, AnimatedSprite sprite, int[] keys) {
+        if (keys != null && keys.length > 4) {
+            KeyboardListener listener = new KeyboardListener(keys[0], keys[1], keys[2], keys[3], keys[4]);
+            Player player = new Player(x, y, sprite, listener);
+            canvas.addKeyListener(listener);
+            canvas.addFocusListener(listener);
+            objects.add(player);
+        } else {
+            System.out.println("Not enough keys! Using default key bindings...");
+            KeyboardListener listener = new KeyboardListener();
+            Player player = new Player(x, y, sprite, listener);
+            canvas.addKeyListener(listener);
+            canvas.addFocusListener(listener);
+            objects.add(player);
+        }
     }
 
     /**

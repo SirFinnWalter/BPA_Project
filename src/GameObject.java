@@ -4,6 +4,9 @@
  * @createdOn Saturday, 10 November, 2018
  */
 
+/**
+ * 
+ */
 public interface GameObject {
     /**
      * Returns the game object collider if present.

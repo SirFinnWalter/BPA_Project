@@ -10,6 +10,9 @@ import java.util.Arrays;
  * @createdOn Sunday, 14 October, 2018
  */
 
+/**
+ * This class is to process key presses and releases.
+ */
 public class KeyboardListener implements KeyListener, FocusListener {
     int[] keys;
     boolean[] keyStates;
