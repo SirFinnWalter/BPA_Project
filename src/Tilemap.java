@@ -128,6 +128,14 @@ public class Tilemap {
 
     }
 
+    /**
+     * Renders the background tiles based off of the {@code fillTileID} then renders
+     * the tiles the map contains.
+     * 
+     * @param renderer The renderer to handle rendering
+     * @param xZoom    The zoom stretch the hortizontal plane
+     * @param yZoom    The zoom stretch the verical plane
+     */
     public void render(RenderHandler renderer, int xZoom, int yZoom) {
         if (fillTileID > -1) {
             Tileset.Tile fillTile = tileset.getTile(fillTileID);
@@ -147,6 +155,11 @@ public class Tilemap {
         });
     }
 
+    /**
+     * Checks the specified collider for collision on any tile with a collider.
+     * 
+     * @param col The specifed collider
+     */
     public void checkCollision(Collider col) {
         ArrayList<MappedTile> tiles = new ArrayList<MappedTile>();
         for (Point corners : col.getCorners()) {
@@ -162,10 +175,27 @@ public class Tilemap {
         }
     }
 
+    /**
+     * Maps the upper-left corner at the specified {@code (x, y)} to a relative
+     * location on the {@code Tilemap}. Returns the relative (x, y) tile location in
+     * a {@code Point}.
+     * 
+     * @param x The specified X coordinate
+     * @param y The specified Y coordinate
+     * @return The tile location {@code Point}
+     */
     public Point mapPointToTilemap(int x, int y) {
         return mapPointToTilemap(new Point(x, y));
     }
 
+    /**
+     * Maps the pixel (x, y) in the specified {@code Point} to a relative location
+     * on the {@code Tilemap}. Returns the relative (x, y) tile location in a
+     * {@code Point}.
+     * 
+     * @param p The specified {@code Point}
+     * @return The tile location {@code Point}
+     */
     public Point mapPointToTilemap(Point p) {
         int x = ((p.x * (width - 1)) / ((width - 1) * 16 * BombGame.XZOOM));
         int y = ((p.y * (height - 1)) / ((height - 1) * 16 * BombGame.YZOOM));
@@ -176,16 +206,44 @@ public class Tilemap {
         return new Point(x, y);
     }
 
+    /**
+     * Maps the relative location at the specified {@code (x, y)} to an exact pixel
+     * location on the screen. Returns the exact (x, y) pixel location in a
+     * {@code Point}.
+     * 
+     * @param x The specified X coordinate
+     * @param y The specified Y coordinate
+     * @return The exact pixel {@code location}
+     */
     public Point mapPointToScreen(int x, int y) {
         return mapPointToScreen(new Point(x, y));
     }
 
+    /**
+     * Maps the tile (x, y) in the specified {@code Point} to an exact pixel
+     * location on the screen. Returns the exact (x, y) pixel location in a
+     * {@code Point}.
+     * 
+     * @param x The specified X coordinate
+     * @param y The specified Y coordinate
+     * @return The exact pixel {@code location}
+     */
     public Point mapPointToScreen(Point p) {
         int x = p.x * 16 * BombGame.XZOOM;
         int y = p.y * 16 * BombGame.YZOOM;
         return new Point(x, y);
     }
 
+    /**
+     * Returns the tile at the relative location specified as {@code (x, y)}. If the
+     * location is outside the tilemap's {@code width} or {@code height}, returns a
+     * void tile.
+     * 
+     * @param x The specified X coordinate
+     * @param y The specified Y coordinate
+     * @return The tile at {@code (x, y)}; or a void tile if outside the tilemap's
+     *         range.
+     */
     public MappedTile getTile(int x, int y) {
         int key = x + (y * width);
 
@@ -198,14 +256,23 @@ public class Tilemap {
 
     }
 
+    /**
+     * @return The width of the {@code Tilemap}
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * @return The height of the {@code Tilemap}
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     * A {@code Tile} that has an (x, y) location.
+     */
     class MappedTile {
         public int mappedTileID, tileID, x, y;
         private boolean collidable;
@@ -220,7 +287,7 @@ public class Tilemap {
             this.collidable = this.getTile().getCollision();
             if (collidable) {
                 Point p = mapPointToScreen(x, y);
-                collider = new Collider(null, p.x, p.y, this.getWidth() * BombGame.XZOOM,
+                collider = new Collider(this, p.x, p.y, this.getWidth() * BombGame.XZOOM,
                         this.getHeight() * BombGame.YZOOM);
             }
         }

@@ -11,7 +11,8 @@ import java.util.Arrays;
  */
 
 /**
- * This class is to process key presses and releases.
+ * Process keyboard events and relays information of a key state for movement
+ * and action. Upon losing focus, all key states are state to {@code false}.
  */
 public class KeyboardListener implements KeyListener, FocusListener {
     int[] keys;
@@ -30,14 +31,6 @@ public class KeyboardListener implements KeyListener, FocusListener {
         keys = new int[] { upKey, downKey, leftKey, rightKey, actionKey };
         keyStates = new boolean[5];
         Arrays.fill(keyStates, false);
-    }
-
-    /**
-     * Sets keyCodes into the keys array. By default, W = up, S = down, A = left, D
-     * = right, Z = act.
-     */
-    public KeyboardListener() {
-        this(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_Z);
     }
 
     @Override
@@ -87,36 +80,28 @@ public class KeyboardListener implements KeyListener, FocusListener {
     }
 
     /**
-     * Returns the key state of up.
-     * 
-     * @return The key state of up.
+     * @return The key state of up
      */
     public boolean up() {
         return (keyStates[0]);
     }
 
     /**
-     * Returns the key state of down.
-     * 
-     * @return The key state of down.
+     * @return The key state of down
      */
     public boolean down() {
         return (keyStates[1]);
     }
 
     /**
-     * Returns the key state of left.
-     * 
-     * @return The key state of left.
+     * @return The key state of left
      */
     public boolean left() {
         return (keyStates[2]);
     }
 
     /**
-     * Returns the key state of right.
-     * 
-     * @return The key state of right.
+     * @return The key state of right
      */
     public boolean right() {
         return (keyStates[3]);

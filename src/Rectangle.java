@@ -6,24 +6,32 @@ import java.awt.Point;
  * @createdOn Sunday, 14 October, 2018
  */
 
+/**
+ * A {@code java.awt.Rectangle} that may have a color, border or both, as well
+ * as provides an array of each corner location in a {@code (x,y)} format using
+ * {@code java.awt.Point}.
+ */
 public class Rectangle extends java.awt.Rectangle {
     private static final long serialVersionUID = -8044325233882769813L;
     int pixels[];
 
     /**
-     * Creates a new rectangle.
+     * Constructs a new {@code Rectangle} whose upper-left corner is specified as
+     * {@code (x,y)} and whose width and height are specified by the arguments of
+     * the same name.
      * 
-     * @param x      The x position on the screen.
-     * @param y      The y position on the screen.
-     * @param width  The width in pixels.
-     * @param height The height in pixels.
+     * @param x      the specified X coordinate
+     * @param y      the specified Y coordinate
+     * @param width  the width of the {@code Rectangle}
+     * @param height the height of the {@code Rectangle}
      */
     public Rectangle(int x, int y, int width, int height) {
         super(x, y, width, height);
     }
 
     /**
-     * Creates a rectangle from an existing java Rectangle.
+     * Constructs a new {@code Rectangle} from an existing
+     * {@code java.awt.Rectangle}.
      * 
      * @param r The java Rectangle.
      */
@@ -39,19 +47,21 @@ public class Rectangle extends java.awt.Rectangle {
     }
 
     /**
-     * Returns the cross-section between this and another rectangle.
+     * Returns a new {@code Rectangle} from the intersection between this
+     * {@code Rectangle} and the specified {@code Rectangle}.
      * 
-     * @param r The rectangle to cross with this rectangle.
-     * @return the cross-section between this and another rectangle.
+     * @param r The specified {@code Rectangle}
+     * @return A {@code Rectangle} from the intersection; or an empty
+     *         {@code Rectangle} if the rectangles do not intersect
      */
     public Rectangle intersection(Rectangle r) {
         return new Rectangle(super.intersection(r));
     }
 
     /**
-     * Returns the color pixel array. Will log error if no color has been set.
+     * Returns the color pixel. Logs error if no color has been set.
      * 
-     * @return the color pixels array.
+     * @return the color pixels
      */
     public int[] getPixels() {
         if (pixels != null)
@@ -63,10 +73,11 @@ public class Rectangle extends java.awt.Rectangle {
 
     /**
      * Returns the four points of each corner of the rectangle. The first element is
-     * the top-left corner point, followed by the top-right corner point, then the
-     * bottom-left corner point, and finally the bottom-right corner point.
+     * the top-left corner {@code Point} followed by the top-right corner
+     * {@code Point} then the bottom-left corner {@code Point} and finally the
+     * bottom-right corner {@code Point}.
      * 
-     * @return The four points of each corner of the rectangle.
+     * @return The four points of each corner of the rectangle
      */
     public Point[] getCorners() {
         Point[] p = new Point[4];
@@ -78,9 +89,16 @@ public class Rectangle extends java.awt.Rectangle {
     }
 
     /**
-     * Sets the color of the rectangle.
+     * Sets every pixel in {@code pixels} to the specified color in the format of
+     * {@code 0xAARRGGBB} where:
+     * <ul>
+     * <li>{@code AA} is Alpha from 00 to FF</li>
+     * <li>{@code RR} is Red from 00 to FF</li>
+     * <li>{@code BB} is Blue from 00 to FF</li>
+     * <li>{@code GG} is Green from 00 to FF</li>
+     * </ul>
      * 
-     * @param color The int color format to set (0xAARRGGBB).
+     * @param color The specified color
      */
     public void setColor(int color) {
         pixels = new int[width * height];
@@ -92,10 +110,18 @@ public class Rectangle extends java.awt.Rectangle {
     }
 
     /**
-     * Sets the border of the rectangle.
+     * Gives the {@code Rectangle} a border with the specified width and sets the
+     * {@code pixels} in the range of the border to the specified color in the
+     * format of {@code 0xAARRGGBB} where:
+     * <ul>
+     * <li>{@code AA} is Alpha from 00 to FF</li>
+     * <li>{@code RR} is Red from 00 to FF</li>
+     * <li>{@code BB} is Blue from 00 to FF</li>
+     * <li>{@code GG} is Green from 00 to FF</li>
+     * </ul>
      * 
-     * @param borderWidth The width of the border.
-     * @param color       The int color format to set the border (0xAARRGGBB).
+     * @param borderWidth The specified width
+     * @param color       The specified color
      */
     public void setBorder(int borderWidth, int color) {
         if (pixels == null)

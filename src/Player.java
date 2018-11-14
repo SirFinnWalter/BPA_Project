@@ -8,15 +8,14 @@ import java.util.Map;
  */
 
 /**
- * A <code>Player</code> is instance of <code>GameObject</code> and
- * <code>CollisionListener</code> that the user controls. The contructor allows
- * you to set the keys to control the player once.
+ * A {@code Player} is instance of {@code GameObject} and
+ * {@code CollisionListener} that the user controls. The contructor allows you
+ * to set the keys to control the player once.
  * <p>
- * The <code>Player</code> can take in an instance of <code>Sprite</code> to
- * render in place of the player box. If no instance of <code>Sprite</code> is
- * passed, then the renderer will default to rendering the <code>Player</code>
- * player box. The <code>Player</code> will not allow movement on collision with
- * its collider.
+ * The {@code Player} can take in an instance of {@code Sprite} to render in
+ * place of the player box. If no instance of {@code Sprite} is passed, then the
+ * renderer will default to rendering the {@code Player} player box. The
+ * {@code Player} will not allow movement on collision with its collider.
  */
 public class Player implements GameObject, CollisionListener {
     private Rectangle playerBox;
@@ -29,19 +28,18 @@ public class Player implements GameObject, CollisionListener {
     private KeyboardListener listener = null;
 
     /**
-     * Constructs a <code>Player</code> at the upper-left bound of
-     * <code>(x,y)</code> and whose sprite and listener is specified by the argument
-     * with the same name.
+     * Constructs a {@code Player} at the upper-left bound of {@code (x,y)} and
+     * whose sprite and listener is specified by the argument with the same name.
      * <p>
-     * If the sprite passed is an instance of <code>AnimatedSprite</code>, then sets
-     * the animatedSprite of the <code>Player</code> to the sprite and renders the
-     * animatedSprite instead. If the sprite passed is <code>null</code>, renders a
-     * transparent white box at the upper-left bound of <code>(x,y)</code>.
+     * If the sprite passed is an instance of {@code AnimatedSprite}, then sets the
+     * animatedSprite of the {@code Player} to the sprite and renders the
+     * animatedSprite instead. If the sprite passed is {@code null}, renders a
+     * transparent white box at the upper-left bound of {@code (x,y)}.
      * 
-     * @param x        The specified X coordinate
-     * @param y        The specified Y coordinate
-     * @param sprite   The sprite render at the <code>Player<code> location
-     * @param listener The listener to control the player movement
+     * @param x      The specified X coordinate
+     * @param y      The specified Y coordinate
+     * @param sprite The sprite render at the {@code Player{@code  location @param
+     *               listener The listener to control the player movement
      */
     public Player(int x, int y, Sprite sprite, KeyboardListener listener) {
         this.sprite = sprite;
@@ -58,6 +56,10 @@ public class Player implements GameObject, CollisionListener {
         this.listener = listener;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void render(RenderHandler renderer, int xZoom, int yZoom) {
         if (animatedSprite != null)
             renderer.renderSprite(animatedSprite, playerBox.x, playerBox.y, xZoom, yZoom);
@@ -68,26 +70,47 @@ public class Player implements GameObject, CollisionListener {
         // renderer.renderRectangle(collider, 1, 1);
     }
 
+    /**
+     * If the {@code Player} has an {@code AnimatedSprite}, then updates what frames
+     * to loop through for the direction the {@code Player} is facing.
+     */
     private void updateDirection() {
         if (animatedSprite != null) {
             animatedSprite.setAnimationRange(currentFD.getValue() * 7, currentFD.getValue() * 7 + 6);
         }
     }
 
+    /**
+     * Adds every player's {@code collider} in every player in the game except for
+     * itself.
+     * 
+     * @param game The game info and state
+     */
+    @Override
     public void init(BombGame game) {
-        game.getMap().mappedTiles.forEach((k, v) -> {
-            if (v.collider != null)
-                v.collider.addGameObject(this);
-        });
-        game.getPlayers().forEach(object -> {
-            if (object != this) {
-                // object.getCollider().addCollisionListener(this);
-                collider.addGameObject((Player) object);
+        // game.getM
+        game.getPlayers().forEach(player -> {
+            if (player != this) {
+                collider.addGameObject((player));
             }
         });
     }
 
-    public synchronized void update(BombGame game) {
+    /**
+     * Updates the location of the {@code collider} then checks for collision on
+     * each movement before actually moving the {@code Player}. Only updates the
+     * direction the {@code Player} is facing if it is a new direction.
+     * <p>
+     * If the {@code Player} is moving, the begin looping through the
+     * {@code animatedSprite}. If not, then stay static on the first frame of the
+     * {@code animatedSprite}.
+     * <p>
+     * Also listens for when the {@code Player} wants to place a {@code Bomb}.
+     * 
+     * @param game The game info and state
+     */
+    @Override
+    public void update(BombGame game) {
         boolean moving = false;
 
         if (listener.left()) {
@@ -136,15 +159,20 @@ public class Player implements GameObject, CollisionListener {
 
     }
 
+    /**
+     * @return The collider
+     */
     @Override
     public Collider getCollider() {
         return collider;
     }
 
+    /**
+     * Auto-adjust the location of the {@code collider} based on the intersection of
+     * the {@code collider} and the source collider.
+     */
     @Override
-    public synchronized void onCollision(CollisionEvent e) {
-        // System.out.println("c");
-        // if (e.getTrigger() == this.collider) {
+    public void onCollision(CollisionEvent e) {
         switch (newFD) {
         case up:
             collider.y += e.intersection(collider).height;
@@ -163,9 +191,12 @@ public class Player implements GameObject, CollisionListener {
             collider.y = playerBox.y;
             break;
         }
-        // }
     }
 
+    /**
+     * Directions the {@code Player} can be facing. Can be refered by name or
+     * integer value.
+     */
     public enum FacingDirection {
         up(0), down(1), left(2), right(3);
 

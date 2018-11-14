@@ -5,13 +5,17 @@
  * @createdOn Saturday, 10 November, 2018
  */
 
+/**
+ * Listens for collision events. The class that implements this interface should
+ * act upon getting a collision call.
+ */
 public interface CollisionListener {
-    // public Collider getCollider();
 
     /**
-     * Called whenever a collision with the object has occurred.
+     * Notifies the class that a collsion has occurred. If the class does nothing
+     * upon recieving, consider not using this interface.
      * 
-     * @param e The collision event.
+     * @param e The collision event
      */
     public void onCollision(CollisionEvent e);
 

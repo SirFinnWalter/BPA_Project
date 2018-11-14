@@ -86,7 +86,6 @@ public class BombGame extends JFrame implements Runnable {
         image = loadImage(new File("assets\\sprites\\ghostygoosterwalk.png"));
         sheet = new SpriteSheet(image, 16, 16);
 
-        // TODO: make keylistener require keys
         try {
             AnimatedSprite playerAnimation = new AnimatedSprite(sheet, 10);
             createPlayer(16 * 8, 16 * 2, (AnimatedSprite) playerAnimation.clone(),
@@ -98,7 +97,8 @@ public class BombGame extends JFrame implements Runnable {
             createPlayer(16 * 16, 16 * 14, (AnimatedSprite) playerAnimation.clone(),
                     new int[] { KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L, KeyEvent.VK_PERIOD });
         } catch (CloneNotSupportedException e) {
-            System.out.println("Clone not supported exception for playerAnimation.");
+            e.printStackTrace();
+            throw new RuntimeException();
         }
 
         objects.forEach(object -> {
@@ -116,17 +116,12 @@ public class BombGame extends JFrame implements Runnable {
             canvas.addFocusListener(listener);
             objects.add(player);
         } else {
-            System.out.println("Not enough keys! Using default key bindings...");
-            KeyboardListener listener = new KeyboardListener();
-            Player player = new Player(x, y, sprite, listener);
-            canvas.addKeyListener(listener);
-            canvas.addFocusListener(listener);
-            objects.add(player);
+            System.out.println("Not enough keys! Could not create player.");
         }
     }
 
     /**
-     * Game loop - variable frame rate, fixed update rate
+     * Main game loop - variable frame rate, fixed update rate
      */
     public void run() {
         running = true;
@@ -149,6 +144,7 @@ public class BombGame extends JFrame implements Runnable {
             objects.removeAll(objects);
             objects.addAll(objectsBuffer);
 
+            // Outputs frames/second
             frames++;
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
@@ -159,7 +155,7 @@ public class BombGame extends JFrame implements Runnable {
     }
 
     /**
-     * Initalizes every game object
+     * Initalizes game objects
      */
     private void init() {
         objects.forEach(object -> {
@@ -168,7 +164,7 @@ public class BombGame extends JFrame implements Runnable {
     }
 
     /**
-     * Updates every game object state
+     * Updates game objects
      */
     private void update() {
         objects.forEach(object -> {
@@ -177,7 +173,7 @@ public class BombGame extends JFrame implements Runnable {
     }
 
     /**
-     * Renders map and game objects to screen
+     * Renders map and game objects to the canvas
      */
     private void render() {
         try {
@@ -201,16 +197,17 @@ public class BombGame extends JFrame implements Runnable {
     }
 
     /**
-     * Returns the game objects buffer
+     * @return The game object buffer
      */
     public Set<GameObject> getGameObjects() {
         return this.objectsBuffer;
     }
 
     /**
-     * Adds a new game object to the game objects buffer. Objects in the buffer are
-     * added into the game objects pool after the current update and render is
-     * finished.
+     * Adds a new game object to the game objects buffer.
+     * <p>
+     * Objects in the buffer are added into the game objects pool after the current
+     * update and render is finished.
      * 
      * @param object The game object to be add
      */
@@ -220,9 +217,10 @@ public class BombGame extends JFrame implements Runnable {
     }
 
     /**
-     * Removes a game object from the game objects buffer if present. Objects in the
-     * buffer are removed from the game object pool after the current update and
-     * render is finished.
+     * Removes a game object from the game objects buffer if present.
+     * <p>
+     * Objects in the buffer are removed from the game object pool after the current
+     * update and render is finished.
      * 
      * @param object The game object to be removed
      */
@@ -232,15 +230,15 @@ public class BombGame extends JFrame implements Runnable {
 
     /**
      * Checks a collider with the map tiles and other colliders defined in the
-     * collider game object pool.
+     * collider's collision pool.
      * 
-     * @param source The collider to check.
+     * @param col The collider to check
      */
-    public void checkCollision(Collider source) {
-        map.checkCollision(source);
+    public void checkCollision(Collider col) {
+        map.checkCollision(col);
         objects.forEach(object -> {
-            if (source.getGameObjects().contains(object)) {
-                source.checkCollision(object.getCollider());
+            if (col.getGameObjects().contains(object)) {
+                col.checkCollision(object.getCollider());
             }
             // if (object.getCollider() != null && object.getCollider() != source) {
             // source.checkCollision(object.getCollider());
@@ -249,10 +247,10 @@ public class BombGame extends JFrame implements Runnable {
     }
 
     /**
-     * Formats a file into a BufferedImage TYPE_INT_ARGB.
+     * Formats a file into a BufferedImage of type TYPE_INT_ARGB
      * 
-     * @param file The image to format.
-     * @return The formatted image.
+     * @param file The image to format
+     * @return The formatted image
      */
     public static BufferedImage loadImage(File file) {
         try {
@@ -269,37 +267,31 @@ public class BombGame extends JFrame implements Runnable {
     }
 
     /**
-     * Returns the running state.
-     * 
-     * @return The running state.
+     * @return The running state
      */
     public boolean isRunning() {
         return running;
     }
 
     /**
-     * Returns the set of players.
-     * 
-     * @return The set of players.
+     * @return The set of players
      */
     public Set<Player> getPlayers() {
         return this.players;
     }
 
     /**
-     * Returns the map.
-     * 
-     * @return the map.
+     * @return the map
      */
     public Tilemap getMap() {
         return map;
     }
 
     /**
-     * Sets the state of the game. Setting the game state to false will close the
-     * game.
+     * Sets the state of the game. Setting the game state to {@code false} will
+     * close the game by first ending the game loop then closing the window.
      * 
-     * @param running The state to set the game to.
+     * @param running The state to set the game state
      */
     public void setRunning(boolean running) {
         this.running = running;
