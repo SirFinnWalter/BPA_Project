@@ -19,7 +19,6 @@ import javax.swing.JOptionPane;
  * @author Dakota Taylor
  * @createdOn Sunday, 14 October, 2018
  */
-
 public class BombGame extends JFrame implements Runnable {
 
     public static void main(String[] args) {
@@ -44,7 +43,8 @@ public class BombGame extends JFrame implements Runnable {
     private Tilemap map;
 
     /**
-     * Creates a default window with a canvas then loads the remaining game files.
+     * Creates a default window with a canvas and loads game files. Uses the game
+     * files to create the players and map.
      */
     public BombGame() {
         this.setTitle("DynoMite");
@@ -57,10 +57,10 @@ public class BombGame extends JFrame implements Runnable {
             }
         });
 
-        BufferedImage image = loadImage(new File("assets\\tilesets\\FireTileset.png"));
+        BufferedImage image = loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
         SpriteSheet sheet = new SpriteSheet(image, 16, 16);
         Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
-        map = new Tilemap(new File("assets\\maps\\RuinMap.bm"), tiles);
+        map = new Tilemap(new File("assets\\maps\\RuinsMap.bm"), tiles);
 
         Dimension size = new Dimension(map.getWidth() * 16 * XZOOM, map.getHeight() * 16 * YZOOM);
 
@@ -88,14 +88,14 @@ public class BombGame extends JFrame implements Runnable {
 
         try {
             AnimatedSprite playerAnimation = new AnimatedSprite(sheet, 10);
-            createPlayer(16 * 8, 16 * 2, (AnimatedSprite) playerAnimation.clone(),
-                    new int[] { KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_Z });
-            createPlayer(16 * 16, 16 * 2, (AnimatedSprite) playerAnimation.clone(), new int[] { KeyEvent.VK_UP,
-                    KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER });
-            createPlayer(16 * 8, 16 * 14, (AnimatedSprite) playerAnimation.clone(),
-                    new int[] { KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H, KeyEvent.VK_C });
-            createPlayer(16 * 16, 16 * 14, (AnimatedSprite) playerAnimation.clone(),
-                    new int[] { KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L, KeyEvent.VK_PERIOD });
+            createPlayer(16 * 7, 16 * 2, (AnimatedSprite) playerAnimation.clone(),
+                    new int[] { KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_E });
+            createPlayer(16 * 17, 16 * 2, (AnimatedSprite) playerAnimation.clone(),
+                    new int[] { KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_Z });
+            createPlayer(16 * 7, 16 * 14, (AnimatedSprite) playerAnimation.clone(),
+                    new int[] { KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H, KeyEvent.VK_Y });
+            createPlayer(16 * 17, 16 * 14, (AnimatedSprite) playerAnimation.clone(),
+                    new int[] { KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L, KeyEvent.VK_O });
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -108,6 +108,14 @@ public class BombGame extends JFrame implements Runnable {
         objectsBuffer.addAll(objects);
     }
 
+    /**
+     * Constructs a {@code KeyboardListener} with the specified {@code keys} then
+     * uses it to construct a {@code Player} at the specified {@code (x, y)} and a
+     * specified sprite.
+     * <p>
+     * The {@code KeyboardListener} is added to the {@code canvas} and the player is
+     * added to the objects buffer.
+     */
     public void createPlayer(int x, int y, AnimatedSprite sprite, int[] keys) {
         if (keys != null && keys.length > 4) {
             KeyboardListener listener = new KeyboardListener(keys[0], keys[1], keys[2], keys[3], keys[4]);
@@ -141,6 +149,10 @@ public class BombGame extends JFrame implements Runnable {
             }
             render();
 
+            for (GameObject object : objectsBuffer) {
+                if (!objects.contains(object))
+                    object.init(this);
+            }
             objects.removeAll(objects);
             objects.addAll(objectsBuffer);
 

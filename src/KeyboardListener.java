@@ -14,6 +14,7 @@ import java.util.Arrays;
  * Process keyboard events and relays information of a key state for movement
  * and action. Upon losing focus, all key states are state to {@code false}.
  */
+// TODO: Use KeyBindings instead of KeyListener (allows multiple keyboards?)
 public class KeyboardListener implements KeyListener, FocusListener {
     int[] keys;
     boolean[] keyStates;
