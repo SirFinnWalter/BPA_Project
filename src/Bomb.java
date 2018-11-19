@@ -19,6 +19,7 @@ public class Bomb implements GameObject {
     private AnimatedSprite animatedSprite;
     private Player owner;
     private boolean init;
+    private boolean exploding;
 
     /**
      * Creates a new {@code Bomb} whose upper-left corner is specified as
@@ -83,10 +84,20 @@ public class Bomb implements GameObject {
             game.removeGameObject(this);
         }
 
-        if (init && !owner.getCollider().intersects(this.collider)) {
+        if (animatedSprite.getCurrentSprite() >= 10) {
+            exploding = true;
+        }
+        boolean collision = owner.getCollider().intersects(this.collider);
+        if (init && !collision) {
             owner.getCollider().addGameObject(this);
             init = false;
+        } else if (exploding && collision) {
+            owner.setDestroyed(true);
         }
+    }
+
+    public boolean isExploding() {
+        return exploding;
     }
 
     /**

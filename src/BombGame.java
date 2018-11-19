@@ -57,7 +57,7 @@ public class BombGame extends JFrame implements Runnable {
             }
         });
 
-        BufferedImage image = loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
+        BufferedImage image = loadImage(new File("assets\\tilesets\\DesertTileset.png"));
         SpriteSheet sheet = new SpriteSheet(image, 16, 16);
         Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
         map = new Tilemap(new File("assets\\maps\\RuinsMap.bm"), tiles);
@@ -88,10 +88,10 @@ public class BombGame extends JFrame implements Runnable {
 
         try {
             AnimatedSprite playerAnimation = new AnimatedSprite(sheet, 10);
-            createPlayer(16 * 7, 16 * 2, (AnimatedSprite) playerAnimation.clone(),
-                    new int[] { KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_E });
+            createPlayer(16 * 7, 16 * 2, (AnimatedSprite) playerAnimation.clone(), new int[] { KeyEvent.VK_UP,
+                    KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER });
             createPlayer(16 * 17, 16 * 2, (AnimatedSprite) playerAnimation.clone(),
-                    new int[] { KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_Z });
+                    new int[] { KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_E });
             createPlayer(16 * 7, 16 * 14, (AnimatedSprite) playerAnimation.clone(),
                     new int[] { KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H, KeyEvent.VK_Y });
             createPlayer(16 * 17, 16 * 14, (AnimatedSprite) playerAnimation.clone(),

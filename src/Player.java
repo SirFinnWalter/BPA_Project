@@ -24,6 +24,7 @@ public class Player implements GameObject, CollisionListener {
     double speedY = 1 * BombGame.YZOOM;
     FacingDirection currentFD, newFD;
     private Sprite sprite;
+    private boolean destroyed;
     private AnimatedSprite animatedSprite = null;
     private KeyboardListener listener = null;
 
@@ -156,7 +157,15 @@ public class Player implements GameObject, CollisionListener {
             game.addGameObject(new Bomb(this, collider.x, collider.y));
 
         }
+        if (destroyed)
+            game.removeGameObject(this);
+    }
 
+    /**
+     * @param destroyed the destroyed to set
+     */
+    public void setDestroyed(boolean destroyed) {
+        this.destroyed = destroyed;
     }
 
     /**
@@ -190,6 +199,10 @@ public class Player implements GameObject, CollisionListener {
             collider.x = playerBox.x;
             collider.y = playerBox.y;
             break;
+        }
+        Object source = e.getSource().getObject();
+        if (source instanceof Bomb && ((Bomb) source).isExploding()) {
+            this.destroyed = true;
         }
     }
 

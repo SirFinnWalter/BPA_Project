@@ -6,15 +6,15 @@
 
 public class CollisionEvent {
 
-    private Collider trigger;
+    private Collider source;
 
     /**
      * Creates a new collision event.
      * 
-     * @param trigger The collider that triggered the event.
+     * @param source The collider that triggered the event.
      */
-    public CollisionEvent(Collider trigger) {
-        this.trigger = trigger;
+    public CollisionEvent(Collider source) {
+        this.source = source;
     }
 
     /**
@@ -26,11 +26,11 @@ public class CollisionEvent {
      *         collider.
      */
     public Rectangle intersection(Collider col) {
-        return trigger.intersection(col);
+        return source.intersection(col);
     }
 
-    // public Collider getTrigger() {
-    // return trigger;
-    // }
+    public Collider getSource() {
+        return source;
+    }
 
 }

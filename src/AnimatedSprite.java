@@ -98,7 +98,6 @@ public class AnimatedSprite extends Sprite implements Cloneable {
                 break;
             }
         }
-
     }
 
     @Override
@@ -120,6 +119,10 @@ public class AnimatedSprite extends Sprite implements Cloneable {
         if (currentSprite >= 0)
             return sprites[currentSprite].getPixels();
         return null;
+    }
+
+    public int getCurrentSprite() {
+        return this.currentSprite;
     }
 
     public boolean isDestroyed() {
