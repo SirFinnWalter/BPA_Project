@@ -60,7 +60,7 @@ public class BombGame extends JFrame implements Runnable {
         BufferedImage image = loadImage(new File("assets\\tilesets\\DesertTileset.png"));
         SpriteSheet sheet = new SpriteSheet(image, 16, 16);
         Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
-        map = new Tilemap(new File("assets\\maps\\RuinsMap.bm"), tiles);
+        map = new Tilemap(new File("assets\\maps\\DefaultMap.bm"), tiles);
 
         Dimension size = new Dimension(map.getWidth() * 16 * XZOOM, map.getHeight() * 16 * YZOOM);
 
@@ -249,7 +249,7 @@ public class BombGame extends JFrame implements Runnable {
     public void checkCollision(Collider col) {
         map.checkCollision(col);
         objects.forEach(object -> {
-            if (col.getGameObjects().contains(object)) {
+            if (col.getGameObjects().containsKey(object)) {
                 col.checkCollision(object.getCollider());
             }
             // if (object.getCollider() != null && object.getCollider() != source) {

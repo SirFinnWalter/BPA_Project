@@ -12,7 +12,7 @@ import java.io.File;
  */
 public class Bomb implements GameObject {
     private static final AnimatedSprite BOMB_ANIMATED_SPRITE = new AnimatedSprite(
-            new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\bomb.png")), 16, 16), 5);
+            new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\bomb.png")), 16, 16), 555);
 
     Collider collider;
 
@@ -51,7 +51,7 @@ public class Bomb implements GameObject {
     public void render(RenderHandler renderer, int xZoom, int yZoom) {
         // animatedSprite.render(renderer, xZoom, yZoom);
         renderer.renderSprite(animatedSprite, collider.x, collider.y, xZoom, yZoom);
-        // renderer.renderRectangle(collider, 1, 1);
+        renderer.renderRectangle(collider, 1, 1);
     }
 
     /**
@@ -61,9 +61,8 @@ public class Bomb implements GameObject {
      */
     @Override
     public void init(BombGame game) {
-        game.getPlayers().forEach(player -> {
-            if (player != owner)
-                player.getCollider().addGameObject(this);
+        game.getPlayers().forEach(player -> { // if (player != owner)
+            player.getCollider().addGameObject(this);
 
         });
     }
@@ -80,13 +79,14 @@ public class Bomb implements GameObject {
     public void update(BombGame game) {
         animatedSprite.update(game);
 
+        if (animatedSprite.getCurrentSprite() >= 10) {
+            exploding = true;
+        }
+
         if (animatedSprite.isDestroyed()) {
             game.removeGameObject(this);
         }
 
-        if (animatedSprite.getCurrentSprite() >= 10) {
-            exploding = true;
-        }
         boolean collision = owner.getCollider().intersects(this.collider);
         if (init && !collision) {
             owner.getCollider().addGameObject(this);

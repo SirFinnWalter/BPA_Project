@@ -17,6 +17,11 @@ public interface CollisionListener {
      * 
      * @param e The collision event
      */
-    public void onCollision(CollisionEvent e);
+    // public void onCollision(CollisionEvent e);
 
+    public void onCollisionEnter(CollisionEvent e);
+
+    public void onCollisionStay(CollisionEvent e);
+
+    public void onCollisionLeave(CollisionEvent e);
 }

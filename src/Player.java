@@ -68,7 +68,7 @@ public class Player implements GameObject, CollisionListener {
             renderer.renderSprite(sprite, playerBox.x, playerBox.y, xZoom, yZoom);
         else
             renderer.renderRectangle(playerBox, xZoom, yZoom);
-        // renderer.renderRectangle(collider, 1, 1);
+        renderer.renderRectangle(collider, 1, 1);
     }
 
     /**
@@ -181,7 +181,9 @@ public class Player implements GameObject, CollisionListener {
      * the {@code collider} and the source collider.
      */
     @Override
-    public void onCollision(CollisionEvent e) {
+    public void onCollisionEnter(CollisionEvent e) {
+        System.out.println("enter");
+
         switch (newFD) {
         case up:
             collider.y += e.intersection(collider).height;
@@ -204,6 +206,25 @@ public class Player implements GameObject, CollisionListener {
         if (source instanceof Bomb && ((Bomb) source).isExploding()) {
             this.destroyed = true;
         }
+
+        if (source instanceof GameObject) {
+            this.collider.checkCollision(((GameObject) source).getCollider());
+        }
+        // } else if (source instanceof Tilemap.MappedTile) {
+        // this.collider.checkCollision(((Tilemap.MappedTile) source).getCollider());
+
+        // }
+    }
+
+    @Override
+    public void onCollisionLeave(CollisionEvent e) {
+        System.out.println("leave");
+
+    }
+
+    @Override
+    public void onCollisionStay(CollisionEvent e) {
+        // System.out.println("stay");
     }
 
     /**
