@@ -109,7 +109,7 @@ public class KeyboardListener implements KeyListener, FocusListener {
     }
 
     private int counter = 120;
-    private int cooldown = 120;
+    private int cooldown = 20;
 
     /**
      * Returns the key state of action. Has a cooldown of two frames before it may

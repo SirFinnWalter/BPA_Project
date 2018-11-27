@@ -277,6 +277,7 @@ public class Tilemap {
         public int mappedTileID, tileID, x, y;
         private boolean collidable;
         public Collider collider;
+        public boolean test;
         // private Rectangle collisionBox;
 
         public MappedTile(int tileID, int x, int y) {
@@ -314,10 +315,6 @@ public class Tilemap {
             if (this.getTile().sprite != null)
                 return this.getTile().sprite.getHeight();
             return 0;
-        }
-
-        public int[] getInfo() {
-            return new int[] { mappedTileID, tileID, x, y };
         }
 
         public MappedTile getTileAbove() {

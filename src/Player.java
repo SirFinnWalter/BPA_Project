@@ -1,5 +1,6 @@
 import java.awt.Point;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -69,7 +70,7 @@ public class Player implements GameObject, CollisionListener {
             renderer.renderSprite(sprite, playerBox.x, playerBox.y, xZoom, yZoom);
         else
             renderer.renderRectangle(playerBox, xZoom, yZoom);
-        renderer.renderRectangle(collider, 1, 1);
+        // renderer.renderRectangle(collider, 1, 1);
     }
 
     /**
@@ -153,11 +154,12 @@ public class Player implements GameObject, CollisionListener {
             animatedSprite.reset();
         }
         if (listener.action()) {
-            // System.out.println("bomb has been planted");
-            Point p = game.getMap().mapPointToTilemap(collider.x + collider.width / 2,
-                    collider.y + collider.height / 2);
-            p = game.getMap().mapPointToScreen(p);
-            game.addGameObject(new Bomb(p.x, p.y));
+            Tilemap map = game.getMap();
+            Point mapPoint = map.mapPointToTilemap(collider.x + collider.width / 2, collider.y + collider.height / 2);
+            // Tilemap.MappedTile tile = map.getTile(mapPoint.x, mapPoint.y);
+            Point screenPoint = map.mapPointToScreen(mapPoint);
+            Bomb bomb = new Bomb(screenPoint.x, screenPoint.y, 10);
+            game.addGameObject(bomb);
 
         }
         if (destroyed)
@@ -204,7 +206,7 @@ public class Player implements GameObject, CollisionListener {
             break;
         }
         Object source = e.getSource().getObject();
-        if (source instanceof Bomb && ((Bomb) source).isExploding()) {
+        if ((source instanceof Bomb && ((Bomb) source).isExploding()) || source instanceof Bomb.BombSegment) {
             this.destroyed = true;
         }
 
@@ -220,7 +222,7 @@ public class Player implements GameObject, CollisionListener {
     @Override
     public void onCollisionStay(CollisionEvent e) {
         Object source = e.getSource().getObject();
-        if (source instanceof Bomb && ((Bomb) source).isExploding()) {
+        if ((source instanceof Bomb && ((Bomb) source).isExploding()) || source instanceof Bomb.BombSegment) {
             this.destroyed = true;
         }
     }

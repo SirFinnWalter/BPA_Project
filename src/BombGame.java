@@ -57,10 +57,10 @@ public class BombGame extends JFrame implements Runnable {
             }
         });
 
-        BufferedImage image = loadImage(new File("assets\\tilesets\\DesertTileset.png"));
+        BufferedImage image = loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
         SpriteSheet sheet = new SpriteSheet(image, 16, 16);
         Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
-        map = new Tilemap(new File("assets\\maps\\DefaultMap.bm"), tiles);
+        map = new Tilemap(new File("assets\\maps\\RuinsMap.bm"), tiles);
 
         Dimension size = new Dimension(map.getWidth() * 16 * XZOOM, map.getHeight() * 16 * YZOOM);
 
