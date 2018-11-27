@@ -19,13 +19,41 @@ import java.util.Set;
  */
 public class Collider extends Rectangle {
     private static final long serialVersionUID = 1630374324558026943L;
-    // private Set<Collider> colliders = new HashSet<Collider>();
 
-    // <Object to listen to, whether collider has collided before>
+    /**
+     * These are the game objects that will trigger a collision event if there is a
+     * collision between {@code this} and another {@code Collider}. The {@code key}
+     * is the game objects to react to while the {@code value} is the current
+     * collision state of both colliders.
+     * 
+     * We just the current collision state to check with the new collision state to
+     * determine what the two colliders are doing, table below shows the different
+     * possiblities.
+     * 
+     * <table>
+     * <th></th>
+     * <th>Staying</th>
+     * <th>Entering</th>
+     * <th>Leaving</th>
+     * <th>Nothing</th>
+     * <tr>
+     * <td>Current</td>
+     * <td>true</td>
+     * <td>true</td>
+     * <td>false</td>
+     * <td>false</td>
+     * </tr>
+     * <tr>
+     * <td>New</td>
+     * <td>true</td>
+     * <td>false</td>
+     * <td>true</td>
+     * <td>false</td>
+     * </tr>
+     * </table>
+     */
     private Map<GameObject, Boolean> gameObjects = new HashMap<GameObject, Boolean>();
-    // GameObject object;
     Object object;
-    // boolean colliding;
 
     /**
      * Constructs a new {@code Collider} with an empty {@code Rectangle} with a
@@ -74,6 +102,10 @@ public class Collider extends Rectangle {
         this.object = tile;
     }
 
+    public void startCollision() {
+
+    }
+
     /**
      * Checks for a collision with {@code col} then fires a collision event if
      * either the {@code col} is a {@code MappedTile} collider or the {@code col} is
@@ -102,39 +134,30 @@ public class Collider extends Rectangle {
             if (col.getObject() instanceof Tilemap.MappedTile) {
                 CollisionEvent e = new CollisionEvent(col);
                 ((CollisionListener) object).onCollisionEnter(e);
-                // this.fireCollision(col);
-                return;
+            } else if (gameObjects.containsKey(col.getObject())) {
+                this.fireCollision(col);
             }
-            gameObjects.forEach((gameObject, colliding) -> {
-                if (col == gameObject.getCollider()) {
-                    CollisionEvent e = new CollisionEvent(col);
-
-                    if (colliding) {
-                        ((CollisionListener) object).onCollisionStay(e);
-                        return;
-                    } else {
-                        gameObjects.replace(gameObject, false, true);
-                        ((CollisionListener) object).onCollisionEnter(e);
-                        // colliding = true;
-                        return;
-                    }
-                    // this.fireCollision(col);
-                    // return;
-                }
-            });
         } else {
-            gameObjects.forEach((gameObject, colliding) -> {
-                if (col == gameObject.getCollider()) {
-                    if (colliding) {
-                        CollisionEvent e = new CollisionEvent(col);
-                        gameObjects.replace(gameObject, true, false);
-                        ((CollisionListener) object).onCollisionLeave(e);
+            if (gameObjects.containsKey(col.getObject()) && gameObjects.get(col.getObject())) {
+                CollisionEvent e = new CollisionEvent(col);
+                gameObjects.replace((GameObject) col.getObject(), true, false);
+                ((CollisionListener) object).onCollisionLeave(e);
+            }
+        }
+    }
 
-                    }
-                    // this.fireCollision(col);
-                    // return;
-                }
-            });
+    public void fireCollision(Collider col) {
+        CollisionEvent e = new CollisionEvent(col);
+        boolean prevState = gameObjects.get(col.getObject());
+
+        if (!(object instanceof CollisionListener))
+            throw new RuntimeException("Warning: Attempted to trigger collision on an object that is not listening.");
+
+        if (prevState) {
+            ((CollisionListener) object).onCollisionStay(e);
+        } else {
+            gameObjects.replace((GameObject) col.getObject(), false, true);
+            ((CollisionListener) object).onCollisionEnter(e);
         }
     }
 
@@ -182,16 +205,5 @@ public class Collider extends Rectangle {
      */
     public Map<GameObject, Boolean> getGameObjects() {
         return this.gameObjects;
-    }
-
-    public void fireCollision(Collider col) {
-        CollisionEvent e = new CollisionEvent(col);
-        if (object instanceof CollisionListener) {
-            ((CollisionListener) object).onCollisionEnter(e);
-
-            // ((CollisionListener) object).onCollision(e);
-        } else {
-            throw new RuntimeException("Warning: Attempted to trigger collision on an object that is not listening.");
-        }
     }
 }

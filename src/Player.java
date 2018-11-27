@@ -1,3 +1,4 @@
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -153,8 +154,10 @@ public class Player implements GameObject, CollisionListener {
         }
         if (listener.action()) {
             // System.out.println("bomb has been planted");
-            // TODO: Create bomb on map tile
-            game.addGameObject(new Bomb(this, collider.x, collider.y));
+            Point p = game.getMap().mapPointToTilemap(collider.x + collider.width / 2,
+                    collider.y + collider.height / 2);
+            p = game.getMap().mapPointToScreen(p);
+            game.addGameObject(new Bomb(p.x, p.y));
 
         }
         if (destroyed)
@@ -182,8 +185,6 @@ public class Player implements GameObject, CollisionListener {
      */
     @Override
     public void onCollisionEnter(CollisionEvent e) {
-        System.out.println("enter");
-
         switch (newFD) {
         case up:
             collider.y += e.intersection(collider).height;
@@ -210,21 +211,18 @@ public class Player implements GameObject, CollisionListener {
         if (source instanceof GameObject) {
             this.collider.checkCollision(((GameObject) source).getCollider());
         }
-        // } else if (source instanceof Tilemap.MappedTile) {
-        // this.collider.checkCollision(((Tilemap.MappedTile) source).getCollider());
-
-        // }
     }
 
     @Override
     public void onCollisionLeave(CollisionEvent e) {
-        System.out.println("leave");
-
     }
 
     @Override
     public void onCollisionStay(CollisionEvent e) {
-        // System.out.println("stay");
+        Object source = e.getSource().getObject();
+        if (source instanceof Bomb && ((Bomb) source).isExploding()) {
+            this.destroyed = true;
+        }
     }
 
     /**

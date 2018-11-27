@@ -1,4 +1,5 @@
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * @file Bomb.java
@@ -12,24 +13,21 @@ import java.io.File;
  */
 public class Bomb implements GameObject {
     private static final AnimatedSprite BOMB_ANIMATED_SPRITE = new AnimatedSprite(
-            new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\bomb.png")), 16, 16), 555);
+            new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\bomb.png")), 16, 16), 15);
 
-    Collider collider;
-
+    private ArrayList<Player> players = new ArrayList<Player>();
+    private Collider collider;
     private AnimatedSprite animatedSprite;
-    private Player owner;
-    private boolean init;
     private boolean exploding;
 
     /**
      * Creates a new {@code Bomb} whose upper-left corner is specified as
      * {@code (x,y)}.
      * 
-     * @param player The player that created the bomb
-     * @param x      the specified X coordinate
-     * @param y      the specified Y coordinate
+     * @param x the specified X coordinate
+     * @param y the specified Y coordinate
      */
-    public Bomb(Player player, int x, int y) {
+    public Bomb(int x, int y) {
         try {
             animatedSprite = (AnimatedSprite) BOMB_ANIMATED_SPRITE.clone();
         } catch (CloneNotSupportedException e) {
@@ -40,8 +38,6 @@ public class Bomb implements GameObject {
         animatedSprite.setAnimationType(AnimatedSprite.AnimationType.destroy);
         collider = new Collider(this, x, y, 16 * BombGame.XZOOM, 16 * BombGame.YZOOM);
         collider.setBorder(1, 0xFFFF0000);
-        this.owner = player;
-        init = true;
     }
 
     /**
@@ -61,9 +57,9 @@ public class Bomb implements GameObject {
      */
     @Override
     public void init(BombGame game) {
-        game.getPlayers().forEach(player -> { // if (player != owner)
+        game.getPlayers().forEach(player -> {
             player.getCollider().addGameObject(this);
-
+            players.add(player);
         });
     }
 
@@ -79,20 +75,15 @@ public class Bomb implements GameObject {
     public void update(BombGame game) {
         animatedSprite.update(game);
 
-        if (animatedSprite.getCurrentSprite() >= 10) {
+        if (animatedSprite.getCurrentSprite() == 10) {
             exploding = true;
+            players.forEach(player -> {
+                player.getCollider().checkCollision(collider);
+            });
         }
 
         if (animatedSprite.isDestroyed()) {
             game.removeGameObject(this);
-        }
-
-        boolean collision = owner.getCollider().intersects(this.collider);
-        if (init && !collision) {
-            owner.getCollider().addGameObject(this);
-            init = false;
-        } else if (exploding && collision) {
-            owner.setDestroyed(true);
         }
     }
 

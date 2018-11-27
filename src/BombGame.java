@@ -35,8 +35,8 @@ public class BombGame extends JFrame implements Runnable {
 
     private boolean running = false;
     private Canvas canvas = new Canvas();
-    private Set<GameObject> objects = new HashSet<GameObject>();
-    private Set<GameObject> objectsBuffer = new HashSet<GameObject>();
+    private Set<GameObject> gameObjects = new HashSet<GameObject>();
+    private Set<GameObject> gameObjectsBuffer = new HashSet<GameObject>();
     private Set<Player> players = new HashSet<Player>();
 
     private RenderHandler renderer;
@@ -101,11 +101,11 @@ public class BombGame extends JFrame implements Runnable {
             throw new RuntimeException();
         }
 
-        objects.forEach(object -> {
+        gameObjects.forEach(object -> {
             if (object instanceof Player)
                 players.add((Player) object);
         });
-        objectsBuffer.addAll(objects);
+        gameObjectsBuffer.addAll(gameObjects);
     }
 
     /**
@@ -122,7 +122,7 @@ public class BombGame extends JFrame implements Runnable {
             Player player = new Player(x, y, sprite, listener);
             canvas.addKeyListener(listener);
             canvas.addFocusListener(listener);
-            objects.add(player);
+            gameObjects.add(player);
         } else {
             System.out.println("Not enough keys! Could not create player.");
         }
@@ -149,12 +149,12 @@ public class BombGame extends JFrame implements Runnable {
             }
             render();
 
-            for (GameObject object : objectsBuffer) {
-                if (!objects.contains(object))
+            for (GameObject object : gameObjectsBuffer) {
+                if (!gameObjects.contains(object))
                     object.init(this);
             }
-            objects.removeAll(objects);
-            objects.addAll(objectsBuffer);
+            gameObjects.removeAll(gameObjects);
+            gameObjects.addAll(gameObjectsBuffer);
 
             // Outputs frames/second
             frames++;
@@ -170,7 +170,7 @@ public class BombGame extends JFrame implements Runnable {
      * Initalizes game objects
      */
     private void init() {
-        objects.forEach(object -> {
+        gameObjects.forEach(object -> {
             object.init(this);
         });
     }
@@ -179,7 +179,7 @@ public class BombGame extends JFrame implements Runnable {
      * Updates game objects
      */
     private void update() {
-        objects.forEach(object -> {
+        gameObjects.forEach(object -> {
             object.update(this);
         });
     }
@@ -194,7 +194,7 @@ public class BombGame extends JFrame implements Runnable {
             super.paint(gfx);
 
             map.render(renderer, XZOOM, YZOOM);
-            objects.forEach(object -> {
+            gameObjects.forEach(object -> {
                 object.render(renderer, XZOOM, YZOOM);
             });
             renderer.render(gfx);
@@ -212,7 +212,7 @@ public class BombGame extends JFrame implements Runnable {
      * @return The game object buffer
      */
     public Set<GameObject> getGameObjects() {
-        return this.objectsBuffer;
+        return this.gameObjectsBuffer;
     }
 
     /**
@@ -224,7 +224,7 @@ public class BombGame extends JFrame implements Runnable {
      * @param object The game object to be add
      */
     public void addGameObject(GameObject object) {
-        objectsBuffer.add(object);
+        gameObjectsBuffer.add(object);
         object.init(this);
     }
 
@@ -237,7 +237,7 @@ public class BombGame extends JFrame implements Runnable {
      * @param object The game object to be removed
      */
     public void removeGameObject(GameObject object) {
-        objectsBuffer.remove(object);
+        gameObjectsBuffer.remove(object);
     }
 
     /**
@@ -248,7 +248,7 @@ public class BombGame extends JFrame implements Runnable {
      */
     public void checkCollision(Collider col) {
         map.checkCollision(col);
-        objects.forEach(object -> {
+        gameObjects.forEach(object -> {
             if (col.getGameObjects().containsKey(object)) {
                 col.checkCollision(object.getCollider());
             }
@@ -257,6 +257,10 @@ public class BombGame extends JFrame implements Runnable {
             // }
         });
     }
+
+    // public void startCollision(Collider col) {
+
+    // }
 
     /**
      * Formats a file into a BufferedImage of type TYPE_INT_ARGB
