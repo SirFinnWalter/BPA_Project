@@ -2,6 +2,7 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * @file Player.java
@@ -99,6 +100,11 @@ public class Player implements GameObject, CollisionListener {
         });
     }
 
+    int tempCount = 0;
+    int tempMax = 2;
+    int tempCurrent = 0;
+    int tempLength = 1;
+
     /**
      * Updates the location of the {@code collider} then checks for collision on
      * each movement before actually moving the {@code Player}. Only updates the
@@ -154,16 +160,30 @@ public class Player implements GameObject, CollisionListener {
             animatedSprite.reset();
         }
         if (listener.action()) {
-            Tilemap map = game.getMap();
-            Point mapPoint = map.mapPointToTilemap(collider.x + collider.width / 2, collider.y + collider.height / 2);
-            // Tilemap.MappedTile tile = map.getTile(mapPoint.x, mapPoint.y);
-            Point screenPoint = map.mapPointToScreen(mapPoint);
-            Bomb bomb = new Bomb(screenPoint.x, screenPoint.y, 10);
-            game.addGameObject(bomb);
-
+            // Tilemap map = game.getMap();
+            if (tempCurrent < tempMax) {
+                Point mapPoint = BombGame.MAP.mapPointToTilemap(collider.x + collider.width / 2,
+                        collider.y + collider.height / 2);
+                // Tilemap.MappedTile tile = map.getTile(mapPoint.x, mapPoint.y);
+                Point screenPoint = BombGame.MAP.mapPointToScreen(mapPoint);
+                Bomb bomb = new Bomb(this, screenPoint.x, screenPoint.y, tempLength);
+                game.addGameObject(bomb);
+                tempCurrent++;
+            }
         }
         if (destroyed)
             game.removeGameObject(this);
+        tempCount++;
+        if (tempCount > 1000) {
+            tempCount = 0;
+            if (new Random().nextFloat() > 0.5) {
+                tempLength++;
+                System.out.println("Bomb length is now " + tempLength + "!");
+            } else {
+                tempMax++;
+                System.out.println("Max # of bombs is now " + tempMax + "!");
+            }
+        }
     }
 
     /**

@@ -32,6 +32,7 @@ public class BombGame extends JFrame implements Runnable {
     public static final int YZOOM = 2;
     private final int TICKSPERSECOND = 60;
     private final double NANOSECONDS = 1000000000.0 / TICKSPERSECOND;
+    public static Tilemap MAP;
 
     private boolean running = false;
     private Canvas canvas = new Canvas();
@@ -40,7 +41,6 @@ public class BombGame extends JFrame implements Runnable {
     private Set<Player> players = new HashSet<Player>();
 
     private RenderHandler renderer;
-    private Tilemap map;
 
     /**
      * Creates a default window with a canvas and loads game files. Uses the game
@@ -60,9 +60,9 @@ public class BombGame extends JFrame implements Runnable {
         BufferedImage image = loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
         SpriteSheet sheet = new SpriteSheet(image, 16, 16);
         Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
-        map = new Tilemap(new File("assets\\maps\\RuinsMap.bm"), tiles);
+        BombGame.MAP = new Tilemap(new File("assets\\maps\\DefaultMap.bm"), tiles);
 
-        Dimension size = new Dimension(map.getWidth() * 16 * XZOOM, map.getHeight() * 16 * YZOOM);
+        Dimension size = new Dimension(BombGame.MAP.getWidth() * 16 * XZOOM, BombGame.MAP.getHeight() * 16 * YZOOM);
 
         this.setBounds(0, 0, size.width, size.height);
         this.setPreferredSize(size);
@@ -88,13 +88,13 @@ public class BombGame extends JFrame implements Runnable {
 
         try {
             AnimatedSprite playerAnimation = new AnimatedSprite(sheet, 10);
-            createPlayer(16 * 7, 16 * 2, (AnimatedSprite) playerAnimation.clone(), new int[] { KeyEvent.VK_UP,
+            createPlayer(16 * 1, 16 * 1, (AnimatedSprite) playerAnimation.clone(), new int[] { KeyEvent.VK_UP,
                     KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER });
-            createPlayer(16 * 17, 16 * 2, (AnimatedSprite) playerAnimation.clone(),
+            createPlayer(16 * 23, 16 * 1, (AnimatedSprite) playerAnimation.clone(),
                     new int[] { KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_E });
-            createPlayer(16 * 7, 16 * 14, (AnimatedSprite) playerAnimation.clone(),
+            createPlayer(16 * 1, 16 * 15, (AnimatedSprite) playerAnimation.clone(),
                     new int[] { KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H, KeyEvent.VK_Y });
-            createPlayer(16 * 17, 16 * 14, (AnimatedSprite) playerAnimation.clone(),
+            createPlayer(16 * 23, 16 * 15, (AnimatedSprite) playerAnimation.clone(),
                     new int[] { KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L, KeyEvent.VK_O });
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
@@ -193,7 +193,7 @@ public class BombGame extends JFrame implements Runnable {
             Graphics gfx = bStrategy.getDrawGraphics();
             super.paint(gfx);
 
-            map.render(renderer, XZOOM, YZOOM);
+            BombGame.MAP.render(renderer, XZOOM, YZOOM);
             gameObjects.forEach(object -> {
                 object.render(renderer, XZOOM, YZOOM);
             });
@@ -247,7 +247,7 @@ public class BombGame extends JFrame implements Runnable {
      * @param col The collider to check
      */
     public void checkCollision(Collider col) {
-        map.checkCollision(col);
+        BombGame.MAP.checkCollision(col);
         gameObjects.forEach(object -> {
             if (col.getGameObjects().containsKey(object)) {
                 col.checkCollision(object.getCollider());
@@ -299,9 +299,9 @@ public class BombGame extends JFrame implements Runnable {
     /**
      * @return the map
      */
-    public Tilemap getMap() {
-        return map;
-    }
+    // public Tilemap getMap() {
+    // return map;
+    // }
 
     /**
      * Sets the state of the game. Setting the game state to {@code false} will

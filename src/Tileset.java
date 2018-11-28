@@ -60,13 +60,17 @@ public class Tileset {
 
     class Tile {
         private boolean collidable;
-        // private boolean breakable;
+        private boolean breakable;
         public Sprite sprite;
 
         public Tile(Sprite sprite, boolean collidable, boolean breakable) {
             this.sprite = sprite;
             this.collidable = collidable;
-            // this.breakable = breakable;
+            this.breakable = breakable;
+        }
+
+        public boolean isBreakable() {
+            return breakable;
         }
 
         public boolean getCollision() {

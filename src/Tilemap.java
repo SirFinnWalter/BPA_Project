@@ -248,12 +248,19 @@ public class Tilemap {
         int key = x + (y * width);
 
         if (mappedTiles.containsKey(key))
-            return mappedTiles.get(x + (y * width));
+            return mappedTiles.get(key);
         else if (key > 0 && key < width * height)
             return new MappedTile(fillTileID, x, y);
         else
             return new MappedTile(-1, -1, -1);
 
+    }
+
+    public void removeTile(int x, int y) {
+        int key = x + (y * width);
+
+        if (mappedTiles.containsKey(key))
+            mappedTiles.remove(key);
     }
 
     /**
@@ -277,7 +284,6 @@ public class Tilemap {
         public int mappedTileID, tileID, x, y;
         private boolean collidable;
         public Collider collider;
-        public boolean test;
         // private Rectangle collisionBox;
 
         public MappedTile(int tileID, int x, int y) {
@@ -303,6 +309,10 @@ public class Tilemap {
 
         public boolean isCollidable() {
             return this.collidable;
+        }
+
+        public boolean isBreakable() {
+            return this.getTile().isBreakable();
         }
 
         public int getWidth() {
