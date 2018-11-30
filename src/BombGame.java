@@ -83,19 +83,29 @@ public class BombGame extends JFrame implements Runnable {
 
         renderer = new RenderHandler(getWidth(), getHeight());
 
-        image = loadImage(new File("assets\\sprites\\ghostygoosterwalk.png"));
-        sheet = new SpriteSheet(image, 16, 16);
+        image = loadImage(new File("assets\\sprites\\tempDinosaur.png"));
+        sheet = new SpriteSheet(image, 16, 21);
 
         try {
-            AnimatedSprite playerAnimation = new AnimatedSprite(sheet, 10);
-            createPlayer(16 * 1, 16 * 1, (AnimatedSprite) playerAnimation.clone(), new int[] { KeyEvent.VK_UP,
-                    KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER });
-            createPlayer(16 * 23, 16 * 1, (AnimatedSprite) playerAnimation.clone(),
-                    new int[] { KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_E });
-            createPlayer(16 * 1, 16 * 15, (AnimatedSprite) playerAnimation.clone(),
-                    new int[] { KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H, KeyEvent.VK_Y });
-            createPlayer(16 * 23, 16 * 15, (AnimatedSprite) playerAnimation.clone(),
-                    new int[] { KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L, KeyEvent.VK_O });
+            AnimatedSprite playerAnimation = new AnimatedSprite(sheet, 8);
+            createPlayer("Player 1", 16 * 1, 16 * 1, (AnimatedSprite) playerAnimation.clone(),
+                    new int[] { KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_SHIFT });
+
+            // createPlayer(16 * 23, 16 * 1, (AnimatedSprite) playerAnimation.clone(),
+            // new int[] { KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D,
+            // KeyEvent.VK_E });
+            image = loadImage(new File("assets\\sprites\\ghostygoosterwalk.png"));
+            sheet = new SpriteSheet(image, 16, 16);
+            playerAnimation = new AnimatedSprite(sheet, 10);
+            createPlayer("Player 2", 16 * 23, 16 * 1, (AnimatedSprite) playerAnimation.clone(), new int[] {
+                    KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER });
+
+            // createPlayer(16 * 1, 16 * 15, (AnimatedSprite) playerAnimation.clone(),
+            // new int[] { KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H,
+            // KeyEvent.VK_Y });
+            // createPlayer(16 * 23, 16 * 15, (AnimatedSprite) playerAnimation.clone(),
+            // new int[] { KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L,
+            // KeyEvent.VK_O });
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -116,15 +126,15 @@ public class BombGame extends JFrame implements Runnable {
      * The {@code KeyboardListener} is added to the {@code canvas} and the player is
      * added to the objects buffer.
      */
-    public void createPlayer(int x, int y, AnimatedSprite sprite, int[] keys) {
+    public void createPlayer(final String name, int x, int y, AnimatedSprite sprite, final int[] keys) {
         if (keys != null && keys.length > 4) {
             KeyboardListener listener = new KeyboardListener(keys[0], keys[1], keys[2], keys[3], keys[4]);
-            Player player = new Player(x, y, sprite, listener);
+            Player player = new Player(name, x, y, sprite, listener);
             canvas.addKeyListener(listener);
             canvas.addFocusListener(listener);
             gameObjects.add(player);
         } else {
-            System.out.println("Not enough keys! Could not create player.");
+            System.out.println("Not enough keys! (Need up, down, left, right, and action) Could not create player.");
         }
     }
 
@@ -163,7 +173,30 @@ public class BombGame extends JFrame implements Runnable {
                 System.out.println(frames + " fps");
                 frames = 0;
             }
+
+            if (players.size() == 1) {
+                update();
+                render();
+                update();
+                render();
+                JOptionPane.showMessageDialog(null,
+                        players.iterator().next().getName() + " has won by surviving!\nThanks for playing!");
+                running = false;
+            } else {
+                players.forEach(player -> {
+                    if (player.tempPoints >= 80) {
+                        update();
+                        render();
+                        update();
+                        render();
+                        JOptionPane.showMessageDialog(null,
+                                player.getName() + " has won by getting 80 points!!\nThanks for playing!");
+                        running = false;
+                    }
+                });
+            }
         }
+        System.exit(0);
     }
 
     /**
@@ -182,6 +215,7 @@ public class BombGame extends JFrame implements Runnable {
         gameObjects.forEach(object -> {
             object.update(this);
         });
+
     }
 
     /**
@@ -238,6 +272,9 @@ public class BombGame extends JFrame implements Runnable {
      */
     public void removeGameObject(GameObject object) {
         gameObjectsBuffer.remove(object);
+
+        if (object instanceof Player)
+            players.remove(object);
     }
 
     /**

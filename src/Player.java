@@ -31,6 +31,8 @@ public class Player implements GameObject, CollisionListener {
     private AnimatedSprite animatedSprite = null;
     private KeyboardListener listener = null;
 
+    private String name;
+
     /**
      * Constructs a {@code Player} at the upper-left bound of {@code (x,y)} and
      * whose sprite and listener is specified by the argument with the same name.
@@ -45,15 +47,19 @@ public class Player implements GameObject, CollisionListener {
      * @param sprite The sprite render at the {@code Player{@code  location @param
      *               listener The listener to control the player movement
      */
-    public Player(int x, int y, Sprite sprite, KeyboardListener listener) {
+    public Player(String name, int x, int y, Sprite sprite, KeyboardListener listener) {
+        this.name = name;
         this.sprite = sprite;
-        if (sprite != null && sprite instanceof AnimatedSprite)
+        if (sprite != null && sprite instanceof AnimatedSprite) {
             this.animatedSprite = (AnimatedSprite) sprite;
+        }
+        playerBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, sprite.getWidth(), sprite.getHeight());
+        collider = new Collider(this, x * BombGame.XZOOM, y * BombGame.YZOOM, 14 * BombGame.XZOOM, 14 * BombGame.YZOOM);
+
         currentFD = FacingDirection.up;
         newFD = FacingDirection.up;
         updateDirection();
-        playerBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, 16, 16);
-        collider = new Collider(this, x * BombGame.XZOOM, y * BombGame.YZOOM, 16 * BombGame.XZOOM, 16 * BombGame.YZOOM);
+        // playerBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, 16, 21);
         playerBox.setColor(0x88FFFFFF);
         collider.setBorder(1, 0xFF0000FF);
 
@@ -71,7 +77,7 @@ public class Player implements GameObject, CollisionListener {
             renderer.renderSprite(sprite, playerBox.x, playerBox.y, xZoom, yZoom);
         else
             renderer.renderRectangle(playerBox, xZoom, yZoom);
-        // renderer.renderRectangle(collider, 1, 1);
+        renderer.renderRectangle(collider, 1, 1);
     }
 
     /**
@@ -80,7 +86,9 @@ public class Player implements GameObject, CollisionListener {
      */
     private void updateDirection() {
         if (animatedSprite != null) {
-            animatedSprite.setAnimationRange(currentFD.getValue() * 7, currentFD.getValue() * 7 + 6);
+            int framesLength = (animatedSprite.getLength() / 4);
+            animatedSprite.setAnimationRange(currentFD.getValue() * framesLength,
+                    currentFD.getValue() * framesLength + (framesLength - 1));
         }
     }
 
@@ -101,9 +109,10 @@ public class Player implements GameObject, CollisionListener {
     }
 
     int tempCount = 0;
-    int tempMax = 2;
+    int tempMax = 1;
     int tempCurrent = 0;
     int tempLength = 1;
+    int tempPoints = 0;
 
     /**
      * Updates the location of the {@code collider} then checks for collision on
@@ -147,8 +156,15 @@ public class Player implements GameObject, CollisionListener {
             game.checkCollision(collider);
         }
 
-        playerBox.x = collider.x;
-        playerBox.y = collider.y;
+        // playerBox.x = collider.x - 0;
+        // // playerBox.y = collider.y - 10;
+        // playerBox.y = collider.y - 10;
+
+        // playerBox.x = collider.x - ((playerBox.width - collider.width) *
+        // BombGame.XZOOM);
+        playerBox.x = collider.x - ((playerBox.width * BombGame.XZOOM - collider.width) / 2);
+        playerBox.y = collider.y - ((playerBox.height * BombGame.YZOOM - collider.height));
+        // playerBox.y = collider.y - (5 * 2);
 
         if (this.currentFD != newFD) {
             this.currentFD = newFD;
@@ -174,15 +190,17 @@ public class Player implements GameObject, CollisionListener {
         if (destroyed)
             game.removeGameObject(this);
         tempCount++;
-        if (tempCount > 1000) {
+        if (tempCount > 650) {
             tempCount = 0;
-            if (new Random().nextFloat() > 0.5) {
+            if (Math.random() < 0.5) {
                 tempLength++;
-                System.out.println("Bomb length is now " + tempLength + "!");
+                System.out.println(name + ": Bomb length is now " + tempLength + "!");
             } else {
                 tempMax++;
-                System.out.println("Max # of bombs is now " + tempMax + "!");
+                System.out.println(name + ": Max # of bombs is now " + tempMax + "!");
             }
+
+            System.out.println(name + "'s score: " + tempPoints);
         }
     }
 
@@ -198,7 +216,11 @@ public class Player implements GameObject, CollisionListener {
      */
     @Override
     public Collider getCollider() {
-        return collider;
+        return this.collider;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     /**
@@ -226,11 +248,9 @@ public class Player implements GameObject, CollisionListener {
             break;
         }
         Object source = e.getSource().getObject();
-        if ((source instanceof Bomb && ((Bomb) source).isExploding()) || source instanceof Bomb.BombSegment) {
+        if (source instanceof Bomb.Explosion) {
             this.destroyed = true;
-        }
-
-        if (source instanceof GameObject) {
+        } else if (source instanceof GameObject) {
             this.collider.checkCollision(((GameObject) source).getCollider());
         }
     }
@@ -242,7 +262,7 @@ public class Player implements GameObject, CollisionListener {
     @Override
     public void onCollisionStay(CollisionEvent e) {
         Object source = e.getSource().getObject();
-        if ((source instanceof Bomb && ((Bomb) source).isExploding()) || source instanceof Bomb.BombSegment) {
+        if (source instanceof Bomb.Explosion) {
             this.destroyed = true;
         }
     }

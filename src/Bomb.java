@@ -30,7 +30,6 @@ public class Bomb implements GameObject {
     private Collider collider;
     private AnimatedSprite animatedSprite;
     private Player owner;
-    private boolean exploding;
     private int x, y;
     private int length;
 
@@ -42,7 +41,6 @@ public class Bomb implements GameObject {
      * @param y the specified Y coordinate
      */
     public Bomb(Player owner, int x, int y, int length) {
-        // TODO: Make sure bomb segments cannot go through walls
         this.owner = owner;
         this.x = x;
         this.y = y;
@@ -50,8 +48,7 @@ public class Bomb implements GameObject {
         try {
             animatedSprite = (AnimatedSprite) BOMB_ANIMATED_SPRITE.clone();
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error creating bomb.");
+            throw new RuntimeException("Could not create the bomb! " + e.getMessage());
         }
 
         animatedSprite.setAnimationType(AnimatedSprite.AnimationType.destroy);
@@ -94,39 +91,21 @@ public class Bomb implements GameObject {
     public void update(BombGame game) {
         animatedSprite.update(game);
 
-        // if (animatedSprite.getCurrentSprite() == 10) {
-        // exploding = true;
-        // players.forEach(player -> {
-        // player.getCollider().checkCollision(collider);
-        // });
-        // }
-
         if (animatedSprite.isDestroyed()) {
-            if (!exploding) {
-                exploding = true;
-                try {
-                    animatedSprite = (AnimatedSprite) EXPLOSION_ANIMATED_SPRITE.clone();
 
-                    createSegments(game, EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL, length, -16 * BombGame.XZOOM, 0);
-                    createSegments(game, EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL, length, 16 * BombGame.XZOOM, 0);
-                    createSegments(game, EXPLOSION_ANIMATED_SPRITE_VERTICAL, length, 0, -16 * BombGame.YZOOM);
-                    createSegments(game, EXPLOSION_ANIMATED_SPRITE_VERTICAL, length, 0, 16 * BombGame.YZOOM);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("Error changing bomb sprite to explosion sprite.");
-                }
-
-                animatedSprite.setAnimationType(AnimatedSprite.AnimationType.destroy);
-                players.forEach(player -> {
-                    player.getCollider().checkCollision(collider);
-                });
-            } else {
-                game.removeGameObject(this);
-                owner.tempCurrent -= 1;
+            try {
+                createSegments(game, EXPLOSION_ANIMATED_SPRITE, 1, 0, 0);
+                createSegments(game, EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL, length, -16 * BombGame.XZOOM, 0);
+                createSegments(game, EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL, length, 16 * BombGame.XZOOM, 0);
+                createSegments(game, EXPLOSION_ANIMATED_SPRITE_VERTICAL, length, 0, -16 * BombGame.YZOOM);
+                createSegments(game, EXPLOSION_ANIMATED_SPRITE_VERTICAL, length, 0, 16 * BombGame.YZOOM);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException("Could not create the explosion! " + e.getMessage());
             }
 
+            game.removeGameObject(this);
+            owner.tempCurrent -= 1;
         }
-
     }
 
     private void createSegments(BombGame game, AnimatedSprite sprite, int length, int xIncrement, int yIncrement)
@@ -137,20 +116,17 @@ public class Bomb implements GameObject {
             Point p = BombGame.MAP.mapPointToTilemap(x, y);
             if (BombGame.MAP.getTile(p.x, p.y).isBreakable()) {
                 BombGame.MAP.removeTile(p.x, p.y);
-                BombSegment segment = new BombSegment(this, (AnimatedSprite) sprite.clone(), x, y);
+                owner.tempPoints++;
+                Explosion segment = new Explosion(this, (AnimatedSprite) sprite.clone(), x, y);
                 game.addGameObject(segment);
                 return;
             } else if (!BombGame.MAP.getTile(p.x, p.y).isCollidable()) {
-                BombSegment segment = new BombSegment(this, (AnimatedSprite) sprite.clone(), x, y);
+                Explosion segment = new Explosion(this, (AnimatedSprite) sprite.clone(), x, y);
                 game.addGameObject(segment);
             } else {
                 return;
             }
         }
-    }
-
-    public boolean isExploding() {
-        return exploding;
     }
 
     /**
@@ -161,11 +137,11 @@ public class Bomb implements GameObject {
         return collider;
     }
 
-    class BombSegment implements GameObject {
+    class Explosion implements GameObject {
         private AnimatedSprite animatedSprite;
         private Collider collider;
 
-        public BombSegment(Bomb bomb, AnimatedSprite sprite, int x, int y) {
+        public Explosion(Bomb bomb, AnimatedSprite sprite, int x, int y) {
 
             collider = new Collider(this, x, y, 16 * BombGame.XZOOM, 16 * BombGame.YZOOM);
             collider.setBorder(1, 0xFFFF0000);

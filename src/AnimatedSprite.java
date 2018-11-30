@@ -12,6 +12,7 @@ public class AnimatedSprite extends Sprite implements Cloneable {
     private int counter = 0;
     private int flipFrame;
     private int start, end;
+    private int length;
     private AnimationType animationType = AnimationType.looping;
 
     protected Object clone() throws CloneNotSupportedException {
@@ -23,9 +24,11 @@ public class AnimatedSprite extends Sprite implements Cloneable {
         this.flipFrame = flipFrame;
         this.start = 0;
         this.end = range.length - 1;
+        this.length = range.length;
         for (int i = 0; i < range.length; i++) {
             sprites[i] = new Sprite(sheet, range[i].x, range[i].y, range[i].width, range[i].height);
         }
+
     }
 
     /**
@@ -38,6 +41,7 @@ public class AnimatedSprite extends Sprite implements Cloneable {
         this.flipFrame = flipFrame;
         this.start = 0;
         this.end = images.length - 1;
+        this.length = images.length;
 
         for (int i = 0; i < images.length; i++) {
             sprites[i] = new Sprite(images[i]);
@@ -49,6 +53,8 @@ public class AnimatedSprite extends Sprite implements Cloneable {
         this.flipFrame = flipFrame;
         this.start = 0;
         this.end = this.sprites.length - 1;
+        this.length = sprites.length;
+
     }
 
     public void setAnimationRange(int start, int end) {
@@ -123,6 +129,10 @@ public class AnimatedSprite extends Sprite implements Cloneable {
 
     public int getCurrentSprite() {
         return this.currentSprite;
+    }
+
+    public int getLength() {
+        return this.length;
     }
 
     public boolean isDestroyed() {
