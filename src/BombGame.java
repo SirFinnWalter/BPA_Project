@@ -22,6 +22,9 @@ import javax.swing.JOptionPane;
 public class BombGame extends JFrame implements Runnable {
 
     public static void main(String[] args) {
+
+        System.loadLibrary("xinput_java");
+        // XInput.getState(0, buffer);
         BombGame game = new BombGame();
         Thread gameThread = new Thread(game);
         gameThread.start();
@@ -215,7 +218,6 @@ public class BombGame extends JFrame implements Runnable {
         gameObjects.forEach(object -> {
             object.update(this);
         });
-
     }
 
     /**
