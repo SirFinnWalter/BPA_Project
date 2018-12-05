@@ -21,6 +21,8 @@ import java.util.Random;
  * {@code Player} will not allow movement on collision with its collider.
  */
 public class Player implements GameObject, CollisionListener {
+    public final static int MAX_PLAYERS = 4;
+    public static int PLAYER_COUNT = 0;
     private Rectangle playerBox;
     private Collider collider;
     double speedX = 1 * BombGame.XZOOM;
@@ -31,7 +33,7 @@ public class Player implements GameObject, CollisionListener {
     private AnimatedSprite animatedSprite = null;
     private KeyboardListener listener = null;
 
-    private String name;
+    private int playerNum;
 
     /**
      * Constructs a {@code Player} at the upper-left bound of {@code (x,y)} and
@@ -47,8 +49,8 @@ public class Player implements GameObject, CollisionListener {
      * @param sprite The sprite render at the {@code Player{@code  location @param
      *               listener The listener to control the player movement
      */
-    public Player(String name, int x, int y, Sprite sprite, KeyboardListener listener) {
-        this.name = name;
+    public Player(int x, int y, Sprite sprite, KeyboardListener listener) {
+        this.playerNum = Player.PLAYER_COUNT++;
         this.sprite = sprite;
         if (sprite != null && sprite instanceof AnimatedSprite) {
             this.animatedSprite = (AnimatedSprite) sprite;
@@ -77,7 +79,7 @@ public class Player implements GameObject, CollisionListener {
             renderer.renderSprite(sprite, playerBox.x, playerBox.y, xZoom, yZoom);
         else
             renderer.renderRectangle(playerBox, xZoom, yZoom);
-        renderer.renderRectangle(collider, 1, 1);
+        // renderer.renderRectangle(collider, 1, 1);
     }
 
     /**
@@ -135,36 +137,26 @@ public class Player implements GameObject, CollisionListener {
             collider.x -= speedX;
             newFD = FacingDirection.left;
             moving = true;
-            game.checkCollision(collider);
         }
         if (listener.right()) {
             collider.x += speedX;
             newFD = FacingDirection.right;
             moving = true;
-            game.checkCollision(collider);
         }
+        game.checkCollision(collider);
         if (listener.up()) {
             collider.y -= speedY;
             newFD = FacingDirection.up;
             moving = true;
-            game.checkCollision(collider);
         }
         if (listener.down()) {
             collider.y += speedY;
             newFD = FacingDirection.down;
             moving = true;
-            game.checkCollision(collider);
         }
-
-        // playerBox.x = collider.x - 0;
-        // // playerBox.y = collider.y - 10;
-        // playerBox.y = collider.y - 10;
-
-        // playerBox.x = collider.x - ((playerBox.width - collider.width) *
-        // BombGame.XZOOM);
+        game.checkCollision(collider);
         playerBox.x = collider.x - ((playerBox.width * BombGame.XZOOM - collider.width) / 2);
         playerBox.y = collider.y - ((playerBox.height * BombGame.YZOOM - collider.height));
-        // playerBox.y = collider.y - (5 * 2);
 
         if (this.currentFD != newFD) {
             this.currentFD = newFD;
@@ -194,13 +186,13 @@ public class Player implements GameObject, CollisionListener {
             tempCount = 0;
             if (Math.random() < 0.5) {
                 tempLength++;
-                System.out.println(name + ": Bomb length is now " + tempLength + "!");
+                System.out.println("Player " + playerNum + ": Bomb length is now " + tempLength + "!");
             } else {
                 tempMax++;
-                System.out.println(name + ": Max # of bombs is now " + tempMax + "!");
+                System.out.println("Player " + playerNum + ": Max # of bombs is now " + tempMax + "!");
             }
 
-            System.out.println(name + "'s score: " + tempPoints);
+            System.out.println("Player " + playerNum + "'s score: " + tempPoints);
         }
     }
 
@@ -219,8 +211,12 @@ public class Player implements GameObject, CollisionListener {
         return this.collider;
     }
 
-    public String getName() {
-        return this.name;
+    public KeyboardListener getListener() {
+        return this.listener;
+    }
+
+    public int getPlayerNum() {
+        return this.playerNum;
     }
 
     /**

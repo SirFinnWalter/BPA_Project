@@ -1,7 +1,7 @@
 #define WIN32_LEAN_AND_MEAN // to avoid including unnecessary stuff
 
 #include <Windows.h>
-#include <XInput.h>
+#include <xinput.h>
 #include <ShlObj.h>
 #include <cstdio>
 
