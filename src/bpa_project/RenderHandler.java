@@ -1,3 +1,5 @@
+package bpa_project;
+
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;

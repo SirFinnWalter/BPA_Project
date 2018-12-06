@@ -1,7 +1,4 @@
 .classpath
 .project
 .settings/
-.vscode/settings.json
-.vscode/launch.json
 /bin/
-/tut_bin/

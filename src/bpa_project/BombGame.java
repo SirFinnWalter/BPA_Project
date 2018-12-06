@@ -1,3 +1,5 @@
+package bpa_project;
+
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -15,6 +17,8 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
+import bpa_project.characters.*;
 
 /**
  * @file BombGame.java
@@ -107,8 +111,16 @@ public class BombGame extends JFrame implements Runnable {
             createPlayer(16 * 23, 16 * 1, (AnimatedSprite) playerAnimation.clone(), new int[] { KeyEvent.VK_UP,
                     KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER });
 
-            createPlayer(16 * 1, 16 * 15, (AnimatedSprite) playerAnimation.clone(),
-                    new int[] { KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H, KeyEvent.VK_Y });
+            KeyboardListener listener = new KeyboardListener(KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H,
+                    KeyEvent.VK_Y);
+            CharacterA player = new CharacterA(16 * 1, 16 * 15, listener);
+            canvas.addKeyListener(listener);
+            canvas.addFocusListener(listener);
+            gameObjects.add(player);
+
+            // createPlayer(16 * 1, 16 * 15, (AnimatedSprite) playerAnimation.clone(),
+            // new int[] { KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H,
+            // KeyEvent.VK_Y });
             // createPlayer(16 * 23, 16 * 15, (AnimatedSprite) playerAnimation.clone(),
             // new int[] { KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L,
             // KeyEvent.VK_O });
@@ -182,7 +194,14 @@ public class BombGame extends JFrame implements Runnable {
                 frames = 0;
             }
 
-            if (players.size() == 1) {
+            if (players.isEmpty()) {
+                update();
+                render();
+                update();
+                render();
+                JOptionPane.showMessageDialog(null, "Nobody wins!\nThanks for playing!");
+                running = false;
+            } else if (players.size() == 1) {
                 update();
                 render();
                 update();
@@ -190,27 +209,6 @@ public class BombGame extends JFrame implements Runnable {
                 JOptionPane.showMessageDialog(null, "Player " + players.iterator().next().getPlayerNum()
                         + " has won by surviving!\nThanks for playing!");
                 running = false;
-            } else {
-                if (!players.isEmpty()) {
-                    players.forEach(player -> {
-                        if (player.tempPoints >= 80) {
-                            update();
-                            render();
-                            update();
-                            render();
-                            JOptionPane.showMessageDialog(null, "Player " + player.getPlayerNum()
-                                    + " has won by getting 80 points!!\nThanks for playing!");
-                            running = false;
-                        }
-                    });
-                } else {
-                    update();
-                    render();
-                    update();
-                    render();
-                    JOptionPane.showMessageDialog(null, "Nobody wins!\nThanks for playing!");
-                    running = false;
-                }
             }
         }
         System.exit(0);

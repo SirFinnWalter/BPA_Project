@@ -5,7 +5,7 @@
 #include <ShlObj.h>
 #include <cstdio>
 
-#include "XInputNative.h"
+#include "bpa_project_XInputNative.h"
 
 // taken from https://github.com/speps/XInputDotNet/blob/master/XInputInterface/GamePad.cpp
 
@@ -36,7 +36,7 @@ static void loadXInput()
     }
     else
     {
-        printf_s("Failed to load XInput! Make sure you have the drivers installed")
+        printf_s("Failed to load XInput! Make sure you have the drivers installed");
     }
 }
 
@@ -50,11 +50,11 @@ DWORD XInputGamePadGetState(DWORD dwUserIndex, XINPUT_STATE *pState)
 }
 
 /*
- * Class:     XInputNative
+ * Class:     bpa_project_XInputNative
  * Method:    getState
  * Signature: (ILjava/nio/ByteBuffer;)I
  */
-JNIEXPORT jint JNICALL Java_XInputNative_getState(JNIEnv *env, jclass cls, jint playerNum, jobject byteBuffer)
+JNIEXPORT jint JNICALL Java_bpa_1project_XInputNative_getState(JNIEnv *env, jclass cls, jint playerNum, jobject byteBuffer)
 {
     void *bbuf = env->GetDirectBufferAddress(byteBuffer);
     XINPUT_STATE *state = (XINPUT_STATE *)bbuf;

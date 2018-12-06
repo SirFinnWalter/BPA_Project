@@ -1,8 +1,10 @@
+package bpa_project.characters;
+
 import java.awt.Point;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Random;
+
+import bpa_project.*;
 
 /**
  * @file Player.java
@@ -20,14 +22,14 @@ import java.util.Random;
  * renderer will default to rendering the {@code Player} player box. The
  * {@code Player} will not allow movement on collision with its collider.
  */
-public class Player implements GameObject, CollisionListener {
+public class Player implements IPlayer, CollisionListener {
     public final static int MAX_PLAYERS = 4;
     public static int PLAYER_COUNT = 0;
     private Rectangle playerBox;
     private Collider collider;
-    double speedX = 1 * BombGame.XZOOM;
-    double speedY = 1 * BombGame.YZOOM;
-    FacingDirection currentFD, newFD;
+    private double speedX = 1 * BombGame.XZOOM;
+    private double speedY = 1 * BombGame.YZOOM;
+    private FacingDirection currentFD, newFD;
     private Sprite sprite;
     private boolean destroyed;
     private AnimatedSprite animatedSprite = null;
@@ -111,10 +113,9 @@ public class Player implements GameObject, CollisionListener {
     }
 
     int tempCount = 0;
-    int tempMax = 1;
-    int tempCurrent = 0;
     int tempLength = 1;
     int tempPoints = 0;
+    boolean moving = false;
 
     /**
      * Updates the location of the {@code collider} then checks for collision on
@@ -131,56 +132,40 @@ public class Player implements GameObject, CollisionListener {
      */
     @Override
     public void update(BombGame game) {
-        boolean moving = false;
 
-        if (listener.left()) {
-            collider.x -= speedX;
-            newFD = FacingDirection.left;
-            moving = true;
-        }
-        if (listener.right()) {
-            collider.x += speedX;
-            newFD = FacingDirection.right;
-            moving = true;
-        }
-        game.checkCollision(collider);
-        if (listener.up()) {
-            collider.y -= speedY;
-            newFD = FacingDirection.up;
-            moving = true;
-        }
-        if (listener.down()) {
-            collider.y += speedY;
-            newFD = FacingDirection.down;
-            moving = true;
-        }
-        game.checkCollision(collider);
-        playerBox.x = collider.x - ((playerBox.width * BombGame.XZOOM - collider.width) / 2);
-        playerBox.y = collider.y - ((playerBox.height * BombGame.YZOOM - collider.height));
+        if (listener.up())
+            moveUp();
+        if (listener.down())
+            moveDown();
 
+        if (moving)
+            game.checkCollision(collider);
+
+        if (listener.left())
+            moveLeft();
+        if (listener.right())
+            moveRight();
+
+        if (moving) {
+            game.checkCollision(collider);
+            animatedSprite.update(game);
+
+            playerBox.x = collider.x - ((playerBox.width * BombGame.XZOOM - collider.width) / 2);
+            playerBox.y = collider.y - ((playerBox.height * BombGame.YZOOM - collider.height));
+        } else {
+            animatedSprite.reset();
+
+        }
         if (this.currentFD != newFD) {
             this.currentFD = newFD;
             updateDirection();
         }
-        if (moving) {
-            animatedSprite.update(game);
-        } else {
-            animatedSprite.reset();
-        }
-        if (listener.action()) {
-            // Tilemap map = game.getMap();
-            if (tempCurrent < tempMax) {
-                Point mapPoint = BombGame.MAP.mapPointToTilemap(collider.x + collider.width / 2,
-                        collider.y + collider.height / 2);
-                // Tilemap.MappedTile tile = map.getTile(mapPoint.x, mapPoint.y);
-                Point screenPoint = BombGame.MAP.mapPointToScreen(mapPoint);
-                Bomb bomb = new Bomb(this, screenPoint.x, screenPoint.y, tempLength);
-                game.addGameObject(bomb);
-                tempCurrent++;
-            }
-        }
+        if (listener.action())
+            placeBomb(game);
+
         if (destroyed)
             game.removeGameObject(this);
+
         tempCount++;
         if (tempCount > 650) {
             tempCount = 0;
@@ -188,12 +173,13 @@ public class Player implements GameObject, CollisionListener {
                 tempLength++;
                 System.out.println("Player " + playerNum + ": Bomb length is now " + tempLength + "!");
             } else {
-                tempMax++;
-                System.out.println("Player " + playerNum + ": Max # of bombs is now " + tempMax + "!");
+                maxBombs++;
+                System.out.println("Player " + playerNum + ": Max # of bombs is now " + maxBombs + "!");
             }
 
             System.out.println("Player " + playerNum + "'s score: " + tempPoints);
         }
+        moving = false;
     }
 
     /**
@@ -215,8 +201,57 @@ public class Player implements GameObject, CollisionListener {
         return this.listener;
     }
 
+    @Override
     public int getPlayerNum() {
         return this.playerNum;
+    }
+
+    @Override
+    public void moveUp() {
+        collider.y -= speedY;
+        newFD = FacingDirection.up;
+        moving = true;
+    }
+
+    @Override
+    public void moveDown() {
+        collider.y += speedY;
+        newFD = FacingDirection.down;
+        moving = true;
+    }
+
+    @Override
+    public void moveLeft() {
+        collider.x -= speedX;
+        newFD = FacingDirection.left;
+        moving = true;
+    }
+
+    @Override
+    public void moveRight() {
+        collider.x += speedX;
+        newFD = FacingDirection.right;
+        moving = true;
+    }
+
+    protected int maxBombs = 1;
+    public int bombCount = 0;
+
+    @Override
+    public void placeBomb(BombGame game) {
+        if (bombCount < maxBombs) {
+            Point mapPoint = BombGame.MAP.mapPointToTilemap(collider.x + collider.width / 2,
+                    collider.y + collider.height / 2);
+            Point screenPoint = BombGame.MAP.mapPointToScreen(mapPoint);
+            Bomb bomb = new Bomb(this, screenPoint.x, screenPoint.y, tempLength);
+            game.addGameObject(bomb);
+            bombCount++;
+        }
+    }
+
+    @Override
+    public void useAction(BombGame game) {
+
     }
 
     /**
@@ -244,7 +279,7 @@ public class Player implements GameObject, CollisionListener {
             break;
         }
         Object source = e.getSource().getObject();
-        if (source instanceof Bomb.Explosion) {
+        if (source instanceof Explosion) {
             this.destroyed = true;
         } else if (source instanceof GameObject) {
             this.collider.checkCollision(((GameObject) source).getCollider());
@@ -258,7 +293,7 @@ public class Player implements GameObject, CollisionListener {
     @Override
     public void onCollisionStay(CollisionEvent e) {
         Object source = e.getSource().getObject();
-        if (source instanceof Bomb.Explosion) {
+        if (source instanceof Explosion) {
             this.destroyed = true;
         }
     }

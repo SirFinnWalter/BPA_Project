@@ -1,3 +1,5 @@
+package bpa_project;
+
 import java.awt.Point;
 
 /**

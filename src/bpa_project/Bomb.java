@@ -1,6 +1,9 @@
+package bpa_project;
+
 import java.awt.Point;
 import java.io.File;
 import java.util.ArrayList;
+import bpa_project.characters.Player;;
 
 /**
  * @file Bomb.java
@@ -104,7 +107,7 @@ public class Bomb implements GameObject {
             }
 
             game.removeGameObject(this);
-            owner.tempCurrent -= 1;
+            owner.bombCount -= 1;
         }
     }
 
@@ -116,12 +119,11 @@ public class Bomb implements GameObject {
             Point p = BombGame.MAP.mapPointToTilemap(x, y);
             if (BombGame.MAP.getTile(p.x, p.y).isBreakable()) {
                 BombGame.MAP.removeTile(p.x, p.y);
-                owner.tempPoints++;
-                Explosion segment = new Explosion(this, (AnimatedSprite) sprite.clone(), x, y);
+                Explosion segment = new Explosion((AnimatedSprite) sprite.clone(), x, y);
                 game.addGameObject(segment);
                 return;
             } else if (!BombGame.MAP.getTile(p.x, p.y).isCollidable()) {
-                Explosion segment = new Explosion(this, (AnimatedSprite) sprite.clone(), x, y);
+                Explosion segment = new Explosion((AnimatedSprite) sprite.clone(), x, y);
                 game.addGameObject(segment);
             } else {
                 return;
@@ -135,45 +137,5 @@ public class Bomb implements GameObject {
     @Override
     public Collider getCollider() {
         return collider;
-    }
-
-    class Explosion implements GameObject {
-        private AnimatedSprite animatedSprite;
-        private Collider collider;
-
-        public Explosion(Bomb bomb, AnimatedSprite sprite, int x, int y) {
-
-            collider = new Collider(this, x, y, 16 * BombGame.XZOOM, 16 * BombGame.YZOOM);
-            collider.setBorder(1, 0xFFFF0000);
-            this.animatedSprite = sprite;
-            this.animatedSprite.setAnimationType(AnimatedSprite.AnimationType.destroy);
-        }
-
-        @Override
-        public Collider getCollider() {
-            return this.collider;
-        }
-
-        @Override
-        public void render(RenderHandler renderer, int xZoom, int yZoom) {
-            renderer.renderSprite(animatedSprite, collider.x, collider.y, xZoom, yZoom);
-            // renderer.renderRectangle(collider, 1, 1);
-        }
-
-        @Override
-        public void update(BombGame game) {
-            animatedSprite.update(game);
-            if (animatedSprite.isDestroyed()) {
-                game.removeGameObject(this);
-            }
-        }
-
-        @Override
-        public void init(BombGame game) {
-            game.getPlayers().forEach(player -> {
-                player.getCollider().addGameObject(this);
-                player.getCollider().checkCollision(collider);
-            });
-        }
     }
 }

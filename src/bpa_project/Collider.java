@@ -1,7 +1,7 @@
+package bpa_project;
+
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @file Collider.java

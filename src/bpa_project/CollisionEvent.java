@@ -1,3 +1,5 @@
+package bpa_project;
+
 /**
  * @file CollisionEvent.java
  * @author Dakota Taylor

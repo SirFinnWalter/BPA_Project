@@ -1,3 +1,5 @@
+package bpa_project;
+
 import java.awt.image.BufferedImage;
 
 /**
@@ -15,7 +17,7 @@ public class AnimatedSprite extends Sprite implements Cloneable {
     private int length;
     private AnimationType animationType = AnimationType.looping;
 
-    protected Object clone() throws CloneNotSupportedException {
+    public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
 

@@ -1,3 +1,5 @@
+package bpa_project;
+
 /**
  * @file XInputButtons.java
  * @author Dakota Taylor

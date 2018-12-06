@@ -1,3 +1,5 @@
+package bpa_project;
+
 /**
  * @file GameObject.java
  * @author Dakota Taylor
