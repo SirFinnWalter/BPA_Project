@@ -15,6 +15,7 @@ public class AnimatedSprite extends Sprite implements Cloneable {
     private int flipFrame;
     private int start, end;
     private int length;
+    private boolean visible;
     private AnimationType animationType = AnimationType.looping;
 
     public Object clone() throws CloneNotSupportedException {
@@ -27,6 +28,7 @@ public class AnimatedSprite extends Sprite implements Cloneable {
         this.start = 0;
         this.end = range.length - 1;
         this.length = range.length;
+        this.visible = true;
         for (int i = 0; i < range.length; i++) {
             sprites[i] = new Sprite(sheet, range[i].x, range[i].y, range[i].width, range[i].height);
         }
@@ -44,6 +46,7 @@ public class AnimatedSprite extends Sprite implements Cloneable {
         this.start = 0;
         this.end = images.length - 1;
         this.length = images.length;
+        this.visible = true;
 
         for (int i = 0; i < images.length; i++) {
             sprites[i] = new Sprite(images[i]);
@@ -56,13 +59,15 @@ public class AnimatedSprite extends Sprite implements Cloneable {
         this.start = 0;
         this.end = this.sprites.length - 1;
         this.length = sprites.length;
-
+        this.visible = true;
     }
 
     public void setAnimationRange(int start, int end) {
+        int relativeSprite = this.currentSprite - this.start;
         this.start = start;
         this.end = end;
-        reset();
+        this.currentSprite = this.start + relativeSprite;
+        // reset();
     }
 
     public void setAnimationType(AnimationType animationType) {
@@ -124,8 +129,12 @@ public class AnimatedSprite extends Sprite implements Cloneable {
 
     @Override
     public int[] getPixels() {
+        if (!visible)
+            return null;
+
         if (currentSprite >= 0)
             return sprites[currentSprite].getPixels();
+
         return null;
     }
 
@@ -139,6 +148,21 @@ public class AnimatedSprite extends Sprite implements Cloneable {
 
     public boolean isDestroyed() {
         return (currentSprite == -1);
+    }
+
+    public void setDestoyed(boolean destroyed) {
+        if (destroyed)
+            currentSprite = -1;
+        else
+            currentSprite = 0;
+    }
+
+    public boolean isVisible() {
+        return this.visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
     public enum AnimationType {

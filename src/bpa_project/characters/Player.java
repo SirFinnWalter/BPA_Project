@@ -26,14 +26,15 @@ public class Player implements IPlayer, CollisionListener {
     public final static int MAX_PLAYERS = 4;
     public static int PLAYER_COUNT = 0;
     private Rectangle playerBox;
-    private Collider collider;
+    protected Collider collider;
     private double speedX = 1 * BombGame.XZOOM;
     private double speedY = 1 * BombGame.YZOOM;
     private FacingDirection currentFD, newFD;
     private Sprite sprite;
     private boolean destroyed;
-    private AnimatedSprite animatedSprite = null;
+    protected AnimatedSprite animatedSprite = null;
     private KeyboardListener listener = null;
+    protected int bombLength = 1;
 
     private int playerNum;
 
@@ -113,7 +114,6 @@ public class Player implements IPlayer, CollisionListener {
     }
 
     int tempCount = 0;
-    int tempLength = 1;
     int tempPoints = 0;
     boolean moving = false;
 
@@ -160,8 +160,11 @@ public class Player implements IPlayer, CollisionListener {
             this.currentFD = newFD;
             updateDirection();
         }
-        if (listener.action())
+        if (listener.bomb())
             placeBomb(game);
+
+        if (listener.action())
+            useAction(game);
 
         if (destroyed)
             game.removeGameObject(this);
@@ -170,8 +173,8 @@ public class Player implements IPlayer, CollisionListener {
         if (tempCount > 650) {
             tempCount = 0;
             if (Math.random() < 0.5) {
-                tempLength++;
-                System.out.println("Player " + playerNum + ": Bomb length is now " + tempLength + "!");
+                bombLength++;
+                System.out.println("Player " + playerNum + ": Bomb length is now " + bombLength + "!");
             } else {
                 maxBombs++;
                 System.out.println("Player " + playerNum + ": Max # of bombs is now " + maxBombs + "!");
@@ -243,7 +246,7 @@ public class Player implements IPlayer, CollisionListener {
             Point mapPoint = BombGame.MAP.mapPointToTilemap(collider.x + collider.width / 2,
                     collider.y + collider.height / 2);
             Point screenPoint = BombGame.MAP.mapPointToScreen(mapPoint);
-            Bomb bomb = new Bomb(this, screenPoint.x, screenPoint.y, tempLength);
+            Bomb bomb = new Bomb(this, screenPoint.x, screenPoint.y, bombLength);
             game.addGameObject(bomb);
             bombCount++;
         }

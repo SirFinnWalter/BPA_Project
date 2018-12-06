@@ -17,15 +17,15 @@ import bpa_project.characters.Player;;
  */
 public class Bomb implements GameObject {
     private static final int BOMB_ANIMATION_LENGTH = 10;
-    private static final AnimatedSprite BOMB_ANIMATED_SPRITE = new AnimatedSprite(
+    public static final AnimatedSprite BOMB_ANIMATED_SPRITE = new AnimatedSprite(
             new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\bomb.png")), 16, 16), BOMB_ANIMATION_LENGTH);
-    private static final AnimatedSprite EXPLOSION_ANIMATED_SPRITE = new AnimatedSprite(
+    public static final AnimatedSprite EXPLOSION_ANIMATED_SPRITE = new AnimatedSprite(
             new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\explosion.png")), 16, 16),
             BOMB_ANIMATION_LENGTH);
-    private static final AnimatedSprite EXPLOSION_ANIMATED_SPRITE_VERTICAL = new AnimatedSprite(
+    public static final AnimatedSprite EXPLOSION_ANIMATED_SPRITE_VERTICAL = new AnimatedSprite(
             new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\v_explosion.png")), 16, 16),
             BOMB_ANIMATION_LENGTH);
-    private static final AnimatedSprite EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL = new AnimatedSprite(
+    public static final AnimatedSprite EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL = new AnimatedSprite(
             new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\h_explosion.png")), 16, 16),
             BOMB_ANIMATION_LENGTH);
 
@@ -113,9 +113,14 @@ public class Bomb implements GameObject {
 
     private void createSegments(BombGame game, AnimatedSprite sprite, int length, int xIncrement, int yIncrement)
             throws CloneNotSupportedException {
+        createSegments(game, sprite, length, this.x, this.y, xIncrement, yIncrement);
+    }
+
+    public static void createSegments(BombGame game, AnimatedSprite sprite, int length, int xPos, int yPos,
+            int xIncrement, int yIncrement) throws CloneNotSupportedException {
         for (int i = 1; i <= length; i++) {
-            int x = this.x + (xIncrement * i);
-            int y = this.y + (yIncrement * i);
+            int x = xPos + (xIncrement * i);
+            int y = yPos + (yIncrement * i);
             Point p = BombGame.MAP.mapPointToTilemap(x, y);
             if (BombGame.MAP.getTile(p.x, p.y).isBreakable()) {
                 BombGame.MAP.removeTile(p.x, p.y);

@@ -30,9 +30,9 @@ public class KeyboardListener implements KeyListener, FocusListener {
      * @param rightKey  The keyCode to move right.
      * @param actionKey The keyCode to act.
      */
-    public KeyboardListener(int upKey, int downKey, int leftKey, int rightKey, int actionKey) {
-        keys = new int[] { upKey, downKey, leftKey, rightKey, actionKey };
-        keyStates = new boolean[5];
+    public KeyboardListener(int upKey, int downKey, int leftKey, int rightKey, int bombKey, int actionKey) {
+        keys = new int[] { upKey, downKey, leftKey, rightKey, bombKey, actionKey };
+        keyStates = new boolean[6];
         Arrays.fill(keyStates, false);
     }
 
@@ -49,7 +49,7 @@ public class KeyboardListener implements KeyListener, FocusListener {
      */
     @Override
     public void focusLost(FocusEvent e) {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             keyStates[i] = false;
         }
     }
@@ -61,7 +61,7 @@ public class KeyboardListener implements KeyListener, FocusListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             if (keyCode == keys[i])
                 keyStates[i] = true;
         }
@@ -76,7 +76,7 @@ public class KeyboardListener implements KeyListener, FocusListener {
     @Override
     public void keyReleased(KeyEvent e) {
         int keyCode = e.getKeyCode();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             if (keyCode == keys[i])
                 keyStates[i] = false;
         }
@@ -114,18 +114,22 @@ public class KeyboardListener implements KeyListener, FocusListener {
     private int cooldown = 20;
 
     /**
-     * Returns the key state of action. Has a cooldown of two frames before it may
-     * be actived again.
+     * Returns the key state of bomb. Has a cooldown of two frames before it may be
+     * actived again.
      * 
-     * @return The key state of action.
+     * @return The key state of bomb.
      */
-    public boolean action() {
+    public boolean bomb() {
         counter++;
         if (keyStates[4] && counter >= cooldown) {
             counter = 0;
             return true;
         }
         return false;
+    }
+
+    public boolean action() {
+        return (keyStates[5]);
     }
 
 }

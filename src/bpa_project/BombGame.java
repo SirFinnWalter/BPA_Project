@@ -99,23 +99,31 @@ public class BombGame extends JFrame implements Runnable {
 
         try {
             AnimatedSprite playerAnimation = new AnimatedSprite(sheet, 8);
-            createPlayer(16 * 1, 16 * 1, (AnimatedSprite) playerAnimation.clone(),
-                    new int[] { KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_E });
+            // createPlayer(16 * 1, 16 * 1, (AnimatedSprite) playerAnimation.clone(),
+            // new int[] { KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D,
+            // KeyEvent.VK_E, 0 });
 
             // createPlayer(16 * 23, 16 * 1, (AnimatedSprite) playerAnimation.clone(),
             // new int[] { KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D,
             // KeyEvent.VK_E });
+
+            // TODO: refine character creation
             image = loadImage(new File("assets\\sprites\\stegowalkTEMP.png"));
             sheet = new SpriteSheet(image, 16, 16);
             playerAnimation = new AnimatedSprite(sheet, 10);
-            createPlayer(16 * 23, 16 * 1, (AnimatedSprite) playerAnimation.clone(), new int[] { KeyEvent.VK_UP,
-                    KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER });
 
-            KeyboardListener listener = new KeyboardListener(KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H,
-                    KeyEvent.VK_Y);
-            CharacterA player = new CharacterA(16 * 1, 16 * 15, listener);
+            KeyboardListener listener = new KeyboardListener(KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT,
+                    KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER, KeyEvent.VK_SHIFT);
+            CharacterB player1 = new CharacterB(16 * 23, 16 * 1, listener);
             canvas.addKeyListener(listener);
             canvas.addFocusListener(listener);
+            gameObjects.add(player1);
+
+            KeyboardListener listener2 = new KeyboardListener(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A,
+                    KeyEvent.VK_D, KeyEvent.VK_SPACE, KeyEvent.VK_E);
+            CharacterA player = new CharacterA(16 * 1, 16 * 15, listener2);
+            canvas.addKeyListener(listener2);
+            canvas.addFocusListener(listener2);
             gameObjects.add(player);
 
             // createPlayer(16 * 1, 16 * 15, (AnimatedSprite) playerAnimation.clone(),
@@ -147,8 +155,8 @@ public class BombGame extends JFrame implements Runnable {
     public void createPlayer(int x, int y, AnimatedSprite sprite, final int[] keys) {
         if (Player.PLAYER_COUNT >= Player.MAX_PLAYERS)
             System.out.println("Cannot add more than 4 players!");
-        if (keys != null && keys.length > 4) {
-            KeyboardListener listener = new KeyboardListener(keys[0], keys[1], keys[2], keys[3], keys[4]);
+        if (keys != null && keys.length > 5) {
+            KeyboardListener listener = new KeyboardListener(keys[0], keys[1], keys[2], keys[3], keys[4], keys[5]);
             Player player = new Player(x, y, sprite, listener);
             canvas.addKeyListener(listener);
             canvas.addFocusListener(listener);
