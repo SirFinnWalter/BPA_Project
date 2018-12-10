@@ -185,6 +185,10 @@ public class Player implements IPlayer, CollisionListener {
         moving = false;
     }
 
+    public boolean isDestroyed() {
+        return this.destroyed;
+    }
+
     /**
      * @param destroyed the destroyed to set
      */

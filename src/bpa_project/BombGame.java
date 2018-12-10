@@ -121,7 +121,7 @@ public class BombGame extends JFrame implements Runnable {
 
             KeyboardListener listener2 = new KeyboardListener(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A,
                     KeyEvent.VK_D, KeyEvent.VK_SPACE, KeyEvent.VK_E);
-            CharacterA player = new CharacterA(16 * 1, 16 * 15, listener2);
+            CharacterC player = new CharacterC(16 * 1, 16 * 15, listener2);
             canvas.addKeyListener(listener2);
             canvas.addFocusListener(listener2);
             gameObjects.add(player);
