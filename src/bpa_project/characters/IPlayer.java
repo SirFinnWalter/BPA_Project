@@ -1,7 +1,7 @@
 package bpa_project.characters;
 
 import bpa_project.GameObject;
-import bpa_project.BombGame;
+import bpa_project.Game;;
 
 /**
  * @file IPlayer.java
@@ -18,9 +18,9 @@ public interface IPlayer extends GameObject {
 
     void moveRight();
 
-    void placeBomb(BombGame game);
+    void placeBomb(Game game);
 
-    void useAction(BombGame game);
+    void useAction(Game game);
 
     int getPlayerNum();
 }

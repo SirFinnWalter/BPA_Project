@@ -12,14 +12,14 @@ import bpa_project.*;
  */
 public class CharacterA extends Player {
     private static final AnimatedSprite CHARACTER_A_ANIMATED_SPRITE = new AnimatedSprite(
-            new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\tempDinosaur.png")), 16, 21), 8);
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\tempDinosaur.png")), 16, 21), 8);
 
     public CharacterA(int x, int y, KeyboardListener listener) throws CloneNotSupportedException {
         super(x, y, (AnimatedSprite) CHARACTER_A_ANIMATED_SPRITE.clone(), listener);
     }
 
     @Override
-    public void update(BombGame game) {
+    public void update(Game game) {
         super.update(game);
         if (!animatedSprite.isVisible() && current >= duration)
             animatedSprite.setVisible(true);
@@ -28,12 +28,12 @@ public class CharacterA extends Player {
     }
 
     @Override
-    public void placeBomb(BombGame game) {
+    public void placeBomb(Game game) {
         if (bombCount < maxBombs) {
             Collider collider = this.getCollider();
-            Point mapPoint = BombGame.MAP.mapPointToTilemap(collider.x + collider.width / 2,
+            Point mapPoint = game.getMap().mapPointToTilemap(collider.x + collider.width / 2,
                     collider.y + collider.height / 2);
-            Point screenPoint = BombGame.MAP.mapPointToScreen(mapPoint);
+            Point screenPoint = game.getMap().mapPointToScreen(mapPoint);
             Bomb bomb = new Bomb(this, screenPoint.x, screenPoint.y, bombLength);
             game.addGameObject(bomb);
             bombCount++;
@@ -46,7 +46,7 @@ public class CharacterA extends Player {
     int cooldown = 160;
 
     @Override
-    public void useAction(BombGame game) {
+    public void useAction(Game game) {
         if (current >= cooldown) {
             current = 0;
             animatedSprite.setVisible(false);

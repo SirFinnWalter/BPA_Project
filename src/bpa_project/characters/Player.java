@@ -27,8 +27,8 @@ public class Player implements IPlayer, CollisionListener {
     public static int PLAYER_COUNT = 0;
     private Rectangle playerBox;
     protected Collider collider;
-    private double speedX = 1 * BombGame.XZOOM;
-    private double speedY = 1 * BombGame.YZOOM;
+    private double speedX = 1 * GameWindow.ZOOM;
+    private double speedY = 1 * GameWindow.ZOOM;
     private FacingDirection currentFD, newFD;
     private Sprite sprite;
     private boolean destroyed;
@@ -58,13 +58,14 @@ public class Player implements IPlayer, CollisionListener {
         if (sprite != null && sprite instanceof AnimatedSprite) {
             this.animatedSprite = (AnimatedSprite) sprite;
         }
-        playerBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, sprite.getWidth(), sprite.getHeight());
-        collider = new Collider(this, x * BombGame.XZOOM, y * BombGame.YZOOM, 14 * BombGame.XZOOM, 14 * BombGame.YZOOM);
+        playerBox = new Rectangle(x * GameWindow.ZOOM, y * GameWindow.ZOOM, sprite.getWidth(), sprite.getHeight());
+        collider = new Collider(this, x * GameWindow.ZOOM, y * GameWindow.ZOOM, 14 * GameWindow.ZOOM,
+                14 * GameWindow.ZOOM);
 
         currentFD = FacingDirection.up;
         newFD = FacingDirection.up;
         updateDirection();
-        // playerBox = new Rectangle(x * BombGame.XZOOM, y * BombGame.YZOOM, 16, 21);
+        // playerBox = new Rectangle(x * GameWindow.ZOOM, y * GameWindow.ZOOM, 16, 21);
         playerBox.setColor(0x88FFFFFF);
         collider.setBorder(1, 0xFF0000FF);
 
@@ -104,11 +105,12 @@ public class Player implements IPlayer, CollisionListener {
      * @param game The game info and state
      */
     @Override
-    public void init(BombGame game) {
+    public void init(Game game) {
         // game.getM
         game.getPlayers().forEach(player -> {
             if (player != this) {
                 collider.addGameObject((player));
+                player.collider.addGameObject(this);
             }
         });
     }
@@ -131,7 +133,7 @@ public class Player implements IPlayer, CollisionListener {
      * @param game The game info and state
      */
     @Override
-    public void update(BombGame game) {
+    public void update(Game game) {
 
         if (listener.up())
             moveUp();
@@ -150,8 +152,8 @@ public class Player implements IPlayer, CollisionListener {
             game.checkCollision(collider);
             animatedSprite.update(game);
 
-            playerBox.x = collider.x - ((playerBox.width * BombGame.XZOOM - collider.width) / 2);
-            playerBox.y = collider.y - ((playerBox.height * BombGame.YZOOM - collider.height));
+            playerBox.x = collider.x - ((playerBox.width * GameWindow.ZOOM - collider.width) / 2);
+            playerBox.y = collider.y - ((playerBox.height * GameWindow.ZOOM - collider.height));
         } else {
             animatedSprite.reset();
 
@@ -245,11 +247,11 @@ public class Player implements IPlayer, CollisionListener {
     public int bombCount = 0;
 
     @Override
-    public void placeBomb(BombGame game) {
+    public void placeBomb(Game game) {
         if (bombCount < maxBombs) {
-            Point mapPoint = BombGame.MAP.mapPointToTilemap(collider.x + collider.width / 2,
+            Point mapPoint = game.getMap().mapPointToTilemap(collider.x + collider.width / 2,
                     collider.y + collider.height / 2);
-            Point screenPoint = BombGame.MAP.mapPointToScreen(mapPoint);
+            Point screenPoint = game.getMap().mapPointToScreen(mapPoint);
             Bomb bomb = new Bomb(this, screenPoint.x, screenPoint.y, bombLength);
             game.addGameObject(bomb);
             bombCount++;
@@ -257,7 +259,7 @@ public class Player implements IPlayer, CollisionListener {
     }
 
     @Override
-    public void useAction(BombGame game) {
+    public void useAction(Game game) {
 
     }
 

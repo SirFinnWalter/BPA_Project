@@ -78,7 +78,7 @@ public class AnimatedSprite extends Sprite implements Cloneable {
         System.out.println("DONT CALL THIS - AnimatedSprite.render");
     }
 
-    public void update(BombGame game) {
+    public void update(Game game) {
         counter++;
         if (counter >= flipFrame) {
             counter = 0;

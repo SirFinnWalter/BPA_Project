@@ -152,8 +152,8 @@ public class Tilemap {
         mappedTiles.forEach((k, v) -> {
             int width = v.getTile().sprite.getWidth();
             int height = v.getTile().sprite.getHeight();
-            tileset.renderTiles(renderer, v.tileID, v.x * width * BombGame.XZOOM, v.y * height * BombGame.YZOOM, xZoom,
-                    yZoom);
+            tileset.renderTiles(renderer, v.tileID, v.x * width * GameWindow.ZOOM, v.y * height * GameWindow.ZOOM,
+                    xZoom, yZoom);
         });
     }
 
@@ -199,8 +199,8 @@ public class Tilemap {
      * @return The tile location {@code Point}
      */
     public Point mapPointToTilemap(Point p) {
-        int x = ((p.x * (width - 1)) / ((width - 1) * 16 * BombGame.XZOOM));
-        int y = ((p.y * (height - 1)) / ((height - 1) * 16 * BombGame.YZOOM));
+        int x = ((p.x * (width - 1)) / ((width - 1) * 16 * GameWindow.ZOOM));
+        int y = ((p.y * (height - 1)) / ((height - 1) * 16 * GameWindow.ZOOM));
         if (x > width)
             x = -1;
         if (y > height)
@@ -231,8 +231,8 @@ public class Tilemap {
      * @return The exact pixel {@code location}
      */
     public Point mapPointToScreen(Point p) {
-        int x = p.x * 16 * BombGame.XZOOM;
-        int y = p.y * 16 * BombGame.YZOOM;
+        int x = p.x * 16 * GameWindow.ZOOM;
+        int y = p.y * 16 * GameWindow.ZOOM;
         return new Point(x, y);
     }
 
@@ -296,8 +296,8 @@ public class Tilemap {
             this.collidable = this.getTile().getCollision();
             if (collidable) {
                 Point p = mapPointToScreen(x, y);
-                collider = new Collider(this, p.x, p.y, this.getWidth() * BombGame.XZOOM,
-                        this.getHeight() * BombGame.YZOOM);
+                collider = new Collider(this, p.x, p.y, this.getWidth() * GameWindow.ZOOM,
+                        this.getHeight() * GameWindow.ZOOM);
             }
         }
 

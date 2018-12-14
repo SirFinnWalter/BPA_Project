@@ -12,7 +12,7 @@ public class Explosion implements GameObject {
 
     public Explosion(AnimatedSprite sprite, int x, int y) {
 
-        collider = new Collider(this, x, y, 16 * BombGame.XZOOM, 16 * BombGame.YZOOM);
+        collider = new Collider(this, x, y, 16 * GameWindow.ZOOM, 16 * GameWindow.ZOOM);
         collider.setBorder(1, 0xFFFF0000);
         this.animatedSprite = sprite;
         this.animatedSprite.setAnimationType(AnimatedSprite.AnimationType.destroy);
@@ -30,7 +30,7 @@ public class Explosion implements GameObject {
     }
 
     @Override
-    public void update(BombGame game) {
+    public void update(Game game) {
         animatedSprite.update(game);
         if (animatedSprite.isDestroyed()) {
             game.removeGameObject(this);
@@ -38,7 +38,7 @@ public class Explosion implements GameObject {
     }
 
     @Override
-    public void init(BombGame game) {
+    public void init(Game game) {
         game.getPlayers().forEach(player -> {
             player.getCollider().addGameObject(this);
             player.getCollider().checkCollision(collider);

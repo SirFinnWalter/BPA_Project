@@ -14,7 +14,7 @@ import bpa_project.AnimatedSprite.AnimationType;
 
 public class CharacterB extends Player {
     private static final AnimatedSprite CHARACTER_B_ANIMATED_SPRITE = new AnimatedSprite(
-            new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\test.png")), 16, 16), 20);
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\test.png")), 16, 16), 20);
     private int initialX, initialY;
 
     public CharacterB(int x, int y, KeyboardListener listener) throws CloneNotSupportedException {
@@ -25,35 +25,35 @@ public class CharacterB extends Player {
     }
 
     @Override
-    public void placeBomb(BombGame game) {
+    public void placeBomb(Game game) {
 
     }
 
     @Override
-    public void update(BombGame game) {
+    public void update(Game game) {
         if (animatedSprite.isDestroyed()) {
             try {
 
-                Point mapPoint = BombGame.MAP.mapPointToTilemap(collider.x + collider.width / 2,
+                Point mapPoint = game.getMap().mapPointToTilemap(collider.x + collider.width / 2,
                         collider.y + collider.height / 2);
-                Point screenPoint = BombGame.MAP.mapPointToScreen(mapPoint);
+                Point screenPoint = game.getMap().mapPointToScreen(mapPoint);
                 int x = screenPoint.x;
                 int y = screenPoint.y;
 
                 Bomb.createSegments(game, Bomb.EXPLOSION_ANIMATED_SPRITE, 1, x, y, 0, 0);
                 Bomb.createSegments(game, Bomb.EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL, bombLength, x, y,
-                        -16 * BombGame.XZOOM, 0);
+                        -16 * GameWindow.ZOOM, 0);
                 Bomb.createSegments(game, Bomb.EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL, bombLength, x, y,
-                        16 * BombGame.XZOOM, 0);
+                        16 * GameWindow.ZOOM, 0);
                 Bomb.createSegments(game, Bomb.EXPLOSION_ANIMATED_SPRITE_VERTICAL, bombLength, x, y, 0,
-                        -16 * BombGame.YZOOM);
+                        -16 * GameWindow.ZOOM);
                 Bomb.createSegments(game, Bomb.EXPLOSION_ANIMATED_SPRITE_VERTICAL, bombLength, x, y, 0,
-                        16 * BombGame.YZOOM);
+                        16 * GameWindow.ZOOM);
 
                 // this.collider.x = 16 * 23;
                 // this.collider.y = 16;
-                this.collider.x = initialX * BombGame.XZOOM;
-                this.collider.y = initialY * BombGame.YZOOM;
+                this.collider.x = initialX * GameWindow.ZOOM;
+                this.collider.y = initialY * GameWindow.ZOOM;
                 animatedSprite.reset();
                 this.setDestroyed(false);
             } catch (Exception e) {

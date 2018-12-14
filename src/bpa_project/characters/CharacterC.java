@@ -3,7 +3,6 @@ package bpa_project.characters;
 import java.io.File;
 
 import bpa_project.*;
-import bpa_project.AnimatedSprite.AnimationType;
 
 /**
  * @file CharacterC.java
@@ -13,9 +12,9 @@ import bpa_project.AnimatedSprite.AnimationType;
 
 public class CharacterC extends Player {
     private static final AnimatedSprite CHARACTER_C_ANIMATED_SPRITE = new AnimatedSprite(
-            new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\stegowalkTEMP.png")), 16, 16), 20);
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\stegowalkTEMP.png")), 16, 16), 20);
     private static final AnimatedSprite CHARACTER_C_ANIMATED_SPRITE_2 = new AnimatedSprite(
-            new SpriteSheet(BombGame.loadImage(new File("assets\\sprites\\ghostygoosterwalk.png")), 16, 16), 20);
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\ghostygoosterwalk.png")), 16, 16), 20);
 
     private int initialX, initialY;
     private boolean secondLife;
@@ -27,10 +26,10 @@ public class CharacterC extends Player {
     }
 
     @Override
-    public void update(BombGame game) {
+    public void update(Game game) {
         if (this.isDestroyed() && !secondLife) {
-            this.collider.x = initialX * BombGame.XZOOM;
-            this.collider.y = initialY * BombGame.YZOOM;
+            this.collider.x = initialX * GameWindow.ZOOM;
+            this.collider.y = initialY * GameWindow.ZOOM;
             this.setDestroyed(false);
             secondLife = true;
             animatedSprite.reset();

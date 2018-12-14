@@ -37,7 +37,7 @@ public interface GameObject {
      * 
      * @param game The game window and info
      */
-    public void update(BombGame game);
+    public void update(Game game);
 
     /**
      * Configs the class needs set (but cannot do in its constructor) before
@@ -45,5 +45,5 @@ public interface GameObject {
      * 
      * @param game The game window and info
      */
-    public void init(BombGame game);
+    public void init(Game game);
 }
