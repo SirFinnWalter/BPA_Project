@@ -86,7 +86,7 @@ public class Collider extends Rectangle {
     }
 
     /**
-     * Constructs a new {@code Collider} with a {@code Rectangle} whose upper-left
+     * Constructs a new {@code Collider} with a {@code MappedTile} whose upper-left
      * corner is specified as {@code (x,y)} and whose width and height are specified
      * by the arguments of the same name and a reference to a specified
      * {@code MappedTile}.
@@ -100,10 +100,6 @@ public class Collider extends Rectangle {
     public Collider(Tilemap.MappedTile tile, int x, int y, int width, int height) {
         super(x, y, width, height);
         this.object = tile;
-    }
-
-    public void startCollision() {
-
     }
 
     /**

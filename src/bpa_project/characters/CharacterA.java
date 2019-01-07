@@ -12,7 +12,7 @@ import bpa_project.*;
  */
 public class CharacterA extends Player {
     private static final AnimatedSprite CHARACTER_A_ANIMATED_SPRITE = new AnimatedSprite(
-            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\tempDinosaur.png")), 16, 21), 8);
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\d.png")), 16, 16), 18);
 
     public CharacterA(int x, int y, KeyboardListener listener) throws CloneNotSupportedException {
         super(x, y, (AnimatedSprite) CHARACTER_A_ANIMATED_SPRITE.clone(), listener);

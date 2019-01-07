@@ -12,6 +12,8 @@ import java.awt.Point;
  * A {@code java.awt.Rectangle} that may have a color, border or both, as well
  * as provides an array of each corner location in a {@code (x,y)} format using
  * {@code java.awt.Point}.
+ * 
+ * @see java.awt.Rectangle
  */
 public class Rectangle extends java.awt.Rectangle {
     private static final long serialVersionUID = -8044325233882769813L;

@@ -14,7 +14,7 @@ import bpa_project.AnimatedSprite.AnimationType;
 
 public class CharacterB extends Player {
     private static final AnimatedSprite CHARACTER_B_ANIMATED_SPRITE = new AnimatedSprite(
-            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\test.png")), 16, 16), 20);
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\bombiboi.png")), 16, 16), 12);
     private int initialX, initialY;
 
     public CharacterB(int x, int y, KeyboardListener listener) throws CloneNotSupportedException {
@@ -50,8 +50,6 @@ public class CharacterB extends Player {
                 Bomb.createSegments(game, Bomb.EXPLOSION_ANIMATED_SPRITE_VERTICAL, bombLength, x, y, 0,
                         16 * GameWindow.ZOOM);
 
-                // this.collider.x = 16 * 23;
-                // this.collider.y = 16;
                 this.collider.x = initialX * GameWindow.ZOOM;
                 this.collider.y = initialY * GameWindow.ZOOM;
                 animatedSprite.reset();

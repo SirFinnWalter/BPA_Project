@@ -1,13 +1,17 @@
 package bpa_project;
 
 import java.awt.Canvas;
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
+import java.awt.FlowLayout;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
 
+import bpa_project.characters.*;
 import bpa_project.characters.Player;
 
 /**
@@ -16,7 +20,7 @@ import bpa_project.characters.Player;
  * @createdOn Thursday, 13 December, 2018
  */
 
-public class Game implements WindowContent {
+public class Game extends WindowContent {
 
     private Canvas canvas;
     private RenderHandler renderer;
@@ -24,31 +28,64 @@ public class Game implements WindowContent {
     Set<Player> players;
     Set<GameObject> gameObjects;
     Set<GameObject> gameObjectsBuffer;
-    private boolean running;
 
-    public Game(Canvas canvas, RenderHandler renderer) {
-        this.canvas = canvas;
+    public Canvas getCanvas() {
+        return canvas;
+    }
+
+    public Game(RenderHandler renderer) {
         this.renderer = renderer;
-        this.running = true;
+        this.canvas = new Canvas();
+        this.add(canvas);
 
         players = new HashSet<>();
         gameObjects = new HashSet<>();
         gameObjectsBuffer = new HashSet<>();
+
+        // FIXME: set the size based on the map
+        this.setPreferredSize(new Dimension(800, 600));
+        canvas.setPreferredSize(new Dimension(800, 600));
+        ((FlowLayout) this.getLayout()).setVgap(0);
     }
 
     @Override
     public void init() {
+        super.init();
         gameObjects.forEach(object -> {
             object.init(this);
         });
+
+        ((FlowLayout) this.getLayout()).setVgap(0);
+
+        try {
+            KeyboardListener listener1 = new KeyboardListener(KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT,
+                    KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER, KeyEvent.VK_SHIFT);
+            CharacterC player1 = new CharacterC(16 * 23, 16 * 1, listener1);
+            canvas.addKeyListener(listener1);
+            canvas.addFocusListener(listener1);
+            this.addGameObject(player1);
+
+            KeyboardListener listener2 = new KeyboardListener(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A,
+                    KeyEvent.VK_D, KeyEvent.VK_SPACE, KeyEvent.VK_E);
+            CharacterA player2 = new CharacterA(16 * 1, 16 * 15, listener2);
+            canvas.addKeyListener(listener2);
+            canvas.addFocusListener(listener2);
+            this.addGameObject(player2);
+
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        canvas.createBufferStrategy(3);
+        canvas.requestFocus();
     }
 
     @Override
     public void update() {
-        if (running) {
+        if (isRunning()) {
             gameObjects.forEach(object -> {
                 object.update(this);
                 if (object instanceof Player)
+
                     poll((Player) object);
             });
 
@@ -67,13 +104,13 @@ public class Game implements WindowContent {
             if (players.isEmpty()) {
                 render();
                 JOptionPane.showMessageDialog(null, "Nobody wins!\nThanks for playing!");
-                running = false;
+                setRunning(false);
 
             } else if (players.size() == 1) {
                 render();
                 JOptionPane.showMessageDialog(null, "Player " + players.iterator().next().getPlayerNum()
                         + " has won by surviving!\nThanks for playing!");
-                running = false;
+                setRunning(false);
             }
         }
     }
@@ -98,7 +135,6 @@ public class Game implements WindowContent {
                     JOptionPane.WARNING_MESSAGE);
             System.exit(0);
         }
-
     }
 
     private void poll(Player player) {
@@ -131,6 +167,14 @@ public class Game implements WindowContent {
      */
     public void setMap(Tilemap map) {
         this.map = map;
+
+        // this.setPreferredSize(
+        // new Dimension(map.getWidth() * GameWindow.ZOOM * 16, map.getHeight() *
+        // GameWindow.ZOOM * 16));
+        // canvas.setPreferredSize(
+        // new Dimension(map.getWidth() * GameWindow.ZOOM * 16, map.getHeight() *
+        // GameWindow.ZOOM * 16));
+
         System.out.println("Setting map!");
     }
 

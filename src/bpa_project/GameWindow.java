@@ -2,6 +2,7 @@ package bpa_project;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -10,6 +11,7 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import bpa_project.characters.*;
 
@@ -33,12 +35,11 @@ public class GameWindow extends JFrame implements Runnable {
     private final int TICKSPERSECOND = 60;
     private final double NANOSECONDS = 1000000000.0 / TICKSPERSECOND;
     private boolean running;
-    private Canvas canvas;
     private RenderHandler renderer;
     private WindowContent wc;
 
     public GameWindow() {
-        this.setTitle("DinoMite!");
+        this.setTitle("DynoMite!");
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
             @Override
@@ -48,8 +49,6 @@ public class GameWindow extends JFrame implements Runnable {
             }
         });
 
-        canvas = new Canvas();
-
         // TEST CODE BEGIN:
 
         BufferedImage image = loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
@@ -57,34 +56,18 @@ public class GameWindow extends JFrame implements Runnable {
         Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
         Tilemap map = new Tilemap(new File("assets\\maps\\DefaultMap.bm"), tiles);
         setSize(map.getWidth() * 16, map.getHeight() * 16);
-        this.add(canvas);
+
+        Game game = new Game(renderer);
+        this.add(game);
+
         this.setVisible(true);
-        canvas.createBufferStrategy(3);
-        Game game = new Game(canvas, renderer);
         game.setMap(map);
+        wc = game;
+        this.pack();
 
-        try {
-            KeyboardListener listener1 = new KeyboardListener(KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT,
-                    KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER, KeyEvent.VK_SHIFT);
-            CharacterB player1 = new CharacterB(16 * 23, 16 * 1, listener1);
-            canvas.addKeyListener(listener1);
-            canvas.addFocusListener(listener1);
-            game.addGameObject(player1);
-
-            KeyboardListener listener2 = new KeyboardListener(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A,
-                    KeyEvent.VK_D, KeyEvent.VK_SPACE, KeyEvent.VK_E);
-            CharacterA player2 = new CharacterA(16 * 1, 16 * 15, listener2);
-            canvas.addKeyListener(listener2);
-            canvas.addFocusListener(listener2);
-            game.addGameObject(player2);
-
-            wc = game;
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
         // TEST CODE END
+
         this.toFront();
-        canvas.requestFocus();
     }
 
     public void run() {
@@ -104,7 +87,6 @@ public class GameWindow extends JFrame implements Runnable {
                 delta--;
             }
             wc.render();
-
             frames++;
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
@@ -115,6 +97,11 @@ public class GameWindow extends JFrame implements Runnable {
         System.exit(0);
     }
 
+    public void setWindowContent(WindowContent wc) {
+        this.wc.setRunning(false);
+        this.wc = wc;
+    }
+
     @Override
     public void setSize(int width, int height) {
         Dimension size = new Dimension(width, height);
@@ -123,8 +110,12 @@ public class GameWindow extends JFrame implements Runnable {
 
     @Override
     public void setSize(Dimension size) {
+        System.out.println(size.width + ", " + size.height);
+
         size.width *= ZOOM;
         size.height *= ZOOM;
+
+        this.pack();
 
         this.setBounds(0, 0, size.width, size.height);
         this.setPreferredSize(size);
