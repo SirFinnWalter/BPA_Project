@@ -33,7 +33,8 @@ public class Game extends WindowContent {
         return canvas;
     }
 
-    public Game(RenderHandler renderer) {
+    public Game(GameWindow gw, RenderHandler renderer) {
+        super(gw);
         this.renderer = renderer;
         this.canvas = new Canvas();
         this.add(canvas);
@@ -41,11 +42,7 @@ public class Game extends WindowContent {
         players = new HashSet<>();
         gameObjects = new HashSet<>();
         gameObjectsBuffer = new HashSet<>();
-
-        // FIXME: set the size based on the map
-        this.setPreferredSize(new Dimension(800, 600));
-        canvas.setPreferredSize(new Dimension(800, 600));
-        ((FlowLayout) this.getLayout()).setVgap(0);
+        Player.PLAYER_COUNT = 0;
     }
 
     @Override
@@ -105,12 +102,17 @@ public class Game extends WindowContent {
                 render();
                 JOptionPane.showMessageDialog(null, "Nobody wins!\nThanks for playing!");
                 setRunning(false);
+                MainMenu mm = new MainMenu(super.getGameWindow());
+                super.getGameWindow().setWindowContent(mm);
 
             } else if (players.size() == 1) {
                 render();
                 JOptionPane.showMessageDialog(null, "Player " + players.iterator().next().getPlayerNum()
                         + " has won by surviving!\nThanks for playing!");
                 setRunning(false);
+                MainMenu mm = new MainMenu(super.getGameWindow());
+                super.getGameWindow().setWindowContent(mm);
+
             }
         }
     }
@@ -168,13 +170,11 @@ public class Game extends WindowContent {
     public void setMap(Tilemap map) {
         this.map = map;
 
-        // this.setPreferredSize(
-        // new Dimension(map.getWidth() * GameWindow.ZOOM * 16, map.getHeight() *
-        // GameWindow.ZOOM * 16));
-        // canvas.setPreferredSize(
-        // new Dimension(map.getWidth() * GameWindow.ZOOM * 16, map.getHeight() *
-        // GameWindow.ZOOM * 16));
-
+        this.setPreferredSize(
+                new Dimension(map.getWidth() * GameWindow.ZOOM * 16, map.getHeight() * GameWindow.ZOOM * 16));
+        canvas.setPreferredSize(
+                new Dimension(map.getWidth() * GameWindow.ZOOM * 16, map.getHeight() * GameWindow.ZOOM * 16));
+        ((FlowLayout) this.getLayout()).setVgap(0);
         System.out.println("Setting map!");
     }
 

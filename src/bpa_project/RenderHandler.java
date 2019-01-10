@@ -58,7 +58,6 @@ public class RenderHandler {
             }
         }
     }
-
     public int getWidth() {
         return this.width;
     }

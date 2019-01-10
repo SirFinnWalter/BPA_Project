@@ -10,6 +10,11 @@ import javax.swing.JPanel;
 
 public abstract class WindowContent extends JPanel {
     private boolean running;
+    private GameWindow gw;
+
+    public WindowContent(GameWindow gw) {
+        this.gw = gw;
+    }
 
     public void init() {
         this.running = true;
@@ -29,5 +34,9 @@ public abstract class WindowContent extends JPanel {
 
     public void setRunning(boolean running) {
         this.running = running;
+    }
+
+    public GameWindow getGameWindow() {
+        return this.gw;
     }
 }

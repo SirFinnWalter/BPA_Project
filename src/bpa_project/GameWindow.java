@@ -1,9 +1,6 @@
 package bpa_project;
 
-import java.awt.Canvas;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -11,9 +8,8 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.JPanel;
-
-import bpa_project.characters.*;
 
 /**
  * @file GameWindow.java
@@ -35,6 +31,7 @@ public class GameWindow extends JFrame implements Runnable {
     private final int TICKSPERSECOND = 60;
     private final double NANOSECONDS = 1000000000.0 / TICKSPERSECOND;
     private boolean running;
+    private boolean hasContent;
     private RenderHandler renderer;
     private WindowContent wc;
 
@@ -51,18 +48,30 @@ public class GameWindow extends JFrame implements Runnable {
 
         // TEST CODE BEGIN:
 
-        BufferedImage image = loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
-        SpriteSheet sheet = new SpriteSheet(image, 16, 16);
-        Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
-        Tilemap map = new Tilemap(new File("assets\\maps\\DefaultMap.bm"), tiles);
-        setSize(map.getWidth() * 16, map.getHeight() * 16);
-
-        Game game = new Game(renderer);
-        this.add(game);
-
+        
+        MainMenu mm = new MainMenu(this);
         this.setVisible(true);
-        game.setMap(map);
-        wc = game;
+        this.hasContent = true;
+        wc = mm;
+        renderer = new RenderHandler(this.getWidth(), this.getHeight());
+        // renderer = new RenderHandler(this.getWidth(), this.getHeight());
+        
+        this.add(mm);
+
+        // BufferedImage image = loadImage(new
+        // File("assets\\tilesets\\RuinsTileset.png"));
+        // SpriteSheet sheet = new SpriteSheet(image, 16, 16);
+        // Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"),
+        // sheet);
+        // Tilemap map = new Tilemap(new File("assets\\maps\\DefaultMap.bm"), tiles);
+        // setSize(map.getWidth() * 16, map.getHeight() * 16);
+
+        // Game game = new Game(this, renderer);
+        // this.add(game);
+        // game.setMap(map);
+
+        // this.setVisible(true);
+        // wc = game;
         this.pack();
 
         // TEST CODE END
@@ -74,11 +83,13 @@ public class GameWindow extends JFrame implements Runnable {
         running = true;
         int frames = 0;
         double delta = 0;
+
         wc.init();
 
         long lastTime = System.nanoTime();
         long timer = System.currentTimeMillis();
         while (running) {
+            while(hasContent) {
             long now = System.nanoTime();
             delta += (now - lastTime) / NANOSECONDS;
             lastTime = now;
@@ -92,14 +103,25 @@ public class GameWindow extends JFrame implements Runnable {
                 timer += 1000;
                 System.out.println(frames + " fps");
                 frames = 0;
-            }
+            } 
         }
+        SwingUtilities.updateComponentTreeUI(this);
+    }
         System.exit(0);
     }
 
     public void setWindowContent(WindowContent wc) {
+        this.hasContent = false;
+
         this.wc.setRunning(false);
+        this.remove(this.wc);
         this.wc = wc;
+
+        this.add(this.wc);
+        this.wc.init();
+
+        this.hasContent = true;
+        SwingUtilities.updateComponentTreeUI(this);
     }
 
     @Override
@@ -135,6 +157,10 @@ public class GameWindow extends JFrame implements Runnable {
 
     public void setRunning(boolean running) {
         this.running = running;
+    }
+
+    public RenderHandler getRenderHandler() {
+        return this.renderer;
     }
 
     /**

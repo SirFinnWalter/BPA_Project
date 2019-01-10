@@ -53,7 +53,10 @@ public class Player implements IPlayer, CollisionListener {
      *               listener The listener to control the player movement
      */
     public Player(int x, int y, Sprite sprite, KeyboardListener listener) {
-        this.playerNum = Player.PLAYER_COUNT++;
+        this.playerNum = ++Player.PLAYER_COUNT;
+        if(playerNum > MAX_PLAYERS) {
+            throw new RuntimeException("Reached max number of players! (" + MAX_PLAYERS + ")");
+        }
         this.sprite = sprite;
         if (sprite != null && sprite instanceof AnimatedSprite) {
             this.animatedSprite = (AnimatedSprite) sprite;
