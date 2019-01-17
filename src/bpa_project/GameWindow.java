@@ -48,14 +48,13 @@ public class GameWindow extends JFrame implements Runnable {
 
         // TEST CODE BEGIN:
 
-        
         MainMenu mm = new MainMenu(this);
         this.setVisible(true);
         this.hasContent = true;
         wc = mm;
         renderer = new RenderHandler(this.getWidth(), this.getHeight());
         // renderer = new RenderHandler(this.getWidth(), this.getHeight());
-        
+
         this.add(mm);
 
         // BufferedImage image = loadImage(new
@@ -89,24 +88,24 @@ public class GameWindow extends JFrame implements Runnable {
         long lastTime = System.nanoTime();
         long timer = System.currentTimeMillis();
         while (running) {
-            while(hasContent) {
-            long now = System.nanoTime();
-            delta += (now - lastTime) / NANOSECONDS;
-            lastTime = now;
-            while (delta >= 1) {
-                wc.update();
-                delta--;
+            while (hasContent) {
+                long now = System.nanoTime();
+                delta += (now - lastTime) / NANOSECONDS;
+                lastTime = now;
+                while (delta >= 1) {
+                    wc.update();
+                    delta--;
+                }
+                wc.render();
+                frames++;
+                if (System.currentTimeMillis() - timer > 1000) {
+                    timer += 1000;
+                    System.out.println(frames + " fps");
+                    frames = 0;
+                }
             }
-            wc.render();
-            frames++;
-            if (System.currentTimeMillis() - timer > 1000) {
-                timer += 1000;
-                System.out.println(frames + " fps");
-                frames = 0;
-            } 
+            SwingUtilities.updateComponentTreeUI(this);
         }
-        SwingUtilities.updateComponentTreeUI(this);
-    }
         System.exit(0);
     }
 
@@ -150,7 +149,7 @@ public class GameWindow extends JFrame implements Runnable {
         size.height = size.height + (getHeight() - getContentPane().getHeight());
         this.setPreferredSize(size);
         this.pack();
-        this.setLocationRelativeTo(null);
+        // this.setLocationRelativeTo(null);
 
         renderer = new RenderHandler(this.getWidth(), this.getHeight());
     }

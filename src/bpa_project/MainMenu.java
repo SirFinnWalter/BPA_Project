@@ -26,15 +26,20 @@ public class MainMenu extends WindowContent {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                BufferedImage image = GameWindow.loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
-                SpriteSheet sheet = new SpriteSheet(image, 16, 16);
-                Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
-                Tilemap map = new Tilemap(new File("assets\\maps\\DefaultMap.bm"), tiles);
-                gw.setSize(map.getWidth() * 16, map.getHeight() * 16);
+                // BufferedImage image = GameWindow.loadImage(new
+                // File("assets\\tilesets\\RuinsTileset.png"));
+                // SpriteSheet sheet = new SpriteSheet(image, 16, 16);
+                // Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"),
+                // sheet);
+                // Tilemap map = new Tilemap(new File("assets\\maps\\DefaultMap.bm"), tiles);
+                // gw.setSize(map.getWidth() * 16, map.getHeight() * 16);
 
-                Game game = new Game(gw, gw.getRenderHandler());
-                game.setMap(map);
-                gw.setWindowContent(game);
+                // Game game = new Game(gw, gw.getRenderHandler());
+                // game.setMap(map);
+                // gw.setWindowContent(game);
+
+                CharacterSelect cs = new CharacterSelect(gw);
+                gw.setWindowContent(cs);
             }
         });
         this.setVisible(true);

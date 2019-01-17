@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.awt.FlowLayout;
 import java.util.HashSet;
 import java.util.Set;
@@ -117,6 +119,9 @@ public class Game extends WindowContent {
         }
     }
 
+    // BufferedImage charA = GameWindow.loadImage(new
+    // File("assets\\sprites\\csCharA.png"));
+
     @Override
     public void render() {
         try {
@@ -128,6 +133,7 @@ public class Game extends WindowContent {
             gameObjects.forEach(object -> {
                 object.render(renderer, GameWindow.ZOOM, GameWindow.ZOOM);
             });
+            // renderer.renderImage(charA, 100, 100, 2, 2);
             renderer.render(gfx);
             gfx.dispose();
             bStrategy.show();

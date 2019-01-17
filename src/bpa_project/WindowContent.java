@@ -22,7 +22,6 @@ public abstract class WindowContent extends JPanel {
     }
 
     public void update() {
-
     }
 
     public void render() {
