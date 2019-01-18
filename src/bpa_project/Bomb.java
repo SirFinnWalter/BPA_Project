@@ -18,7 +18,7 @@ import bpa_project.characters.Player;;
 public class Bomb implements GameObject {
     private static final int BOMB_ANIMATION_LENGTH = 10;
     public static final AnimatedSprite BOMB_ANIMATED_SPRITE = new AnimatedSprite(
-            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\bomb.png")), 16, 16),
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\newbomb.png")), 16, 16),
             BOMB_ANIMATION_LENGTH);
     public static final AnimatedSprite EXPLOSION_ANIMATED_SPRITE = new AnimatedSprite(
             new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\explosion.png")), 16, 16),

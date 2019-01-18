@@ -6,16 +6,21 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 import javax.imageio.ImageIO;
 
 /**
@@ -25,104 +30,114 @@ import javax.imageio.ImageIO;
  */
 
 public class CharacterSelect extends WindowContent {
+        JLabel[] csPortraits = new JLabel[4];
+        ArrayList<ImageIcon> csImages = new ArrayList<ImageIcon>();
 
-    public CharacterSelect(GameWindow gw) {
-        super(gw);
+        public CharacterSelect(GameWindow gw) {
+                super(gw);
+                gw.setPreferredSize(new Dimension(400 * GameWindow.ZOOM, 240 * GameWindow.ZOOM));
+                this.setPreferredSize(new Dimension(400 * GameWindow.ZOOM, 240 * GameWindow.ZOOM));
+                gw.setSize(400, 240);
 
-        // Graphics gfx = this.getGraphics();
-        // gfx.drawImage(charA, 200, 200, 400, 400, null);
-        // gw.getRenderHandler().render(gfx);
-        // gfx.dispose();
-        // gw.getRenderHandler().renderImage(charA, 200, 200, GameWindow.ZOOM,
-        // GameWindow.ZOOM);
-        gw.setPreferredSize(new Dimension(400 * GameWindow.ZOOM, 200 * GameWindow.ZOOM));
-        this.setPreferredSize(new Dimension(400 * GameWindow.ZOOM, 200 * GameWindow.ZOOM));
-        gw.setSize(400, 200);
-        JButton upButton1 = new JButton("^");
-        JButton upButton3 = new JButton("^");
-        JButton upButton4 = new JButton("^");
-        JButton upButton2 = new JButton("^");
-        upButton1.setPreferredSize(
-                new Dimension((this.getPreferredSize().width / 4) - 5 * GameWindow.ZOOM, 10 * GameWindow.ZOOM));
-        upButton2.setPreferredSize(
-                new Dimension((this.getPreferredSize().width / 4) - 5 * GameWindow.ZOOM, 10 * GameWindow.ZOOM));
-        upButton3.setPreferredSize(
-                new Dimension((this.getPreferredSize().width / 4) - 5 * GameWindow.ZOOM, 10 * GameWindow.ZOOM));
-        upButton4.setPreferredSize(
-                new Dimension((this.getPreferredSize().width / 4) - 5 * GameWindow.ZOOM, 10 * GameWindow.ZOOM));
+                JPanel centerPanel = new JPanel();
+                Image image1 = GameWindow.loadImage(new File("assets\\sprites\\csCharacter1.png"));
+                image1 = image1.getScaledInstance(image1.getWidth(this) * GameWindow.ZOOM,
+                                image1.getHeight(this) * GameWindow.ZOOM, Image.SCALE_SMOOTH);
+                ImageIcon icon1 = new ImageIcon(image1);
+                Image image2 = GameWindow.loadImage(new File("assets\\sprites\\csCharacter2.png"));
+                image2 = image2.getScaledInstance(image2.getWidth(this) * GameWindow.ZOOM,
+                                image2.getHeight(this) * GameWindow.ZOOM, Image.SCALE_SMOOTH);
+                ImageIcon icon2 = new ImageIcon(image2);
+                csImages.add(icon1);
+                csImages.add(icon2);
+                for (int i = 0; i < csPortraits.length; i++) {
+                        csPortraits[i] = new JLabel(csImages.get(0));
+                        csPortraits[i].putClientProperty("portrait", 0);
+                        centerPanel.add(csPortraits[i], BorderLayout.CENTER);
+                }
 
-        JButton downButton1 = new JButton("v");
-        JButton downButton2 = new JButton("v");
-        JButton downButton3 = new JButton("v");
-        JButton downButton4 = new JButton("v");
-        downButton1.setPreferredSize(
-                new Dimension((this.getPreferredSize().width / 4) - 5 * GameWindow.ZOOM, 10 * GameWindow.ZOOM));
-        downButton2.setPreferredSize(
-                new Dimension((this.getPreferredSize().width / 4) - 5 * GameWindow.ZOOM, 10 * GameWindow.ZOOM));
-        downButton3.setPreferredSize(
-                new Dimension((this.getPreferredSize().width / 4) - 5 * GameWindow.ZOOM, 10 * GameWindow.ZOOM));
-        downButton4.setPreferredSize(
-                new Dimension((this.getPreferredSize().width / 4) - 5 * GameWindow.ZOOM, 10 * GameWindow.ZOOM));
+                JPanel topPanel = new JPanel();
+                JButton[] nextButtons = new JButton[4];
+                for (int i = 0; i < nextButtons.length; i++) {
+                        nextButtons[i] = new JButton("\u2191");
+                        nextButtons[i].putClientProperty("index", i);
+                        nextButtons[i].setPreferredSize(
+                                        new Dimension((this.getPreferredSize().width / 4) - 5 * GameWindow.ZOOM,
+                                                        10 * GameWindow.ZOOM));
 
-        this.setLayout(new BorderLayout());
+                        nextButtons[i].addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                        nextPortrait((int) ((JButton) e.getSource()).getClientProperty("index"));
+                                }
+                        });
+                        topPanel.add(nextButtons[i], BorderLayout.NORTH);
+                }
 
-        JPanel topPanel = new JPanel();
-        topPanel.add(upButton1);
-        topPanel.add(upButton2);
-        topPanel.add(upButton3);
-        topPanel.add(upButton4);
-        this.add(topPanel, BorderLayout.NORTH);
+                JPanel bottomPanel = new JPanel();
+                JButton[] prevButtons = new JButton[4];
+                for (int i = 0; i < prevButtons.length; i++) {
+                        prevButtons[i] = new JButton("\u2193");
+                        prevButtons[i].putClientProperty("index", i);
+                        prevButtons[i].setPreferredSize(
+                                        new Dimension((this.getPreferredSize().width / 4) - 5 * GameWindow.ZOOM,
+                                                        10 * GameWindow.ZOOM));
+                        prevButtons[i].addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                        prevPortrait((int) ((JButton) e.getSource()).getClientProperty("index"));
+                                }
+                        });
+                        bottomPanel.add(prevButtons[i], BorderLayout.SOUTH);
+                }
 
-        JPanel centerPanel = new JPanel();
+                JPanel playPanel = new JPanel();
+                JButton playButton = new JButton("Play!");
+                playButton.setPreferredSize(new Dimension(150 * GameWindow.ZOOM, 25 * GameWindow.ZOOM));
+                playButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
 
-        BufferedImage charImage = GameWindow.loadImage(new File("assets\\sprites\\csCharacter1.png"));
-        JLabel character1 = new JLabel(new ImageIcon(charImage));
-        JLabel character2 = new JLabel(new ImageIcon(charImage));
-        JLabel character3 = new JLabel(new ImageIcon(charImage));
-        JLabel character4 = new JLabel(new ImageIcon(charImage));
-        centerPanel.add(character1);
-        centerPanel.add(character2);
-        centerPanel.add(character3);
-        centerPanel.add(character4);
+                                BufferedImage image = GameWindow
+                                                .loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
+                                SpriteSheet sheet = new SpriteSheet(image, 16, 16);
+                                Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
+                                Tilemap map = new Tilemap(new File("assets\\maps\\DefaultMap.bm"), tiles);
+                                gw.setSize(map.getWidth() * 16, map.getHeight() * 16);
 
-        this.add(centerPanel);
-        JPanel bottomPanel = new JPanel();
+                                Game game = new Game(gw, gw.getRenderHandler());
+                                game.setMap(map);
+                                gw.setWindowContent(game);
+                        }
+                });
+                playPanel.add(playButton);
 
-        bottomPanel.add(downButton1, BorderLayout.SOUTH);
-        bottomPanel.add(downButton2, BorderLayout.SOUTH);
-        bottomPanel.add(downButton3, BorderLayout.SOUTH);
-        bottomPanel.add(downButton4, BorderLayout.SOUTH);
-        this.add(bottomPanel, BorderLayout.SOUTH);
-        this.setVisible(true);
-        // canvas.setPreferredSize(new Dimension(400 * GameWindow.ZOOM, 300 *
-        // GameWindow.ZOOM));
-    }
+                this.add(topPanel);
+                this.add(centerPanel);
+                this.add(bottomPanel);
+                this.add(playPanel);
+                this.setVisible(true);
+        }
 
-    @Override
-    public void init() {
-        super.init();
+        private void nextPortrait(int index) {
+                if (index < 0 || index > 4)
+                        return;
 
-        // canvas.createBufferStrategy(3);
-        // canvas.requestFocus();
-    }
+                int current = (int) csPortraits[index].getClientProperty("portrait");
+                int value = current + 1 > csImages.size() - 1 ? 0 : current + 1;
 
-    @Override
-    public void render() {
+                csPortraits[index].putClientProperty("portrait", value);
+                csPortraits[index].setIcon(csImages.get(value));
+        }
 
-        // try {
-        // BufferStrategy bStrategy = canvas.getBufferStrategy();
-        // Graphics gfx = bStrategy.getDrawGraphics();
-        // // super.paint(gfx);
-        // renderer.renderImage(charA, 100, 100, GameWindow.ZOOM, GameWindow.ZOOM);
-        // renderer.render(gfx);
-        // gfx.dispose();
-        // bStrategy.show();
-        // renderer.clear(0xFF0000FF);
-        // } catch (IllegalStateException e) {
-        // JOptionPane.showMessageDialog(null, "Game preformed an illegal
-        // operation.\nClosing...", "Uh oh!",
-        // JOptionPane.WARNING_MESSAGE);
-        // System.exit(0);
-        // }
-    }
+        private void prevPortrait(int index) {
+                if (index < 0 || index > 4)
+                        return;
+
+                int current = (int) csPortraits[index].getClientProperty("portrait");
+                int value = current - 1 < 0 ? csImages.size() - 1 : current - 1;
+
+                csPortraits[index].putClientProperty("portrait", value);
+                csPortraits[index].setIcon(csImages.get(value));
+        }
 }
