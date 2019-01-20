@@ -110,9 +110,6 @@ public class KeyboardListener implements KeyListener, FocusListener {
         return (keyStates[3]);
     }
 
-    private int counter = 120;
-    private int cooldown = 20;
-
     /**
      * Returns the key state of bomb. Has a cooldown of two frames before it may be
      * actived again.
@@ -120,12 +117,13 @@ public class KeyboardListener implements KeyListener, FocusListener {
      * @return The key state of bomb.
      */
     public boolean bomb() {
-        counter++;
-        if (keyStates[4] && counter >= cooldown) {
-            counter = 0;
-            return true;
-        }
-        return false;
+        return (keyStates[4]);
+        // counter++;
+        // if (keyStates[4] && counter >= cooldown) {
+        // counter = 0;
+        // return true;
+        // }
+        // return false;
     }
 
     public boolean action() {

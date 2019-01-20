@@ -54,7 +54,7 @@ public class Player implements IPlayer, CollisionListener {
      */
     public Player(int x, int y, Sprite sprite, KeyboardListener listener) {
         this.playerNum = ++Player.PLAYER_COUNT;
-        if(playerNum > MAX_PLAYERS) {
+        if (playerNum > MAX_PLAYERS) {
             throw new RuntimeException("Reached max number of players! (" + MAX_PLAYERS + ")");
         }
         this.sprite = sprite;
@@ -188,6 +188,7 @@ public class Player implements IPlayer, CollisionListener {
             System.out.println("Player " + playerNum + "'s score: " + tempPoints);
         }
         moving = false;
+        counter++;
     }
 
     public boolean isDestroyed() {
@@ -249,15 +250,21 @@ public class Player implements IPlayer, CollisionListener {
     protected int maxBombs = 1;
     public int bombCount = 0;
 
+    private int counter = 120;
+    private int bombCooldown = 20;
+
     @Override
     public void placeBomb(Game game) {
-        if (bombCount < maxBombs) {
-            Point mapPoint = game.getMap().mapPointToTilemap(collider.x + collider.width / 2,
-                    collider.y + collider.height / 2);
-            Point screenPoint = game.getMap().mapPointToScreen(mapPoint);
-            Bomb bomb = new Bomb(this, screenPoint.x, screenPoint.y, bombLength);
-            game.addGameObject(bomb);
-            bombCount++;
+        if (counter >= bombCooldown) {
+            counter = 0;
+            if (bombCount < maxBombs) {
+                Point mapPoint = game.getMap().mapPointToTilemap(collider.x + collider.width / 2,
+                        collider.y + collider.height / 2);
+                Point screenPoint = game.getMap().mapPointToScreen(mapPoint);
+                Bomb bomb = new Bomb(this, screenPoint.x, screenPoint.y, bombLength);
+                game.addGameObject(bomb);
+                bombCount++;
+            }
         }
     }
 

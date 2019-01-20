@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JButton;
@@ -44,20 +46,6 @@ public class MainMenu extends WindowContent {
         });
         this.setVisible(true);
         this.add(button);
-    }
-
-    @Override
-    public void init() {
-    }
-
-    @Override
-    public void update() {
-
-    }
-
-    @Override
-    public void render() {
-
     }
 
 }

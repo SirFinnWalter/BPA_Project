@@ -5,8 +5,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.awt.FlowLayout;
 import java.util.HashSet;
 import java.util.Set;
@@ -56,24 +54,26 @@ public class Game extends WindowContent {
 
         ((FlowLayout) this.getLayout()).setVgap(0);
 
-        try {
-            KeyboardListener listener1 = new KeyboardListener(KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT,
-                    KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER, KeyEvent.VK_SHIFT);
-            CharacterC player1 = new CharacterC(16 * 23, 16 * 1, listener1);
-            canvas.addKeyListener(listener1);
-            canvas.addFocusListener(listener1);
-            this.addGameObject(player1);
+        // try {
+        // KeyboardListener listener1 = new KeyboardListener(KeyEvent.VK_UP,
+        // KeyEvent.VK_DOWN, KeyEvent.VK_LEFT,
+        // KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER, KeyEvent.VK_SHIFT);
+        // CharacterC player1 = new CharacterC(16 * 23, 16 * 1, listener1);
+        // canvas.addKeyListener(listener1);
+        // canvas.addFocusListener(listener1);
+        // this.addGameObject(player1);
 
-            KeyboardListener listener2 = new KeyboardListener(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A,
-                    KeyEvent.VK_D, KeyEvent.VK_SPACE, KeyEvent.VK_E);
-            CharacterA player2 = new CharacterA(16 * 1, 16 * 15, listener2);
-            canvas.addKeyListener(listener2);
-            canvas.addFocusListener(listener2);
-            this.addGameObject(player2);
+        // KeyboardListener listener2 = new KeyboardListener(KeyEvent.VK_W,
+        // KeyEvent.VK_S, KeyEvent.VK_A,
+        // KeyEvent.VK_D, KeyEvent.VK_SPACE, KeyEvent.VK_E);
+        // CharacterA player2 = new CharacterA(16 * 1, 16 * 15, listener2);
+        // canvas.addKeyListener(listener2);
+        // canvas.addFocusListener(listener2);
+        // this.addGameObject(player2);
 
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
+        // } catch (CloneNotSupportedException e) {
+        // e.printStackTrace();
+        // }
         canvas.createBufferStrategy(3);
         canvas.requestFocus();
     }
@@ -109,8 +109,8 @@ public class Game extends WindowContent {
 
             } else if (players.size() == 1) {
                 render();
-                JOptionPane.showMessageDialog(null, "Player " + players.iterator().next().getPlayerNum()
-                        + " has won by surviving!\nThanks for playing!");
+                JOptionPane.showMessageDialog(null,
+                        "Player " + players.iterator().next().getPlayerNum() + " has won!\nThanks for playing!");
                 setRunning(false);
                 MainMenu mm = new MainMenu(super.getGameWindow());
                 super.getGameWindow().setWindowContent(mm);
@@ -146,7 +146,7 @@ public class Game extends WindowContent {
     }
 
     private void poll(Player player) {
-        XInputButtons buttons = XInputNative.getInput(player.getPlayerNum());
+        XInputButtons buttons = XInputNative.getInput(player.getPlayerNum() - 1);
         if (buttons != null) {
             KeyboardListener listener = player.getListener();
             for (int i = 0; i < listener.keyStates.length; i++) {
@@ -186,6 +186,13 @@ public class Game extends WindowContent {
 
     public Tilemap getMap() {
         return this.map;
+    }
+
+    public void addPlayer(Player character) {
+        this.players.add(character);
+        this.addGameObject(character);
+        canvas.addKeyListener(character.getListener());
+        canvas.addFocusListener(character.getListener());
     }
 
     public Set<Player> getPlayers() {

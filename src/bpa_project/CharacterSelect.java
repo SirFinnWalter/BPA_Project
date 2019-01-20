@@ -1,27 +1,21 @@
 package bpa_project;
 
 import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.imageio.ImageIO;
+
+import bpa_project.characters.*;
 
 /**
  * @file CharacterSelect.java
@@ -40,6 +34,12 @@ public class CharacterSelect extends WindowContent {
                 gw.setSize(400, 240);
 
                 JPanel centerPanel = new JPanel();
+
+                Image image0 = GameWindow.loadImage(new File("assets\\sprites\\csCharacter0.png"));
+                image0 = image0.getScaledInstance(image0.getWidth(this) * GameWindow.ZOOM,
+                                image0.getHeight(this) * GameWindow.ZOOM, Image.SCALE_SMOOTH);
+                ImageIcon icon0 = new ImageIcon(image0);
+
                 Image image1 = GameWindow.loadImage(new File("assets\\sprites\\csCharacter1.png"));
                 image1 = image1.getScaledInstance(image1.getWidth(this) * GameWindow.ZOOM,
                                 image1.getHeight(this) * GameWindow.ZOOM, Image.SCALE_SMOOTH);
@@ -48,6 +48,7 @@ public class CharacterSelect extends WindowContent {
                 image2 = image2.getScaledInstance(image2.getWidth(this) * GameWindow.ZOOM,
                                 image2.getHeight(this) * GameWindow.ZOOM, Image.SCALE_SMOOTH);
                 ImageIcon icon2 = new ImageIcon(image2);
+                csImages.add(icon0);
                 csImages.add(icon1);
                 csImages.add(icon2);
                 for (int i = 0; i < csPortraits.length; i++) {
@@ -99,14 +100,41 @@ public class CharacterSelect extends WindowContent {
                         public void actionPerformed(ActionEvent e) {
 
                                 BufferedImage image = GameWindow
-                                                .loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
+                                                .loadImage(new File("assets\\tilesets\\FireTileset.png"));
                                 SpriteSheet sheet = new SpriteSheet(image, 16, 16);
                                 Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
-                                Tilemap map = new Tilemap(new File("assets\\maps\\DefaultMap.bm"), tiles);
+                                Tilemap map = new Tilemap(new File("assets\\maps\\FireMap.bm"), tiles);
                                 gw.setSize(map.getWidth() * 16, map.getHeight() * 16);
 
                                 Game game = new Game(gw, gw.getRenderHandler());
                                 game.setMap(map);
+
+                                try {
+                                        for (int i = 0; i < csPortraits.length; i++) {
+                                                int characterValue = (int) csPortraits[i].getClientProperty("portrait");
+                                                Point p = map.getPlayerPosition(i);
+                                                switch (characterValue) {
+                                                case 1:
+                                                        game.addPlayer(new CharacterA(16 * p.x, 16 * p.y,
+                                                                        gw.getListener(i)));
+                                                        break;
+                                                case 2:
+                                                        game.addPlayer(new CharacterB(16 * p.x, 16 * p.y,
+                                                                        gw.getListener(i)));
+
+                                                        break;
+                                                case 3:
+                                                        game.addPlayer(new CharacterC(16 * p.x, 16 * p.y,
+                                                                        gw.getListener(i)));
+                                                default:
+                                                        break;
+                                                }
+                                        }
+
+                                } catch (CloneNotSupportedException ex) {
+                                        // TODO: handle exception
+                                }
+
                                 gw.setWindowContent(game);
                         }
                 });

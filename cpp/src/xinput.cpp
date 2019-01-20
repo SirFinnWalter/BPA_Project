@@ -50,7 +50,7 @@ DWORD XInputGamePadGetState(DWORD dwUserIndex, XINPUT_STATE *pState)
 }
 
 /*
- * Class:     bpa_project_XInputNative
+ * Class:     XInputNative
  * Method:    getState
  * Signature: (ILjava/nio/ByteBuffer;)I
  */

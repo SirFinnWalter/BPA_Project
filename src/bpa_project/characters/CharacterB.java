@@ -14,7 +14,7 @@ import bpa_project.AnimatedSprite.AnimationType;
 
 public class CharacterB extends Player {
     private static final AnimatedSprite CHARACTER_B_ANIMATED_SPRITE = new AnimatedSprite(
-            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\bombiboi.png")), 16, 16), 12);
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\bombiboi.png")), 16, 16), 8);
     private int initialX, initialY;
 
     public CharacterB(int x, int y, KeyboardListener listener) throws CloneNotSupportedException {
@@ -27,6 +27,10 @@ public class CharacterB extends Player {
     @Override
     public void placeBomb(Game game) {
 
+    }
+
+    @Override
+    public void useAction(Game game) {
     }
 
     @Override
@@ -59,6 +63,8 @@ public class CharacterB extends Player {
             }
         }
         super.update(game);
+        if (getListener().action() || getListener().bomb())
+            moving = true;
 
     }
 }

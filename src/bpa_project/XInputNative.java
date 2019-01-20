@@ -21,6 +21,8 @@ public class XInputNative {
         final ByteBuffer buffer = ByteBuffer.allocateDirect(16);
         buffer.order(ByteOrder.nativeOrder());
         if (XInputNative.getState(playerNum, buffer) != 0) {
+            // System.out.println(playerNum + ": " + XInputNative.getState(playerNum,
+            // buffer));
             return null;
         }
 

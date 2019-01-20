@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class Tileset {
     private SpriteSheet sheet;
     private ArrayList<Tile> tilesList = new ArrayList<Tile>();
-    public final Tile voidTile = new Tile(null, true, false);
+    public final Tile voidTile = new Tile(Sprite.voidSprite, true, false);
 
     public Tileset(File file, SpriteSheet sheet) {
         this.sheet = sheet;
@@ -44,9 +44,16 @@ public class Tileset {
         }
     }
 
-    // test
+    public void renderVoid(RenderHandler renderer, int xPos, int yPos, int xZoom, int yZoom) {
+        Rectangle voidRect = new Rectangle(xPos, yPos, 16, 16);
+        voidRect.setColor(0xFF000000);
+        renderer.renderRectangle(voidRect, xZoom, yZoom);
+    }
+
     public void renderTiles(RenderHandler renderer, int tileID, int xPos, int yPos, int xZoom, int yZoom) {
-        if (tileID < tilesList.size() && tileID != -1)
+        if (tileID == -1)
+            renderer.renderSprite(voidTile.sprite, xPos, yPos, xZoom, yZoom);
+        else if (tileID < tilesList.size())
             renderer.renderSprite(tilesList.get(tileID).sprite, xPos, yPos, xZoom, yZoom);
         else
             System.out.println("Warning: TileID of " + tileID + " is not in the range of " + tilesList.size() + ".");

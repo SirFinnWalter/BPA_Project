@@ -1,6 +1,7 @@
 package bpa_project;
 
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -34,6 +35,7 @@ public class GameWindow extends JFrame implements Runnable {
     private boolean hasContent;
     private RenderHandler renderer;
     private WindowContent wc;
+    public KeyboardListener[] listeners;
 
     public GameWindow() {
         this.setTitle("DynoMite!");
@@ -56,6 +58,16 @@ public class GameWindow extends JFrame implements Runnable {
         // renderer = new RenderHandler(this.getWidth(), this.getHeight());
 
         this.add(mm);
+
+        listeners = new KeyboardListener[] {
+                new KeyboardListener(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_SPACE,
+                        KeyEvent.VK_E),
+                new KeyboardListener(KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT,
+                        KeyEvent.VK_ENTER, KeyEvent.VK_SHIFT),
+                new KeyboardListener(KeyEvent.VK_T, KeyEvent.VK_G, KeyEvent.VK_F, KeyEvent.VK_H, KeyEvent.VK_N,
+                        KeyEvent.VK_Y),
+                new KeyboardListener(KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L, KeyEvent.VK_PERIOD,
+                        KeyEvent.VK_O) };
 
         // BufferedImage image = loadImage(new
         // File("assets\\tilesets\\RuinsTileset.png"));
@@ -180,6 +192,14 @@ public class GameWindow extends JFrame implements Runnable {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public KeyboardListener getListener(int playerNum) {
+        if (playerNum > listeners.length || playerNum < 0) {
+            System.out.println("Player #" + playerNum + "has no controls!");
+            return null;
+        }
+        return listeners[playerNum];
     }
 
 }
