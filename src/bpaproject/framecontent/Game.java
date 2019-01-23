@@ -23,7 +23,7 @@ import bpaproject.*;
  * @createdOn Thursday, 13 December, 2018
  */
 
-public class Game extends WindowContent {
+public class Game extends FrameContent {
     private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
     private static final long serialVersionUID = 3570399387338681022L;
 

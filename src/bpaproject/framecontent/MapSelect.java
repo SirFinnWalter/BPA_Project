@@ -18,7 +18,7 @@ import bpaproject.*;
  * @createdOn Saturday, 19 January, 2019
  */
 
-public class MapSelect extends WindowContent {
+public class MapSelect extends FrameContent {
     private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
     private static final long serialVersionUID = 4049890020257627138L;
 

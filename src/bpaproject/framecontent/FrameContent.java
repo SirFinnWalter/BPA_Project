@@ -1,5 +1,6 @@
 package bpaproject.framecontent;
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,13 +14,13 @@ import bpaproject.GameWindow;
  * @createdOn Thursday, 13 December, 2018
  */
 
-public abstract class WindowContent extends JPanel {
+public abstract class FrameContent extends JPanel {
     private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
     private static final long serialVersionUID = 8395917451549932189L;
 
     private GameWindow gw;
 
-    public WindowContent(GameWindow gw) {
+    public FrameContent(GameWindow gw) {
         if (gw != null)
             this.gw = gw;
         else {
@@ -30,6 +31,9 @@ public abstract class WindowContent extends JPanel {
 
     public void init() {
         gw.pack();
+
+        if (!(this instanceof MainMenu))
+            gw.getAudioPlayer().playAudio(new File("assets\\audio\\Selection.wav"));
     }
 
     public void update() {

@@ -41,7 +41,7 @@ public abstract class Player implements GameObject, CollisionListener {
     private KeyboardListener listener = null;
     protected boolean moving = false;
 
-    protected int bombLength = 20;
+    protected int bombLength = 1;
     protected int maxBombs = 1;
     public int bombCount = 0;
 

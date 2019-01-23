@@ -19,7 +19,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import bpaproject.framecontent.WindowContent;
+import bpaproject.framecontent.FrameContent;
 import bpaproject.framecontent.MainMenu;;
 
 /**
@@ -56,7 +56,7 @@ public class GameWindow extends JFrame implements Runnable {
     private final double NANOSECONDS = 1000000000.0 / TICKSPERSECOND;
     private boolean running;
     private boolean hasContent;
-    private WindowContent wc;
+    private FrameContent wc;
     private AudioPlayer player;
     private final KeyboardListener[] listeners = new KeyboardListener[] {
             new KeyboardListener(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_SPACE,
@@ -129,7 +129,7 @@ public class GameWindow extends JFrame implements Runnable {
         System.exit(0);
     }
 
-    public void setWindowContent(WindowContent wc) {
+    public void setWindowContent(FrameContent wc) {
         LOGGER.log(Level.FINE, "Changing window content to " + wc.getClass().getSimpleName());
         this.hasContent = false;
 

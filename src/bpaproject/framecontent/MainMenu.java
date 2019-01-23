@@ -15,7 +15,7 @@ import bpaproject.GameWindow;
  * @createdOn Monday, 07 January, 2019
  */
 
-public class MainMenu extends WindowContent {
+public class MainMenu extends FrameContent {
 
     public MainMenu(GameWindow gw) {
         super(gw);
@@ -28,7 +28,6 @@ public class MainMenu extends WindowContent {
                 MapSelect ms = new MapSelect(gw);
                 gw.setWindowContent(ms);
                 gw.getAudioPlayer().setAudio(new File("assets\\audio\\MapSelc2D.wav"));
-
             }
         });
         play.setPreferredSize(new Dimension(150 * GameWindow.ZOOM, 60 * GameWindow.ZOOM));

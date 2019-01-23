@@ -24,7 +24,7 @@ import bpaproject.Tilemap;
  * @createdOn Tuesday, 15 January, 2019
  */
 
-public class CharacterSelect extends WindowContent {
+public class CharacterSelect extends FrameContent {
     private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
     private static final long serialVersionUID = -2395465395541349602L;
 
