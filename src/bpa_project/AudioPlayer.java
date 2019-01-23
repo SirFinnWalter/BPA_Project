@@ -64,12 +64,8 @@ public class AudioPlayer implements Runnable {
         }
     }
 
-    // public void stopAudio() {
-    // clip.stop();
-    // }
-
     public void playAudio(File file) {
-        LOGGER.log(Level.FINER, "Playing " + file.getName());
+        LOGGER.log(Level.FINEST, "Playing " + file.getName());
         try (AudioInputStream audio = AudioSystem.getAudioInputStream(file)) {
             Clip clip = AudioSystem.getClip();
             clip.open(audio);

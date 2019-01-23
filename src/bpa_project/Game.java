@@ -23,6 +23,7 @@ import bpa_project.characters.Player;
 
 public class Game extends WindowContent {
     private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+    private static final long serialVersionUID = 3570399387338681022L;
 
     private Canvas canvas;
     private RenderHandler renderer;

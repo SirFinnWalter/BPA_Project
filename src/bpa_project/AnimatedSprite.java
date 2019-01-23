@@ -10,7 +10,7 @@ import java.util.logging.Logger;
  * @createdOn Saturday, 03 November, 2018
  */
 
-public class AnimatedSprite extends Sprite implements Cloneable {
+public class AnimatedSprite extends Sprite {
     private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
 
     private Sprite[] sprites;
@@ -19,18 +19,11 @@ public class AnimatedSprite extends Sprite implements Cloneable {
     private int flipFrame;
     private int start, end;
     private int length;
-    private boolean visible;
     private AnimationType animationType = AnimationType.looping;
 
     @Override
     public AnimatedSprite clone() {
-        try {
-            return (AnimatedSprite) super.clone();
-        } catch (CloneNotSupportedException ex) {
-            LOGGER.log(Level.SEVERE, ex.toString(), ex);
-            throw new RuntimeException(ex.getMessage());
-        }
-
+        return (AnimatedSprite) super.clone();
     }
 
     public AnimatedSprite(SpriteSheet sheet, Rectangle[] range, int flipFrame) {
@@ -165,14 +158,6 @@ public class AnimatedSprite extends Sprite implements Cloneable {
             currentSprite = -1;
         else
             currentSprite = 0;
-    }
-
-    public boolean isVisible() {
-        return this.visible;
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
     }
 
     public enum AnimationType {

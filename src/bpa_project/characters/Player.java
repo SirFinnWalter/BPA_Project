@@ -24,7 +24,7 @@ import bpa_project.*;
  * renderer will default to rendering the {@code Player} player box. The
  * {@code Player} will not allow movement on collision with its collider.
  */
-public class Player implements IPlayer, CollisionListener {
+public abstract class Player implements GameObject, CollisionListener {
     private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
 
     public final static int MAX_PLAYERS = 4;
@@ -34,11 +34,11 @@ public class Player implements IPlayer, CollisionListener {
     private double speedX = 1 * GameWindow.ZOOM;
     private double speedY = 1 * GameWindow.ZOOM;
     protected FacingDirection currentFD, newFD;
-    private Sprite sprite;
     private boolean destroyed;
+    protected Sprite sprite;
     protected AnimatedSprite animatedSprite = null;
     private KeyboardListener listener = null;
-    protected int bombLength = 1;
+    protected int bombLength = 15;
     protected boolean moving = false;
 
     int tempCount = 0;
@@ -156,13 +156,14 @@ public class Player implements IPlayer, CollisionListener {
 
         if (moving) {
             game.checkCollision(collider);
-            animatedSprite.update(game);
+
+            if (animatedSprite != null)
+                animatedSprite.update(game);
 
             playerBox.x = collider.x - ((playerBox.width * GameWindow.ZOOM - collider.width) / 2);
             playerBox.y = collider.y - ((playerBox.height * GameWindow.ZOOM - collider.height));
-        } else {
+        } else if (animatedSprite != null) {
             animatedSprite.reset();
-
         }
         if (this.currentFD != newFD) {
             this.currentFD = newFD;
@@ -216,33 +217,28 @@ public class Player implements IPlayer, CollisionListener {
         return this.listener;
     }
 
-    @Override
     public int getPlayerNum() {
         return this.playerNum;
     }
 
-    @Override
     public void moveUp() {
         collider.y -= speedY;
         newFD = FacingDirection.up;
         moving = true;
     }
 
-    @Override
     public void moveDown() {
         collider.y += speedY;
         newFD = FacingDirection.down;
         moving = true;
     }
 
-    @Override
     public void moveLeft() {
         collider.x -= speedX;
         newFD = FacingDirection.left;
         moving = true;
     }
 
-    @Override
     public void moveRight() {
         collider.x += speedX;
         newFD = FacingDirection.right;
@@ -255,7 +251,6 @@ public class Player implements IPlayer, CollisionListener {
     private int counter = 120;
     private int bombCooldown = 20;
 
-    @Override
     public void placeBomb(Game game) {
         if (counter >= bombCooldown) {
             counter = 0;
@@ -270,7 +265,6 @@ public class Player implements IPlayer, CollisionListener {
         }
     }
 
-    @Override
     public void useAction(Game game) {
 
     }

@@ -3,6 +3,7 @@ package bpa_project;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,9 +44,10 @@ public class Tileset {
                 s = reader.readLine();
             }
             reader.close();
-        } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
+        } catch (IOException ex) {
+            // TODO: handle this properly
+            LOGGER.log(Level.SEVERE, ex.toString(), ex);
+            throw new RuntimeException(ex.getMessage());
         }
     }
 

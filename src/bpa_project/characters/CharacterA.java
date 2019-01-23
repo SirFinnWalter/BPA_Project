@@ -21,8 +21,8 @@ public class CharacterA extends Player {
     @Override
     public void update(Game game) {
         super.update(game);
-        if (!animatedSprite.isVisible() && current >= duration)
-            animatedSprite.setVisible(true);
+        if (!sprite.isVisible() && current >= duration)
+            sprite.setVisible(true);
 
         current++;
     }
@@ -36,7 +36,7 @@ public class CharacterA extends Player {
     public void useAction(Game game) {
         if (current >= cooldown) {
             current = 0;
-            animatedSprite.setVisible(false);
+            sprite.setVisible(false);
         }
     }
 }

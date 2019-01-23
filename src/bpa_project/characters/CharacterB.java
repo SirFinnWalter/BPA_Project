@@ -48,15 +48,7 @@ public class CharacterB extends Player {
             int x = screenPoint.x;
             int y = screenPoint.y;
 
-            Bomb.createSegments(game, Explosion.EXPLOSION_ANIMATED_SPRITE, 1, x, y, 0, 0);
-            Bomb.createSegments(game, Explosion.EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL, bombLength, x, y,
-                    -16 * GameWindow.ZOOM, 0);
-            Bomb.createSegments(game, Explosion.EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL, bombLength, x, y,
-                    16 * GameWindow.ZOOM, 0);
-            Bomb.createSegments(game, Explosion.EXPLOSION_ANIMATED_SPRITE_VERTICAL, bombLength, x, y, 0,
-                    -16 * GameWindow.ZOOM);
-            Bomb.createSegments(game, Explosion.EXPLOSION_ANIMATED_SPRITE_VERTICAL, bombLength, x, y, 0,
-                    16 * GameWindow.ZOOM);
+            Explosion.createExplosion(game, bombLength, x, y);
 
             this.collider.x = initialX * GameWindow.ZOOM;
             this.collider.y = initialY * GameWindow.ZOOM;
