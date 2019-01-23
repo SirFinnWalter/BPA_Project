@@ -1,6 +1,6 @@
 {
   "code-runner.executorMap": {
     // "java": "cd $dir && javac BombGame.java -d ../bin && cd ../ && java -cp ./bin BombGame"
-    "java": "cd $workspaceRoot/src/bpa_project && javac -h ../../cpp/include -d ../../bin *.java characters/*.java powerups/*.java && cd ../../ && java -cp ./bin bpa_project/GameWindow"
+    "java": "cd $workspaceRoot/src/bpaproject && javac -h ../../cpp/include -d ../../bin *.java characters/*.java powerups/*.java framecontent/*.java && cd ../../ && java -cp ./bin bpaproject/GameWindow"
   }
 }

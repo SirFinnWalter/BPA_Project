@@ -54,7 +54,7 @@ DWORD XInputGamePadGetState(DWORD dwUserIndex, XINPUT_STATE *pState)
  * Method:    getState
  * Signature: (ILjava/nio/ByteBuffer;)I
  */
-JNIEXPORT jint JNICALL Java_bpa_1project_XInputNative_getState(JNIEnv *env, jclass cls, jint playerNum, jobject byteBuffer)
+JNIEXPORT jint JNICALL Java_bpaproject_XInputNative_getState(JNIEnv *env, jclass cls, jint playerNum, jobject byteBuffer)
 {
     void *bbuf = env->GetDirectBufferAddress(byteBuffer);
     XINPUT_STATE *state = (XINPUT_STATE *)bbuf;
