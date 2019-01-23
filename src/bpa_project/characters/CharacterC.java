@@ -12,9 +12,9 @@ import bpa_project.*;
 
 public class CharacterC extends Player {
     private static final AnimatedSprite CHARACTER_C_ANIMATED_SPRITE = new AnimatedSprite(
-            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\stegowalkTEMP.png")), 16, 16), 12);
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\stego.png")), 16, 16), 12);
     private static final AnimatedSprite CHARACTER_C_ANIMATED_SPRITE_2 = new AnimatedSprite(
-            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\ghostygoosterwalk.png")), 16, 16), 12);
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\ghostygooster.png")), 16, 16), 12);
 
     private int timer = 0;
     private boolean invincible;

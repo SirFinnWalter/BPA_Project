@@ -50,6 +50,7 @@ public class Game extends WindowContent {
     @Override
     public void init() {
         super.init();
+
         gameObjects.forEach(object -> {
             object.init(this);
         });
@@ -64,7 +65,6 @@ public class Game extends WindowContent {
         gameObjects.forEach(object -> {
             object.update(this);
             if (object instanceof Player)
-
                 poll((Player) object);
         });
 
@@ -156,6 +156,12 @@ public class Game extends WindowContent {
         canvas.setPreferredSize(
                 new Dimension(map.getWidth() * GameWindow.ZOOM * 16, map.getHeight() * GameWindow.ZOOM * 16));
         renderer = new RenderHandler(map.getWidth() * GameWindow.ZOOM * 16, map.getHeight() * GameWindow.ZOOM * 16);
+
+        map.mappedTiles.forEach((v, k) -> {
+            if (k.hasPowerup()) {
+                gameObjectsBuffer.add(k.getPowerup());
+            }
+        });
 
         ((FlowLayout) this.getLayout()).setVgap(0);
         ((FlowLayout) this.getLayout()).setHgap(0);

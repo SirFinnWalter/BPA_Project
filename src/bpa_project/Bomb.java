@@ -17,12 +17,12 @@ import bpa_project.characters.Player;
 public class Bomb implements GameObject {
     private static final int BOMB_ANIMATION_LENGTH = 10;
     public static final AnimatedSprite BOMB_ANIMATED_SPRITE = new AnimatedSprite(
-            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\newbomb.png")), 16, 16),
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\bomb.png")), 16, 16),
             BOMB_ANIMATION_LENGTH);
 
     private Collider collider;
     private AnimatedSprite animatedSprite;
-    private Player owner;
+    private Player player;
     private int x, y;
     private int length;
 
@@ -33,8 +33,8 @@ public class Bomb implements GameObject {
      * @param x the specified X coordinate
      * @param y the specified Y coordinate
      */
-    public Bomb(Player owner, int x, int y, int length) {
-        this.owner = owner;
+    public Bomb(Player player, int x, int y, int length) {
+        this.player = player;
         this.x = x;
         this.y = y;
         this.length = length;
@@ -81,7 +81,7 @@ public class Bomb implements GameObject {
         if (animatedSprite.isDestroyed()) {
             Explosion.createExplosion(game, length, this.x, this.y);
             game.removeGameObject(this);
-            owner.bombCount -= 1;
+            this.player.bombCount -= 1;
         }
     }
 

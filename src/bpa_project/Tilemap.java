@@ -9,10 +9,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import bpa_project.characters.Player;
+import bpa_project.powerups.*;
 
 /**
  * @file Tilemap.java
@@ -22,13 +24,31 @@ import bpa_project.characters.Player;
 
 public class Tilemap {
     private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+    private static final Random RANDOM = new Random(System.currentTimeMillis());
 
     private Tileset tileset;
     private int fillTileID = -1;
     private int width, height;
     private boolean valid;
-    public Map<Integer, MappedTile> mappedTiles = new HashMap<Integer, MappedTile>();
     public Map<Integer, Point> playerPositions = new HashMap<Integer, Point>();
+    public Map<Integer, MappedTile> mappedTiles = new HashMap<Integer, MappedTile>() {
+        private static final long serialVersionUID = 7952020856602712011L;
+
+        @Override
+        public MappedTile put(Integer key, MappedTile value) {
+            if (containsKey(key) && get(key).hasPowerup() && value.isBreakable()) {
+                value.addPowerup(get(key).getPowerup());
+            } else if (value.isBreakable()) {
+                if (RANDOM.nextInt(101) <= 20) {
+                    if (RANDOM.nextBoolean())
+                        value.addPowerup(new BlastUp(value.x * 16, value.y * 16));
+                    else
+                        value.addPowerup(new BombUp(value.x * 16, value.y * 16));
+                }
+            }
+            return super.put(key, value);
+        }
+    };
 
     public Tilemap(File file, Tileset tileset) {
         this.tileset = tileset;
@@ -376,8 +396,10 @@ public class Tilemap {
     public void removeTile(int x, int y) {
         int key = x + (y * width);
 
-        if (mappedTiles.containsKey(key))
+        if (mappedTiles.containsKey(key)) {
+            mappedTiles.get(key).destroy();
             mappedTiles.remove(key);
+        }
     }
 
     /**
@@ -413,10 +435,11 @@ public class Tilemap {
     /**
      * A {@code Tile} that has an (x, y) location.
      */
-    class MappedTile {
+    public class MappedTile {
         public int mappedTileID, tileID, x, y;
         private boolean collidable;
         public Collider collider;
+        private Powerup powerup;
         // private Rectangle collisionBox;
 
         public MappedTile(int tileID, int x, int y) {
@@ -430,6 +453,16 @@ public class Tilemap {
                 collider = new Collider(this, p.x, p.y, this.getWidth() * GameWindow.ZOOM,
                         this.getHeight() * GameWindow.ZOOM);
             }
+        }
+
+        public void destroy() {
+            if (powerup != null)
+                powerup.setVisible(true);
+        }
+
+        public void addPowerup(Powerup powerup) {
+            if (this.powerup == null)
+                this.powerup = powerup;
         }
 
         public Tileset.Tile getTile() {
@@ -446,6 +479,16 @@ public class Tilemap {
 
         public boolean isBreakable() {
             return this.getTile().isBreakable();
+        }
+
+        public Powerup getPowerup() {
+            if (this.powerup == null)
+                LOGGER.log(Level.WARNING, "Returning a null power!");
+            return this.powerup;
+        }
+
+        public boolean hasPowerup() {
+            return (this.powerup != null);
         }
 
         public int getWidth() {

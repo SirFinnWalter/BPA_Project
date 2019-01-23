@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import bpa_project.*;
+import bpa_project.powerups.Powerup;
 
 /**
  * @file Player.java
@@ -31,17 +32,20 @@ public abstract class Player implements GameObject, CollisionListener {
     public static int PLAYER_COUNT = 0;
     protected Rectangle playerBox;
     protected Collider collider;
-    private double speedX = 1 * GameWindow.ZOOM;
-    private double speedY = 1 * GameWindow.ZOOM;
+    private int speed = 1 * GameWindow.ZOOM;
     protected FacingDirection currentFD, newFD;
     private boolean destroyed;
     protected Sprite sprite;
     protected AnimatedSprite animatedSprite = null;
     private KeyboardListener listener = null;
-    protected int bombLength = 15;
     protected boolean moving = false;
 
-    int tempCount = 0;
+    protected int bombLength = 1;
+    protected int maxBombs = 1;
+    public int bombCount = 0;
+
+    private int bombCounter = 20;
+    private int bombCooldown = 20;
 
     private int playerNum;
 
@@ -73,8 +77,8 @@ public abstract class Player implements GameObject, CollisionListener {
         collider = new Collider(this, x * GameWindow.ZOOM, y * GameWindow.ZOOM, 14 * GameWindow.ZOOM,
                 14 * GameWindow.ZOOM);
 
-        currentFD = FacingDirection.up;
-        newFD = FacingDirection.up;
+        currentFD = FacingDirection.left;
+        newFD = FacingDirection.left;
         updateDirection();
         // playerBox = new Rectangle(x * GameWindow.ZOOM, y * GameWindow.ZOOM, 16, 21);
         playerBox.setColor(0x88FFFFFF);
@@ -103,7 +107,7 @@ public abstract class Player implements GameObject, CollisionListener {
      */
     private void updateDirection() {
         if (animatedSprite != null) {
-            int framesLength = (animatedSprite.getLength() / 4);
+            int framesLength = (animatedSprite.getLength() / 2);
             animatedSprite.setAnimationRange(currentFD.getValue() * framesLength,
                     currentFD.getValue() * framesLength + (framesLength - 1));
         }
@@ -167,7 +171,9 @@ public abstract class Player implements GameObject, CollisionListener {
         }
         if (this.currentFD != newFD) {
             this.currentFD = newFD;
-            updateDirection();
+
+            if (newFD == FacingDirection.left || newFD == FacingDirection.right)
+                updateDirection();
         }
         if (listener.bomb())
             placeBomb(game);
@@ -178,20 +184,10 @@ public abstract class Player implements GameObject, CollisionListener {
         if (destroyed)
             game.removeGameObject(this);
 
-        tempCount++;
-        if (tempCount > 650) {
-            tempCount = 0;
-            if (Math.random() < 0.5) {
-                bombLength++;
-                System.out.println("Player " + playerNum + ": Bomb length is now " + bombLength + "!");
-            } else {
-                maxBombs++;
-                System.out.println("Player " + playerNum + ": Max # of bombs is now " + maxBombs + "!");
-            }
-        }
         moving = false;
-        counter++;
 
+        if (bombCounter < bombCooldown)
+            bombCounter++;
     }
 
     public boolean isDestroyed() {
@@ -222,38 +218,36 @@ public abstract class Player implements GameObject, CollisionListener {
     }
 
     public void moveUp() {
-        collider.y -= speedY;
+        collider.y -= speed;
+
         newFD = FacingDirection.up;
         moving = true;
     }
 
     public void moveDown() {
-        collider.y += speedY;
+        collider.y += speed;
+
         newFD = FacingDirection.down;
         moving = true;
     }
 
     public void moveLeft() {
-        collider.x -= speedX;
+        collider.x -= speed;
+
         newFD = FacingDirection.left;
         moving = true;
     }
 
     public void moveRight() {
-        collider.x += speedX;
+        collider.x += speed;
+
         newFD = FacingDirection.right;
         moving = true;
     }
 
-    protected int maxBombs = 1;
-    public int bombCount = 0;
-
-    private int counter = 120;
-    private int bombCooldown = 20;
-
     public void placeBomb(Game game) {
-        if (counter >= bombCooldown) {
-            counter = 0;
+        if (bombCounter >= bombCooldown) {
+            bombCounter = 0;
             if (bombCount < maxBombs) {
                 Point mapPoint = game.getMap().mapPointToTilemap(collider.x + collider.width / 2,
                         collider.y + collider.height / 2);
@@ -276,17 +270,17 @@ public abstract class Player implements GameObject, CollisionListener {
     @Override
     public void onCollisionEnter(CollisionEvent e) {
         switch (newFD) {
-        case up:
-            collider.y += e.intersection(collider).height;
-            break;
-        case down:
-            collider.y -= e.intersection(collider).height;
-            break;
         case left:
             collider.x += e.intersection(collider).width;
             break;
         case right:
             collider.x -= e.intersection(collider).width;
+            break;
+        case up:
+            collider.y += e.intersection(collider).height;
+            break;
+        case down:
+            collider.y -= e.intersection(collider).height;
             break;
         default:
             collider.x = playerBox.x;
@@ -296,6 +290,8 @@ public abstract class Player implements GameObject, CollisionListener {
         Object source = e.getSource().getObject();
         if (source instanceof Explosion) {
             this.destroyed = true;
+        } else if (source instanceof Powerup) {
+            ((Powerup) source).applyPower(this);
         } else if (source instanceof GameObject) {
             this.collider.checkCollision(((GameObject) source).getCollider());
         }
@@ -313,12 +309,20 @@ public abstract class Player implements GameObject, CollisionListener {
         }
     }
 
+    public void increaseBombLength() {
+        bombLength++;
+    }
+
+    public void increaseMaxBombs() {
+        maxBombs++;
+    }
+
     /**
      * Directions the {@code Player} can be facing. Can be refered by name or
      * integer value.
      */
     public enum FacingDirection {
-        up(0), down(1), left(2), right(3);
+        left(0), right(1), up(2), down(3);
 
         private int value;
         private static Map<Integer, FacingDirection> map = new HashMap<>();
