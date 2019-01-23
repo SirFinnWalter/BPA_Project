@@ -1,5 +1,8 @@
 package bpa_project;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.swing.JPanel;
 
 /**
@@ -9,30 +12,28 @@ import javax.swing.JPanel;
  */
 
 public abstract class WindowContent extends JPanel {
-    private boolean running;
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+    private static final long serialVersionUID = 8395917451549932189L;
+
     private GameWindow gw;
 
     public WindowContent(GameWindow gw) {
-        this.gw = gw;
+        if (gw != null)
+            this.gw = gw;
+        else {
+            LOGGER.log(Level.SEVERE, "GameWindow cannot be null!");
+            throw new NullPointerException("GameWindow cannot be null!");
+        }
     }
 
     public void init() {
-        this.running = true;
-
+        gw.pack();
     }
 
     public void update() {
     }
 
     public void render() {
-    }
-
-    public boolean isRunning() {
-        return this.running;
-    }
-
-    public void setRunning(boolean running) {
-        this.running = running;
     }
 
     public GameWindow getGameWindow() {

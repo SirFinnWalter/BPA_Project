@@ -2,6 +2,8 @@ package bpa_project;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @file XInput.java
@@ -10,6 +12,8 @@ import java.nio.ByteOrder;
  */
 
 public class XInputNative {
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+
     private final static int[] dwPacketNumber = new int[4];
 
     /**
@@ -20,29 +24,33 @@ public class XInputNative {
     public static XInputButtons getInput(int playerNum) {
         final ByteBuffer buffer = ByteBuffer.allocateDirect(16);
         buffer.order(ByteOrder.nativeOrder());
-        if (XInputNative.getState(playerNum, buffer) != 0) {
-            // System.out.println(playerNum + ": " + XInputNative.getState(playerNum,
-            // buffer));
+        int state = XInputNative.getState(playerNum, buffer);
+        // state 0 = ERROR_SUCCESS
+        // state 1167 = ERROR_DEVICE_NOT_CONNECTED
+        if (state != 0) {
+            if (state != 1167)
+                LOGGER.log(Level.WARNING, "Player #" + playerNum + " controller error " + state);
             return null;
         }
 
         /**
          * NOTE: Structure of ByteBuffer <code> 
-          * 
-          * typedef struct _XINPUT_STATE {}
-          * DWORD dwPacketNumber;
-          * XINPUT_GAMEPAD Gamepad;
-          * } XINPUT_STATE, *PXINPUT_STATE;
-          * 
-          * typedef struct _XINPUT_GAMEPAD { 
-          * WORD wButtons; BYTE bLeftTrigger;
-          * BYTE bRightTrigger;
-          * SHORT sThumbLX;
-          * SHORT sThumbLY;
-          * SHORT sThumbRX;
-          * SHORTsThumbRY;
-          * } XINPUT_GAMEPAD, *PXINPUT_GAMEPAD;
-          * </code>
+         * 
+         * typedef struct _XINPUT_STATE {}
+         * DWORD dwPacketNumber;
+         * XINPUT_GAMEPAD Gamepad;
+         * } XINPUT_STATE, *PXINPUT_STATE;
+         * 
+         * typedef struct _XINPUT_GAMEPAD { 
+         * WORD wButtons; BYTE bLeftTrigger;
+         * BYTE bRightTrigger;
+         * SHORT sThumbLX;
+         * SHORT sThumbLY;
+         * SHORT sThumbRX;
+         * SHORTsThumbRY;
+         * } XINPUT_GAMEPAD, *PXINPUT_GAMEPAD;
+         * 
+         * </code>
          */
 
         int dwPacketNumber = buffer.getInt();
@@ -69,8 +77,10 @@ public class XInputNative {
         buttons.x = (wButtons & XINPUT_GAMEPAD.X) != 0;
         buttons.y = (wButtons & XINPUT_GAMEPAD.Y) != 0;
 
-        final byte bLeftTrigger = buffer.get();
-        final byte bRightTrigger = buffer.get();
+        // final byte bLeftTrigger = buffer.get();
+        // final byte bRightTrigger = buffer.get();
+        buffer.get();
+        buffer.get();
         final short sThumbLX = buffer.getShort();
         // if (sThumbLX > 26044)
         if (sThumbLX > 7849)
@@ -83,8 +93,8 @@ public class XInputNative {
         else if (sThumbLY < -7849)
             buttons.down = true;
 
-        final short sThumbRX = buffer.getShort();
-        final short sThumbRY = buffer.getShort();
+        // final short sThumbRX = buffer.getShort();
+        // final short sThumbRY = buffer.getShort();
 
         return buttons;
 

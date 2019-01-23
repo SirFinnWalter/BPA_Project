@@ -1,5 +1,7 @@
 package bpa_project;
 
+import java.io.File;
+
 /**
  * @file Explosion.java
  * @author Dakota Taylor
@@ -7,6 +9,17 @@ package bpa_project;
  */
 
 public class Explosion implements GameObject {
+    private static final int EXPLOSION_ANIMATION_LENGTH = 10;
+    public static final AnimatedSprite EXPLOSION_ANIMATED_SPRITE = new AnimatedSprite(
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\explosion.png")), 16, 16),
+            EXPLOSION_ANIMATION_LENGTH);
+    public static final AnimatedSprite EXPLOSION_ANIMATED_SPRITE_VERTICAL = new AnimatedSprite(
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\v_explosion.png")), 16, 16),
+            EXPLOSION_ANIMATION_LENGTH);
+    public static final AnimatedSprite EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL = new AnimatedSprite(
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\h_explosion.png")), 16, 16),
+            EXPLOSION_ANIMATION_LENGTH);
+    private final static File EXPLOSION_AUDIO = new File("assets\\audio\\Explosion.wav");
     private AnimatedSprite animatedSprite;
     private Collider collider;
 
@@ -43,5 +56,7 @@ public class Explosion implements GameObject {
             player.getCollider().addGameObject(this);
             player.getCollider().checkCollision(collider);
         });
+
+        game.getGameWindow().getAudioPlayer().playAudio(EXPLOSION_AUDIO);
     }
 }

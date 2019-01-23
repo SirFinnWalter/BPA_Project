@@ -1,14 +1,13 @@
 package bpa_project;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Image;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -24,148 +23,136 @@ import bpa_project.characters.*;
  */
 
 public class CharacterSelect extends WindowContent {
-        JLabel[] csPortraits = new JLabel[4];
-        ArrayList<ImageIcon> csImages = new ArrayList<ImageIcon>();
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+    private static final long serialVersionUID = -2395465395541349602L;
 
-        public CharacterSelect(GameWindow gw) {
-                super(gw);
-                gw.setPreferredSize(new Dimension(400 * GameWindow.ZOOM, 240 * GameWindow.ZOOM));
-                this.setPreferredSize(new Dimension(400 * GameWindow.ZOOM, 240 * GameWindow.ZOOM));
-                gw.setSize(400, 240);
+    private static final ImageIcon[] CS_IMAGES = new ImageIcon[] {
+            new ImageIcon(GameWindow.loadImage(new File("assets\\select\\character0.png"), GameWindow.ZOOM)),
+            new ImageIcon(GameWindow.loadImage(new File("assets\\select\\character1.png"), GameWindow.ZOOM)),
+            new ImageIcon(GameWindow.loadImage(new File("assets\\select\\character2.png"), GameWindow.ZOOM)),
+            new ImageIcon(GameWindow.loadImage(new File("assets\\select\\character3.png"), GameWindow.ZOOM)), };
 
-                JPanel centerPanel = new JPanel();
+    JLabel[] csPortraits = new JLabel[4];
+    Tilemap map;
 
-                Image image0 = GameWindow.loadImage(new File("assets\\sprites\\csCharacter0.png"));
-                image0 = image0.getScaledInstance(image0.getWidth(this) * GameWindow.ZOOM,
-                                image0.getHeight(this) * GameWindow.ZOOM, Image.SCALE_SMOOTH);
-                ImageIcon icon0 = new ImageIcon(image0);
+    public CharacterSelect(GameWindow gw, Tilemap map) {
+        super(gw);
+        this.map = map;
+        JPanel main = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
 
-                Image image1 = GameWindow.loadImage(new File("assets\\sprites\\csCharacter1.png"));
-                image1 = image1.getScaledInstance(image1.getWidth(this) * GameWindow.ZOOM,
-                                image1.getHeight(this) * GameWindow.ZOOM, Image.SCALE_SMOOTH);
-                ImageIcon icon1 = new ImageIcon(image1);
-                Image image2 = GameWindow.loadImage(new File("assets\\sprites\\csCharacter2.png"));
-                image2 = image2.getScaledInstance(image2.getWidth(this) * GameWindow.ZOOM,
-                                image2.getHeight(this) * GameWindow.ZOOM, Image.SCALE_SMOOTH);
-                ImageIcon icon2 = new ImageIcon(image2);
-                csImages.add(icon0);
-                csImages.add(icon1);
-                csImages.add(icon2);
-                for (int i = 0; i < csPortraits.length; i++) {
-                        csPortraits[i] = new JLabel(csImages.get(0));
-                        csPortraits[i].putClientProperty("portrait", 0);
-                        centerPanel.add(csPortraits[i], BorderLayout.CENTER);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridy = 0;
+        JButton[] next = new JButton[4];
+        for (int i = 0; i < next.length; i++) {
+            next[i] = new JButton("\u2191");
+            next[i].putClientProperty("index", i);
+            next[i].addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    nextPortrait((int) ((JButton) e.getSource()).getClientProperty("index"));
                 }
+            });
 
-                JPanel topPanel = new JPanel();
-                JButton[] nextButtons = new JButton[4];
-                for (int i = 0; i < nextButtons.length; i++) {
-                        nextButtons[i] = new JButton("\u2191");
-                        nextButtons[i].putClientProperty("index", i);
-                        nextButtons[i].setPreferredSize(
-                                        new Dimension((this.getPreferredSize().width / 4) - 5 * GameWindow.ZOOM,
-                                                        10 * GameWindow.ZOOM));
-
-                        nextButtons[i].addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                        nextPortrait((int) ((JButton) e.getSource()).getClientProperty("index"));
-                                }
-                        });
-                        topPanel.add(nextButtons[i], BorderLayout.NORTH);
-                }
-
-                JPanel bottomPanel = new JPanel();
-                JButton[] prevButtons = new JButton[4];
-                for (int i = 0; i < prevButtons.length; i++) {
-                        prevButtons[i] = new JButton("\u2193");
-                        prevButtons[i].putClientProperty("index", i);
-                        prevButtons[i].setPreferredSize(
-                                        new Dimension((this.getPreferredSize().width / 4) - 5 * GameWindow.ZOOM,
-                                                        10 * GameWindow.ZOOM));
-                        prevButtons[i].addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                        prevPortrait((int) ((JButton) e.getSource()).getClientProperty("index"));
-                                }
-                        });
-                        bottomPanel.add(prevButtons[i], BorderLayout.SOUTH);
-                }
-
-                JPanel playPanel = new JPanel();
-                JButton playButton = new JButton("Play!");
-                playButton.setPreferredSize(new Dimension(150 * GameWindow.ZOOM, 25 * GameWindow.ZOOM));
-                playButton.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-
-                                BufferedImage image = GameWindow
-                                                .loadImage(new File("assets\\tilesets\\FireTileset.png"));
-                                SpriteSheet sheet = new SpriteSheet(image, 16, 16);
-                                Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
-                                Tilemap map = new Tilemap(new File("assets\\maps\\FireMap.bm"), tiles);
-                                gw.setSize(map.getWidth() * 16, map.getHeight() * 16);
-
-                                Game game = new Game(gw, gw.getRenderHandler());
-                                game.setMap(map);
-
-                                try {
-                                        for (int i = 0; i < csPortraits.length; i++) {
-                                                int characterValue = (int) csPortraits[i].getClientProperty("portrait");
-                                                Point p = map.getPlayerPosition(i);
-                                                switch (characterValue) {
-                                                case 1:
-                                                        game.addPlayer(new CharacterA(16 * p.x, 16 * p.y,
-                                                                        gw.getListener(i)));
-                                                        break;
-                                                case 2:
-                                                        game.addPlayer(new CharacterB(16 * p.x, 16 * p.y,
-                                                                        gw.getListener(i)));
-
-                                                        break;
-                                                case 3:
-                                                        game.addPlayer(new CharacterC(16 * p.x, 16 * p.y,
-                                                                        gw.getListener(i)));
-                                                default:
-                                                        break;
-                                                }
-                                        }
-
-                                } catch (CloneNotSupportedException ex) {
-                                        // TODO: handle exception
-                                }
-
-                                gw.setWindowContent(game);
-                        }
-                });
-                playPanel.add(playButton);
-
-                this.add(topPanel);
-                this.add(centerPanel);
-                this.add(bottomPanel);
-                this.add(playPanel);
-                this.setVisible(true);
+            gbc.gridx = i;
+            main.add(next[i], gbc);
         }
 
-        private void nextPortrait(int index) {
-                if (index < 0 || index > 4)
-                        return;
-
-                int current = (int) csPortraits[index].getClientProperty("portrait");
-                int value = current + 1 > csImages.size() - 1 ? 0 : current + 1;
-
-                csPortraits[index].putClientProperty("portrait", value);
-                csPortraits[index].setIcon(csImages.get(value));
+        gbc.gridy = 1;
+        for (int i = 0; i < csPortraits.length; i++) {
+            csPortraits[i] = new JLabel(CS_IMAGES[0]);
+            csPortraits[i].putClientProperty("portrait", 0);
+            gbc.gridx = i;
+            main.add(csPortraits[i], gbc);
         }
 
-        private void prevPortrait(int index) {
-                if (index < 0 || index > 4)
-                        return;
+        gbc.gridy = 2;
+        JButton[] prev = new JButton[4];
+        for (int i = 0; i < prev.length; i++) {
+            prev[i] = new JButton("\u2193");
+            prev[i].putClientProperty("index", i);
+            prev[i].addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    prevPortrait((int) ((JButton) e.getSource()).getClientProperty("index"));
+                }
+            });
 
-                int current = (int) csPortraits[index].getClientProperty("portrait");
-                int value = current - 1 < 0 ? csImages.size() - 1 : current - 1;
-
-                csPortraits[index].putClientProperty("portrait", value);
-                csPortraits[index].setIcon(csImages.get(value));
+            gbc.gridx = i;
+            main.add(prev[i], gbc);
         }
+
+        gbc.gridy = 3;
+        JButton play = new JButton("Play!");
+        play.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startGame();
+            }
+        });
+        main.add(play, gbc);
+        this.add(main);
+        gw.pack();
+    }
+
+    private void nextPortrait(int index) {
+        if (index < 0 || index > 4)
+            return;
+
+        int current = (int) csPortraits[index].getClientProperty("portrait");
+        int value = current + 1 > CS_IMAGES.length - 1 ? 0 : current + 1;
+
+        csPortraits[index].putClientProperty("portrait", value);
+        csPortraits[index].setIcon(CS_IMAGES[value]);
+        LOGGER.log(Level.FINER, "Next image to " + value + " from button index #" + index);
+    }
+
+    private void prevPortrait(int index) {
+        if (index < 0 || index > 4)
+            return;
+
+        int current = (int) csPortraits[index].getClientProperty("portrait");
+        int value = current - 1 < 0 ? CS_IMAGES.length - 1 : current - 1;
+
+        csPortraits[index].putClientProperty("portrait", value);
+        csPortraits[index].setIcon(CS_IMAGES[value]);
+        LOGGER.log(Level.FINER, "Previous image to " + value + " from button index #" + index);
+    }
+
+    private void startGame() {
+        LOGGER.log(Level.FINE, "Creating game.");
+        Game game = new Game(getGameWindow());
+        game.setMap(map);
+
+        for (int i = 0; i < csPortraits.length; i++) {
+            int characterValue = (int) csPortraits[i].getClientProperty("portrait");
+            Point p = map.getPlayerPosition(i);
+            if (p == null)
+                continue;
+
+            Player character;
+            switch (characterValue) {
+            case 1:
+                character = new CharacterA(16 * p.x, 16 * p.y, getGameWindow().getListener(i));
+                break;
+            case 2:
+                character = new CharacterB(16 * p.x, 16 * p.y, getGameWindow().getListener(i));
+                break;
+            case 3:
+                character = new CharacterC(16 * p.x, 16 * p.y, getGameWindow().getListener(i));
+                break;
+            default:
+                character = null;
+                break;
+            }
+            if (character != null)
+                game.addPlayer(character);
+
+        }
+        getGameWindow().setSize(map.getWidth() * 16, map.getHeight() * 16);
+        getGameWindow().getAudioPlayer().endLoop();
+        LOGGER.log(Level.INFO, "Starting game.");
+        getGameWindow().setWindowContent(game);
+
+    }
 }

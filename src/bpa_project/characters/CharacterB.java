@@ -17,8 +17,8 @@ public class CharacterB extends Player {
             new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\bombiboi.png")), 16, 16), 8);
     private int initialX, initialY;
 
-    public CharacterB(int x, int y, KeyboardListener listener) throws CloneNotSupportedException {
-        super(x, y, (AnimatedSprite) CHARACTER_B_ANIMATED_SPRITE.clone(), listener);
+    public CharacterB(int x, int y, KeyboardListener listener) {
+        super(x, y, CHARACTER_B_ANIMATED_SPRITE.clone(), listener);
         this.initialX = x;
         this.initialY = y;
         animatedSprite.setAnimationType(AnimationType.destroy);
@@ -33,38 +33,59 @@ public class CharacterB extends Player {
     public void useAction(Game game) {
     }
 
+    private boolean invicible;
+    private int timer;
+
     @Override
     public void update(Game game) {
         if (animatedSprite.isDestroyed()) {
-            try {
+            invicible = true;
+            timer = 0;
 
-                Point mapPoint = game.getMap().mapPointToTilemap(collider.x + collider.width / 2,
-                        collider.y + collider.height / 2);
-                Point screenPoint = game.getMap().mapPointToScreen(mapPoint);
-                int x = screenPoint.x;
-                int y = screenPoint.y;
+            Point mapPoint = game.getMap().mapPointToTilemap(collider.x + collider.width / 2,
+                    collider.y + collider.height / 2);
+            Point screenPoint = game.getMap().mapPointToScreen(mapPoint);
+            int x = screenPoint.x;
+            int y = screenPoint.y;
 
-                Bomb.createSegments(game, Bomb.EXPLOSION_ANIMATED_SPRITE, 1, x, y, 0, 0);
-                Bomb.createSegments(game, Bomb.EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL, bombLength, x, y,
-                        -16 * GameWindow.ZOOM, 0);
-                Bomb.createSegments(game, Bomb.EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL, bombLength, x, y,
-                        16 * GameWindow.ZOOM, 0);
-                Bomb.createSegments(game, Bomb.EXPLOSION_ANIMATED_SPRITE_VERTICAL, bombLength, x, y, 0,
-                        -16 * GameWindow.ZOOM);
-                Bomb.createSegments(game, Bomb.EXPLOSION_ANIMATED_SPRITE_VERTICAL, bombLength, x, y, 0,
-                        16 * GameWindow.ZOOM);
+            Bomb.createSegments(game, Explosion.EXPLOSION_ANIMATED_SPRITE, 1, x, y, 0, 0);
+            Bomb.createSegments(game, Explosion.EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL, bombLength, x, y,
+                    -16 * GameWindow.ZOOM, 0);
+            Bomb.createSegments(game, Explosion.EXPLOSION_ANIMATED_SPRITE_HORTIZONTAL, bombLength, x, y,
+                    16 * GameWindow.ZOOM, 0);
+            Bomb.createSegments(game, Explosion.EXPLOSION_ANIMATED_SPRITE_VERTICAL, bombLength, x, y, 0,
+                    -16 * GameWindow.ZOOM);
+            Bomb.createSegments(game, Explosion.EXPLOSION_ANIMATED_SPRITE_VERTICAL, bombLength, x, y, 0,
+                    16 * GameWindow.ZOOM);
 
-                this.collider.x = initialX * GameWindow.ZOOM;
-                this.collider.y = initialY * GameWindow.ZOOM;
-                animatedSprite.reset();
-                this.setDestroyed(false);
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
+            this.collider.x = initialX * GameWindow.ZOOM;
+            this.collider.y = initialY * GameWindow.ZOOM;
+            animatedSprite.reset();
+            this.setDestroyed(false);
         }
         super.update(game);
         if (getListener().action() || getListener().bomb())
             moving = true;
+        if (invicible) {
+            timer++;
+            if (timer > 40) {
+                invicible = false;
+                timer = 0;
+            }
+        }
+    }
 
+    @Override
+    public void onCollisionEnter(CollisionEvent e) {
+        super.onCollisionEnter(e);
+        if (invicible)
+            setDestroyed(false);
+    }
+
+    @Override
+    public void onCollisionStay(CollisionEvent e) {
+        super.onCollisionStay(e);
+        if (invicible)
+            setDestroyed(false);
     }
 }

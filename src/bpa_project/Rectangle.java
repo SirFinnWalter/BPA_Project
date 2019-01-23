@@ -1,6 +1,8 @@
 package bpa_project;
 
 import java.awt.Point;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @file Rectangle.java
@@ -16,8 +18,9 @@ import java.awt.Point;
  * @see java.awt.Rectangle
  */
 public class Rectangle extends java.awt.Rectangle {
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
     private static final long serialVersionUID = -8044325233882769813L;
-    int pixels[];
+    private int pixels[];
 
     /**
      * Constructs a new {@code Rectangle} whose upper-left corner is specified as
@@ -71,7 +74,7 @@ public class Rectangle extends java.awt.Rectangle {
         if (pixels != null)
             return pixels;
         else
-            System.out.println("Warning: attempted to retrieve Rectangle pixels without setting a color");
+            LOGGER.log(Level.WARNING, "Attempted to retrieve Rectangle pixels without setting a color!");
         return null;
     }
 

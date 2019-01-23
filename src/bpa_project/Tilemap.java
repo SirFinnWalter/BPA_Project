@@ -3,10 +3,14 @@ package bpa_project;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import bpa_project.characters.Player;
 
@@ -17,44 +21,82 @@ import bpa_project.characters.Player;
  */
 
 public class Tilemap {
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+
     private Tileset tileset;
     private int fillTileID = -1;
     private int width, height;
+    private boolean valid;
     public Map<Integer, MappedTile> mappedTiles = new HashMap<Integer, MappedTile>();
     public Map<Integer, Point> playerPositions = new HashMap<Integer, Point>();
 
     public Tilemap(File file, Tileset tileset) {
         this.tileset = tileset;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+        this.width = 0;
+        this.height = 0;
 
+        LOGGER.log(Level.FINE, "Parsing tilemap file: " + file.getAbsolutePath());
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String s = reader.readLine();
             while (s != null) {
                 if (!s.trim().startsWith("//")) {
                     String[] data = s.trim().split(":");
                     switch (data[0]) {
                     case "Width": {
-                        this.width = Integer.parseInt(data[1]);
+                        LOGGER.log(Level.FINER, "Parsing width.");
+                        this.width = Integer.parseInt(data[1].trim());
+
+                        if (this.width <= 0) {
+                            throw new RuntimeException("Tilemap width cannot be less than or equal to 0!");
+                        }
                         break;
                     }
                     case "Height": {
-                        this.height = Integer.parseInt(data[1]);
+                        LOGGER.log(Level.FINER, "Parsing height.");
+                        this.height = Integer.parseInt(data[1].trim());
+
+                        if (this.height <= 0) {
+                            throw new RuntimeException("Tilemap height cannot be less than or equal to 0!");
+                        }
                         break;
                     }
                     case "Fill": {
-                        this.fillTileID = Integer.parseInt(data[1]);
+                        LOGGER.log(Level.FINER, "Parsing fill.");
+                        this.fillTileID = Integer.parseInt(data[1].trim());
+
+                        if (this.fillTileID < -1 || this.fillTileID > tileset.getSize()) {
+                            LOGGER.log(Level.WARNING, "Fill TileID of " + this.fillTileID + " is not in the range of "
+                                    + tileset.getSize() + "!");
+                            this.fillTileID = -1;
+                        }
                         break;
                     }
                     case "Positions": {
+                        LOGGER.log(Level.FINER, "Parsing positions.");
                         s = reader.readLine();
 
                         while (!s.equals("]") && s != null) {
                             if (!s.trim().startsWith("//")) {
                                 String[] line = s.trim().split("[:,]");
-                                int playerNum = Integer.parseInt(line[0]);
+                                int playerNum = Integer.parseInt(line[0].trim());
                                 Point position = new Point(Integer.parseInt(line[1].trim()),
                                         Integer.parseInt(line[2].trim()));
-                                playerPositions.put(playerNum, position);
+
+                                playerPositions.put(playerNum, null);
+                                if (position.x < 0)
+                                    LOGGER.log(Level.WARNING,
+                                            "Player #" + playerNum + " x position cannot be less than 0!");
+                                else if (position.x > width)
+                                    LOGGER.log(Level.WARNING, "Player #" + playerNum
+                                            + " x position cannot be greater than the width of " + width + "!");
+                                else if (position.y < 0)
+                                    LOGGER.log(Level.WARNING,
+                                            "Player #" + playerNum + " y position cannot be less than 0!");
+                                else if (position.y > height)
+                                    LOGGER.log(Level.WARNING, "Player #" + playerNum
+                                            + " y position cannot be greater than the height of " + height + "!");
+                                else
+                                    playerPositions.put(playerNum, position);
                             }
                             s = reader.readLine();
                         }
@@ -62,40 +104,45 @@ public class Tilemap {
                     }
 
                     case "Tiles": {
+                        LOGGER.log(Level.FINER, "Parsing tiles.");
                         s = reader.readLine();
-                        // TODO: extract into methods
                         while (!s.equals("]") && s != null) {
                             if (!s.trim().startsWith("//")) {
                                 String[] line = s.trim().split(":");
-                                int tileID = Integer.parseInt(line[0]);
+                                int tileID = Integer.parseInt(line[0].trim());
+
+                                if (tileID < -1 || tileID > tileset.getSize()) {
+                                    LOGGER.log(Level.WARNING, "TileID of " + tileID + " is not in the range of "
+                                            + tileset.getSize() + "!");
+                                    tileID = -1;
+                                }
+
                                 String[] coordsSet = line[1].split(",(?=(?:[^\\}]*\\{[^\\}]*\\})*[^\\}]*$)");
                                 for (String c : coordsSet) {
-                                    // parseCoords(c);
                                     if (!c.contains("-")) {
                                         String[] coords = c.replaceAll("[^,\\d]", "").split(",");
-                                        int x = Integer.parseInt(coords[0]);
-                                        int y = Integer.parseInt(coords[1]);
+                                        int x = Integer.parseInt(coords[0].trim());
+                                        int y = Integer.parseInt(coords[1].trim());
                                         addTile(tileID, x, y, x, y, 1, 1, false);
-
                                     } else if (!c.contains("%")) {
                                         boolean diagonal = c.contains("-d");
                                         c.replaceAll("-d", "-");
                                         String[] coords = c.replaceAll("[^,\\-\\d]", "").split("[,-]");
-                                        int x1 = Integer.parseInt(coords[0]);
-                                        int y1 = Integer.parseInt(coords[1]);
-                                        int x2 = Integer.parseInt(coords[2]);
-                                        int y2 = Integer.parseInt(coords[3]);
+                                        int x1 = Integer.parseInt(coords[0].trim());
+                                        int y1 = Integer.parseInt(coords[1].trim());
+                                        int x2 = Integer.parseInt(coords[2].trim());
+                                        int y2 = Integer.parseInt(coords[3].trim());
                                         addTile(tileID, x1, y1, x2, y2, 1, 1, diagonal);
                                     } else {
                                         boolean diagonal = c.contains("-d");
                                         c.replaceAll("-d", "-");
                                         String[] coords = c.replaceAll("[^,\\-\\d\\%]", "").split("[%,-]");
-                                        int x1 = Integer.parseInt(coords[0]);
-                                        int y1 = Integer.parseInt(coords[1]);
-                                        int x2 = Integer.parseInt(coords[2]);
-                                        int y2 = Integer.parseInt(coords[3]);
-                                        int xMod = Integer.parseInt(coords[4]);
-                                        int yMod = coords.length >= 6 ? Integer.parseInt(coords[5]) : xMod;
+                                        int x1 = Integer.parseInt(coords[0].trim());
+                                        int y1 = Integer.parseInt(coords[1].trim());
+                                        int x2 = Integer.parseInt(coords[2].trim());
+                                        int y2 = Integer.parseInt(coords[3].trim());
+                                        int xMod = Integer.parseInt(coords[4].trim());
+                                        int yMod = coords.length >= 6 ? Integer.parseInt(coords[5].trim()) : xMod;
                                         addTile(tileID, x1, y1, x2, y2, xMod, yMod, diagonal);
                                     }
                                 }
@@ -111,10 +158,24 @@ public class Tilemap {
                 }
                 s = reader.readLine();
             }
-            reader.close();
-        } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
+            if (width <= 0)
+                throw new RuntimeException("Tilemap must have a width!");
+            if (height <= 0)
+                throw new RuntimeException("Tilemap must have a height!");
+            if (playerPositions.isEmpty())
+                throw new RuntimeException("Tilemap must have specify player positions!");
+            if (mappedTiles.isEmpty())
+                throw new RuntimeException("Tilemap must have a tiles!");
+
+            valid = true;
+
+        } catch (FileNotFoundException ex) {
+            LOGGER.log(Level.WARNING, ex.toString(), ex);
+            valid = false;
+        } catch (RuntimeException | IOException ex) {
+            LOGGER.log(Level.SEVERE, ex.toString(), ex);
+            valid = false;
+            throw new RuntimeException(ex.getMessage());
         }
 
     }
@@ -134,8 +195,8 @@ public class Tilemap {
             for (int y = y1; y <= y2; y += yMod) {
                 for (int x = x1; x <= x2; x += xMod) {
                     if (x + 1 > width || y + 1 > height) {
-                        System.out.println("Warning: tile at {" + x + ", " + y + "} is outside the map size of ["
-                                + width + ", " + height + "]");
+                        LOGGER.log(Level.WARNING, "Tile at {" + x + ", " + y + "} is outside the map size of [" + width
+                                + ", " + height + "]");
                     } else {
                         MappedTile mappedTile = new MappedTile(tileID, x, y);
                         mappedTiles.put(mappedTile.getID(), mappedTile);
@@ -151,25 +212,34 @@ public class Tilemap {
                 temp = y1;
                 y1 = y2;
                 y2 = temp;
-
             }
             if (y1 > y2) {
                 int y = y1;
                 for (int x = x1; x <= x2; x += xMod) {
-                    MappedTile mappedTile = new MappedTile(tileID, x, y);
-                    mappedTiles.put(mappedTile.getID(), mappedTile);
-                    y -= yMod;
-                    if (y < y2)
-                        break;
+                    if (x + 1 > width || y + 1 > height) {
+                        LOGGER.log(Level.WARNING, "Tile at {" + x + ", " + y + "} is outside the map size of [" + width
+                                + ", " + height + "]");
+                    } else {
+                        MappedTile mappedTile = new MappedTile(tileID, x, y);
+                        mappedTiles.put(mappedTile.getID(), mappedTile);
+                        y -= yMod;
+                        if (y < y2)
+                            break;
+                    }
                 }
             } else {
                 int y = y1;
                 for (int x = x1; x <= x2; x += xMod) {
-                    MappedTile mappedTile = new MappedTile(tileID, x, y);
-                    mappedTiles.put(mappedTile.getID(), mappedTile);
-                    y += yMod;
-                    if (y > y2)
-                        break;
+                    if (x + 1 > width || y + 1 > height) {
+                        LOGGER.log(Level.WARNING, "Tile at {" + x + ", " + y + "} is outside the map size of [" + width
+                                + ", " + height + "]");
+                    } else {
+                        MappedTile mappedTile = new MappedTile(tileID, x, y);
+                        mappedTiles.put(mappedTile.getID(), mappedTile);
+                        y += yMod;
+                        if (y > y2)
+                            break;
+                    }
                 }
             }
         }
@@ -195,16 +265,10 @@ public class Tilemap {
             }
         }
         mappedTiles.forEach((k, v) -> {
-            // if (v.getTile().sprite == null) {
-            // tileset.renderVoid(renderer, v.x * 16 * GameWindow.ZOOM, v.y * 16 *
-            // GameWindow.ZOOM, GameWindow.ZOOM,
-            // GameWindow.ZOOM);
-            // } else {
             int width = v.getTile().sprite.getWidth();
             int height = v.getTile().sprite.getHeight();
             tileset.renderTiles(renderer, v.tileID, v.x * width * GameWindow.ZOOM, v.y * height * GameWindow.ZOOM,
                     xZoom, yZoom);
-            // }
         });
     }
 
@@ -332,14 +396,18 @@ public class Tilemap {
 
     public Point getPlayerPosition(int playerNum) {
         if (playerNum > Player.MAX_PLAYERS || playerNum < 0) {
-            System.out.println("Not a valid player number! Tilemap.getPlayerPosition");
+            LOGGER.log(Level.WARNING, "Player #" + playerNum + " is not a valid player number!");
             return null;
         }
         Point position = playerPositions.get(playerNum);
         if (position == null) {
-            System.out.println("No position for player #" + playerNum + " in map!");
+            LOGGER.log(Level.WARNING, "No position for player #" + playerNum + " in tilemap!");
         }
         return position;
+    }
+
+    public boolean isValid() {
+        return valid;
     }
 
     /**

@@ -3,6 +3,8 @@ package bpa_project.characters;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import bpa_project.*;
 
@@ -23,18 +25,23 @@ import bpa_project.*;
  * {@code Player} will not allow movement on collision with its collider.
  */
 public class Player implements IPlayer, CollisionListener {
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+
     public final static int MAX_PLAYERS = 4;
     public static int PLAYER_COUNT = 0;
-    private Rectangle playerBox;
+    protected Rectangle playerBox;
     protected Collider collider;
     private double speedX = 1 * GameWindow.ZOOM;
     private double speedY = 1 * GameWindow.ZOOM;
-    private FacingDirection currentFD, newFD;
+    protected FacingDirection currentFD, newFD;
     private Sprite sprite;
     private boolean destroyed;
     protected AnimatedSprite animatedSprite = null;
     private KeyboardListener listener = null;
     protected int bombLength = 1;
+    protected boolean moving = false;
+
+    int tempCount = 0;
 
     private int playerNum;
 
@@ -55,7 +62,8 @@ public class Player implements IPlayer, CollisionListener {
     public Player(int x, int y, Sprite sprite, KeyboardListener listener) {
         this.playerNum = ++Player.PLAYER_COUNT;
         if (playerNum > MAX_PLAYERS) {
-            throw new RuntimeException("Reached max number of players! (" + MAX_PLAYERS + ")");
+            LOGGER.log(Level.WARNING, "Reached max numbers of players! (" + MAX_PLAYERS + ")");
+            return;
         }
         this.sprite = sprite;
         if (sprite != null && sprite instanceof AnimatedSprite) {
@@ -109,7 +117,6 @@ public class Player implements IPlayer, CollisionListener {
      */
     @Override
     public void init(Game game) {
-        // game.getM
         game.getPlayers().forEach(player -> {
             if (player != this) {
                 collider.addGameObject((player));
@@ -118,16 +125,12 @@ public class Player implements IPlayer, CollisionListener {
         });
     }
 
-    int tempCount = 0;
-    int tempPoints = 0;
-    boolean moving = false;
-
     /**
      * Updates the location of the {@code collider} then checks for collision on
      * each movement before actually moving the {@code Player}. Only updates the
      * direction the {@code Player} is facing if it is a new direction.
      * <p>
-     * If the {@code Player} is moving, the begin looping through the
+     * If the {@code Player} is moving, then begin looping through the
      * {@code animatedSprite}. If not, then stay static on the first frame of the
      * {@code animatedSprite}.
      * <p>
@@ -184,11 +187,10 @@ public class Player implements IPlayer, CollisionListener {
                 maxBombs++;
                 System.out.println("Player " + playerNum + ": Max # of bombs is now " + maxBombs + "!");
             }
-
-            System.out.println("Player " + playerNum + "'s score: " + tempPoints);
         }
         moving = false;
         counter++;
+
     }
 
     public boolean isDestroyed() {

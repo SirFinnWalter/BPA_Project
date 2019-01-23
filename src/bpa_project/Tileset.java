@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @file Tileset.java
@@ -12,9 +14,12 @@ import java.util.ArrayList;
  */
 
 public class Tileset {
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+
     private SpriteSheet sheet;
     private ArrayList<Tile> tilesList = new ArrayList<Tile>();
-    public final Tile voidTile = new Tile(Sprite.voidSprite, true, false);
+    public final Tile voidTile = new Tile(new Sprite(GameWindow.loadImage(new File("assets\\tilesets\\VoidTile.png"))),
+            false, false);
 
     public Tileset(File file, SpriteSheet sheet) {
         this.sheet = sheet;
@@ -53,18 +58,24 @@ public class Tileset {
     public void renderTiles(RenderHandler renderer, int tileID, int xPos, int yPos, int xZoom, int yZoom) {
         if (tileID == -1)
             renderer.renderSprite(voidTile.sprite, xPos, yPos, xZoom, yZoom);
-        else if (tileID < tilesList.size())
+        else if (tileID > -1 && tileID < tilesList.size())
             renderer.renderSprite(tilesList.get(tileID).sprite, xPos, yPos, xZoom, yZoom);
         else
-            System.out.println("Warning: TileID of " + tileID + " is not in the range of " + tilesList.size() + ".");
+            LOGGER.log(Level.SEVERE, "tileID of " + tileID + " is not in the of " + tilesList.size() + "!");
     }
 
     public Tile getTile(int tileID) {
-        if (tileID != -1)
+        if (tileID > -1 && tileID < tilesList.size())
             return this.tilesList.get(tileID);
         else {
+            if (tileID != -1)
+                LOGGER.log(Level.SEVERE, "tileID of " + tileID + " is not in the of " + tilesList.size() + "!");
             return voidTile;
         }
+    }
+
+    public int getSize() {
+        return tilesList.size();
     }
 
     class Tile {

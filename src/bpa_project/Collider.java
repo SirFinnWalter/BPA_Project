@@ -2,6 +2,8 @@ package bpa_project;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @file Collider.java
@@ -18,6 +20,7 @@ import java.util.Map;
  * the collider is an instance of {@code CollisionListener}
  */
 public class Collider extends Rectangle {
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
     private static final long serialVersionUID = 1630374324558026943L;
 
     /**
@@ -111,20 +114,6 @@ public class Collider extends Rectangle {
      */
     public void checkCollision(Collider col) {
         boolean collision = this.intersects(col);
-        // System.out.println(collision);
-        // if (colliding && !collision) {
-
-        // gameObjects.forEach((gameObject, colliding) -> {
-        // if (col == gameObject.getCollider()) {
-        // CollisionEvent e = new CollisionEvent(gameObject.getCollider());
-        // colliding = false;
-        // // if (gameObject instanceof CollisionListener)
-
-        // ((CollisionListener) object).onCollisionLeave(e);
-        // return;
-        // // ((CollisionListener) gameObject).onCollisionLeave(e);
-        // }
-        // });
         if (collision) {
 
             if (col.getObject() instanceof Tilemap.MappedTile) {
@@ -145,9 +134,10 @@ public class Collider extends Rectangle {
     public void fireCollision(Collider col) {
         CollisionEvent e = new CollisionEvent(col);
         boolean prevState = gameObjects.get(col.getObject());
-
-        if (!(object instanceof CollisionListener))
-            throw new RuntimeException("Warning: Attempted to trigger collision on an object that is not listening.");
+        if (!(object instanceof CollisionListener)) {
+            LOGGER.log(Level.WARNING, "Attempted to trigger collision on an object that is not listening.");
+            return;
+        }
 
         if (prevState) {
             ((CollisionListener) object).onCollisionStay(e);
@@ -167,9 +157,6 @@ public class Collider extends Rectangle {
 
         boolean collision = this.intersects(object.getCollider());
         gameObjects.put(object, collision);
-
-        // object.getCollider().colliding = true;
-        // checkCollision(object.getCollider());
     }
 
     /**

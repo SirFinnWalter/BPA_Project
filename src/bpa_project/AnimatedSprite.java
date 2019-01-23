@@ -1,6 +1,8 @@
 package bpa_project;
 
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @file AnimatedSprite.java
@@ -9,6 +11,8 @@ import java.awt.image.BufferedImage;
  */
 
 public class AnimatedSprite extends Sprite implements Cloneable {
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+
     private Sprite[] sprites;
     private int currentSprite = 0;
     private int counter = 0;
@@ -18,8 +22,15 @@ public class AnimatedSprite extends Sprite implements Cloneable {
     private boolean visible;
     private AnimationType animationType = AnimationType.looping;
 
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    @Override
+    public AnimatedSprite clone() {
+        try {
+            return (AnimatedSprite) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            LOGGER.log(Level.SEVERE, ex.toString(), ex);
+            throw new RuntimeException(ex.getMessage());
+        }
+
     }
 
     public AnimatedSprite(SpriteSheet sheet, Rectangle[] range, int flipFrame) {
@@ -67,7 +78,6 @@ public class AnimatedSprite extends Sprite implements Cloneable {
         this.start = start;
         this.end = end;
         this.currentSprite = this.start + relativeSprite;
-        // reset();
     }
 
     public void setAnimationType(AnimationType animationType) {
@@ -75,7 +85,7 @@ public class AnimatedSprite extends Sprite implements Cloneable {
     }
 
     public void render(RenderHandler renderer, int xZoom, int yZoom) {
-        System.out.println("DONT CALL THIS - AnimatedSprite.render");
+        LOGGER.log(Level.WARNING, "Called render() on an AnimatedSprite object.");
     }
 
     public void update(Game game) {
@@ -150,7 +160,7 @@ public class AnimatedSprite extends Sprite implements Cloneable {
         return (currentSprite == -1);
     }
 
-    public void setDestoyed(boolean destroyed) {
+    public void setDestroyed(boolean destroyed) {
         if (destroyed)
             currentSprite = -1;
         else

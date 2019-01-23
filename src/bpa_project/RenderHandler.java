@@ -3,6 +3,8 @@ package bpa_project;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @file RenderHandler.java
@@ -11,15 +13,26 @@ import java.awt.image.DataBufferInt;
  */
 
 public class RenderHandler {
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+
+    private final int WIDTH, HEIGHT;
     private BufferedImage view;
     private int[] pixels;
-    // private Rectangle camera;
-
-    private int width, height;
 
     public RenderHandler(int width, int height) {
-        this.width = width;
-        this.height = height;
+        if (width > 0)
+            this.WIDTH = width;
+        else {
+            LOGGER.log(Level.WARNING, "RenderHandler width cannot be less than or equal to 0!");
+            this.WIDTH = 1;
+        }
+
+        if (height > 0)
+            this.HEIGHT = height;
+        else {
+            LOGGER.log(Level.WARNING, "RenderHandler height cannot be less than or equal to 0!");
+            this.HEIGHT = 1;
+        }
 
         view = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         pixels = ((DataBufferInt) view.getRaster().getDataBuffer()).getData();
@@ -58,27 +71,26 @@ public class RenderHandler {
             }
         }
     }
+
     public int getWidth() {
-        return this.width;
+        return this.WIDTH;
     }
 
     public int getHeight() {
-        return this.height;
+        return this.HEIGHT;
     }
 
     private void setPixel(int pixel, int x, int y) {
-        // if (x >= camera.x && y >= camera.y && x <= camera.x + camera.getWidth() && y
-        // <= camera.y + camera.getHeight()) {
         int alpha = ((pixel >> 24) & 0xFF);
-        if (x >= 0 && y >= 0 && x <= width && y <= height && alpha != 0) {
+        if (x >= 0 && y >= 0 && x <= WIDTH && y <= HEIGHT && alpha != 0) {
             int index = x + y * view.getWidth();
             if (pixels.length > index) {
                 if (alpha == 255) {
-                    pixels[x + y * width] = pixel;
+                    pixels[x + y * WIDTH] = pixel;
                     return;
                 }
                 // 0xAARRGGBB
-                int dstPixel = pixels[x + y * width];
+                int dstPixel = pixels[x + y * WIDTH];
                 int outRed = ((dstPixel >> 16) & 0xFF)
                         - (int) ((((dstPixel >> 16) & 0xFF) - ((pixel >> 16) & 0xFF)) * (alpha / 255f));
                 int outGreen = ((dstPixel >> 8) & 0xFF)
@@ -86,7 +98,7 @@ public class RenderHandler {
                 int outBlue = ((dstPixel >> 0) & 0xFF)
                         - (int) ((((dstPixel >> 0) & 0xFF) - ((pixel >> 0) & 0xFF)) * (alpha / 255f));
 
-                pixels[x + y * width] = (255 << 24 | outRed << 16 | outGreen << 8 | outBlue << 0);
+                pixels[x + y * WIDTH] = (255 << 24 | outRed << 16 | outGreen << 8 | outBlue << 0);
             }
 
         }

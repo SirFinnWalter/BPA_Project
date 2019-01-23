@@ -3,15 +3,16 @@ package bpa_project;
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferStrategy;
 import java.awt.FlowLayout;
+import java.awt.image.BufferStrategy;
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import bpa_project.characters.*;
 import bpa_project.characters.Player;
 
 /**
@@ -21,6 +22,7 @@ import bpa_project.characters.Player;
  */
 
 public class Game extends WindowContent {
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
 
     private Canvas canvas;
     private RenderHandler renderer;
@@ -33,12 +35,11 @@ public class Game extends WindowContent {
         return canvas;
     }
 
-    public Game(GameWindow gw, RenderHandler renderer) {
+    public Game(GameWindow gw) {
         super(gw);
-        this.renderer = renderer;
         this.canvas = new Canvas();
         this.add(canvas);
-
+        // System.out.println(renderer.getWidth() + ", " + renderer.getHeight());
         players = new HashSet<>();
         gameObjects = new HashSet<>();
         gameObjectsBuffer = new HashSet<>();
@@ -52,96 +53,72 @@ public class Game extends WindowContent {
             object.init(this);
         });
 
-        ((FlowLayout) this.getLayout()).setVgap(0);
-
-        // try {
-        // KeyboardListener listener1 = new KeyboardListener(KeyEvent.VK_UP,
-        // KeyEvent.VK_DOWN, KeyEvent.VK_LEFT,
-        // KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER, KeyEvent.VK_SHIFT);
-        // CharacterC player1 = new CharacterC(16 * 23, 16 * 1, listener1);
-        // canvas.addKeyListener(listener1);
-        // canvas.addFocusListener(listener1);
-        // this.addGameObject(player1);
-
-        // KeyboardListener listener2 = new KeyboardListener(KeyEvent.VK_W,
-        // KeyEvent.VK_S, KeyEvent.VK_A,
-        // KeyEvent.VK_D, KeyEvent.VK_SPACE, KeyEvent.VK_E);
-        // CharacterA player2 = new CharacterA(16 * 1, 16 * 15, listener2);
-        // canvas.addKeyListener(listener2);
-        // canvas.addFocusListener(listener2);
-        // this.addGameObject(player2);
-
-        // } catch (CloneNotSupportedException e) {
-        // e.printStackTrace();
-        // }
+        LOGGER.log(Level.FINER, "Game canvas creating buffer strategy.");
         canvas.createBufferStrategy(3);
         canvas.requestFocus();
     }
 
     @Override
     public void update() {
-        if (isRunning()) {
-            gameObjects.forEach(object -> {
-                object.update(this);
-                if (object instanceof Player)
+        gameObjects.forEach(object -> {
+            object.update(this);
+            if (object instanceof Player)
 
-                    poll((Player) object);
-            });
+                poll((Player) object);
+        });
 
-            for (GameObject object : gameObjectsBuffer) {
-                if (!gameObjects.contains(object)) {
-                    object.init(this);
+        for (GameObject object : gameObjectsBuffer) {
+            if (!gameObjects.contains(object)) {
+                object.init(this);
 
-                    if (object instanceof Player) {
-                        players.add((Player) object);
-                    }
+                if (object instanceof Player) {
+                    players.add((Player) object);
                 }
             }
-            gameObjects.removeAll(gameObjects);
-            gameObjects.addAll(gameObjectsBuffer);
+        }
+        gameObjects.removeAll(gameObjects);
+        gameObjects.addAll(gameObjectsBuffer);
 
-            if (players.isEmpty()) {
-                render();
-                JOptionPane.showMessageDialog(null, "Nobody wins!\nThanks for playing!");
-                setRunning(false);
-                MainMenu mm = new MainMenu(super.getGameWindow());
-                super.getGameWindow().setWindowContent(mm);
+        if (players.isEmpty()) {
+            render();
+            JOptionPane.showMessageDialog(null, "Nobody wins!\nThanks for playing!");
+            LOGGER.log(Level.INFO, "Game ended with nobody winning.");
+            MainMenu mm = new MainMenu(getGameWindow());
+            getGameWindow().setWindowContent(mm);
 
-            } else if (players.size() == 1) {
-                render();
-                JOptionPane.showMessageDialog(null,
-                        "Player " + players.iterator().next().getPlayerNum() + " has won!\nThanks for playing!");
-                setRunning(false);
-                MainMenu mm = new MainMenu(super.getGameWindow());
-                super.getGameWindow().setWindowContent(mm);
+        } else if (players.size() == 1) {
+            render();
+            int playerNum = players.iterator().next().getPlayerNum();
+            JOptionPane.showMessageDialog(null, "Player " + playerNum + " has won!\nThanks for playing!");
+            LOGGER.log(Level.INFO, "Game ended with " + "player #" + playerNum + " winning.");
+            MainMenu mm = new MainMenu(getGameWindow());
+            getGameWindow().setWindowContent(mm);
 
-            }
         }
     }
-
-    // BufferedImage charA = GameWindow.loadImage(new
-    // File("assets\\sprites\\csCharA.png"));
 
     @Override
     public void render() {
         try {
             BufferStrategy bStrategy = canvas.getBufferStrategy();
+            if (bStrategy == null)
+                return;
+
             Graphics gfx = bStrategy.getDrawGraphics();
-            // super.paint(gfx);
 
             map.render(renderer, GameWindow.ZOOM, GameWindow.ZOOM);
             gameObjects.forEach(object -> {
                 object.render(renderer, GameWindow.ZOOM, GameWindow.ZOOM);
             });
-            // renderer.renderImage(charA, 100, 100, 2, 2);
             renderer.render(gfx);
             gfx.dispose();
             bStrategy.show();
-            renderer.clear(0xFF0000FF);
-        } catch (IllegalStateException e) {
-            JOptionPane.showMessageDialog(null, "Game preformed an illegal operation.\nClosing...", "Uh oh!",
-                    JOptionPane.WARNING_MESSAGE);
-            System.exit(0);
+            renderer.clear(0xFF000000);
+        } catch (IllegalStateException ex) {
+            LOGGER.log(Level.SEVERE, ex.toString(), ex);
+            throw ex;
+        } catch (NullPointerException ex) {
+            LOGGER.log(Level.WARNING, ex.toString(), ex);
         }
     }
 
@@ -166,22 +143,22 @@ public class Game extends WindowContent {
             if (buttons.b)
                 listener.keyStates[5] = true;
         }
-        // System.out.println(XInputNative.getState(0, buffer));
-
     }
 
     /**
      * @param map the map to set
      */
     public void setMap(Tilemap map) {
-        this.map = map;
+        LOGGER.log(Level.FINE, "Setting game map.");
 
-        this.setPreferredSize(
-                new Dimension(map.getWidth() * GameWindow.ZOOM * 16, map.getHeight() * GameWindow.ZOOM * 16));
+        this.map = map;
         canvas.setPreferredSize(
                 new Dimension(map.getWidth() * GameWindow.ZOOM * 16, map.getHeight() * GameWindow.ZOOM * 16));
+        renderer = new RenderHandler(map.getWidth() * GameWindow.ZOOM * 16, map.getHeight() * GameWindow.ZOOM * 16);
+
         ((FlowLayout) this.getLayout()).setVgap(0);
-        System.out.println("Setting map!");
+        ((FlowLayout) this.getLayout()).setHgap(0);
+        this.getGameWindow().pack();
     }
 
     public Tilemap getMap() {
@@ -189,6 +166,8 @@ public class Game extends WindowContent {
     }
 
     public void addPlayer(Player character) {
+        LOGGER.log(Level.FINE, "Adding player #" + Player.PLAYER_COUNT + " as " + character.getClass().getSimpleName());
+
         this.players.add(character);
         this.addGameObject(character);
         canvas.addKeyListener(character.getListener());
@@ -208,7 +187,7 @@ public class Game extends WindowContent {
      * <p>
      * Objects in the buffer are added into the game objects pool after the current
      * update and render is finished.
-     * 
+     *
      * @param object The game object to be add
      */
     public void addGameObject(GameObject object) {
@@ -221,20 +200,24 @@ public class Game extends WindowContent {
      * <p>
      * Objects in the buffer are removed from the game object pool after the current
      * update and render is finished.
-     * 
+     *
      * @param object The game object to be removed
      */
     public void removeGameObject(GameObject object) {
         gameObjectsBuffer.remove(object);
 
-        if (object instanceof Player)
+        if (object instanceof Player) {
+            LOGGER.log(Level.FINE, "Removing player #" + ((Player) object).getPlayerNum() + " from game.");
+
+            getGameWindow().getAudioPlayer().playAudio(new File("assets\\audio\\Death.wav"));
             players.remove(object);
+        }
     }
 
     /**
      * Checks a collider with the map tiles and other colliders defined in the
      * collider's collision pool.
-     * 
+     *
      * @param col The collider to check
      */
     public void checkCollision(Collider col) {

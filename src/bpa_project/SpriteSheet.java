@@ -1,6 +1,8 @@
 package bpa_project;
 
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @file SpriteSheet.java
@@ -9,6 +11,8 @@ import java.awt.image.BufferedImage;
  */
 
 public class SpriteSheet {
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+
     public final int WIDTH, HEIGHT;
     private BufferedImage image;
     private int[] pixels;
@@ -26,9 +30,9 @@ public class SpriteSheet {
         image.getRGB(0, 0, WIDTH, HEIGHT, pixels, 0, WIDTH);
     }
 
-    public SpriteSheet(BufferedImage image, int sWidth, int sHeight) {
+    public SpriteSheet(BufferedImage image, int spriteWidth, int spriteHeight) {
         this(image);
-        loadSprites(sWidth, sHeight);
+        loadSprites(spriteWidth, spriteHeight);
     }
 
     public void loadSprites(int width, int height) {
@@ -36,13 +40,21 @@ public class SpriteSheet {
     }
 
     public void loadSprites(int width, int height, int xPad, int yPad) {
-        this.spriteWidth = width;
-        sprites = new Sprite[(WIDTH / width) * (HEIGHT / height)];
-        int spriteID = 0;
-        for (int y = 0; y < HEIGHT; y += height + yPad) {
-            for (int x = 0; x < WIDTH; x += width + xPad) {
-                sprites[spriteID++] = new Sprite(this, x, y, width, height);
+        if (width > 0 && height > 0) {
+            this.spriteWidth = width;
+            sprites = new Sprite[(WIDTH / width) * (HEIGHT / height)];
+            int spriteID = 0;
+            for (int y = 0; y < HEIGHT; y += height + yPad) {
+                for (int x = 0; x < WIDTH; x += width + xPad) {
+                    sprites[spriteID++] = new Sprite(this, x, y, width, height);
+                }
             }
+        } else {
+            if (width <= 0)
+                LOGGER.log(Level.WARNING, "Attempted to load sprites with a width less than or equal to zero!");
+
+            if (height <= 0)
+                LOGGER.log(Level.WARNING, "Attempted to load sprites with a height less than or equal to zero!");
         }
     }
 
@@ -55,10 +67,10 @@ public class SpriteSheet {
             if (spriteID < sprites.length)
                 return sprites[spriteID];
             else
-                System.out.println(
-                        "Warning: SpriteID of " + spriteID + " is not in the range of " + sprites.length + ".");
+                LOGGER.log(Level.WARNING,
+                        "SpriteID of " + spriteID + " is not in the range of " + sprites.length + "!");
         } else
-            System.out.println("Warning: SpriteSheet attempted to retrieve sprites before loading sprites");
+            LOGGER.log(Level.WARNING, "Attempted to retrieve sprites before loading sprites");
 
         return null;
     }
@@ -67,7 +79,7 @@ public class SpriteSheet {
         if (sprites != null)
             return this.sprites;
         else
-            System.out.println("Warning: SpriteSheet attempted to retrieve sprites before loading sprites");
+            LOGGER.log(Level.WARNING, "Attempted to retrieve sprites before loading sprites");
         return null;
     }
 

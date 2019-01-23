@@ -1,8 +1,8 @@
 // width and height of the map
-Width:25
+Width:25 
 Height:17
 
-// Fill:{tileid} - what to fill background by default
+// Fill:{tileid} - what the floor of the map is
 Fill:0
 
 // The positions of players, zero-based
