@@ -25,14 +25,15 @@ import bpaproject.Tilemap;
  */
 
 public class CharacterSelect extends FrameContent {
-    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
     private static final long serialVersionUID = -2395465395541349602L;
 
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+    private static final File BGM_FILE = new File("assets\\audio\\MenuSelc02.wav");
     private static final ImageIcon[] CS_IMAGES = new ImageIcon[] {
-            new ImageIcon(GameWindow.loadImage(new File("assets\\select\\character0.png"), GameWindow.ZOOM)),
-            new ImageIcon(GameWindow.loadImage(new File("assets\\select\\character1.png"), GameWindow.ZOOM)),
-            new ImageIcon(GameWindow.loadImage(new File("assets\\select\\character2.png"), GameWindow.ZOOM)),
-            new ImageIcon(GameWindow.loadImage(new File("assets\\select\\character3.png"), GameWindow.ZOOM)), };
+            new ImageIcon(GameWindow.loadImage(new File("assets\\select\\char0.png"), GameWindow.ZOOM)),
+            new ImageIcon(GameWindow.loadImage(new File("assets\\select\\char1.png"), GameWindow.ZOOM)),
+            new ImageIcon(GameWindow.loadImage(new File("assets\\select\\char2.png"), GameWindow.ZOOM)),
+            new ImageIcon(GameWindow.loadImage(new File("assets\\select\\char3.png"), GameWindow.ZOOM)), };
 
     JLabel[] csPortraits = new JLabel[4];
     Tilemap map;
@@ -40,6 +41,9 @@ public class CharacterSelect extends FrameContent {
     public CharacterSelect(GameWindow gw, Tilemap map) {
         super(gw);
         this.map = map;
+        gw.getAudioPlayer().setAudio(BGM_FILE);
+        gw.getAudioPlayer().loopAudio();
+
         JPanel main = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -152,9 +156,8 @@ public class CharacterSelect extends FrameContent {
 
         }
         getGameWindow().setSize(map.getWidth() * 16, map.getHeight() * 16);
-        getGameWindow().getAudioPlayer().endLoop();
         LOGGER.log(Level.INFO, "Starting game.");
-        getGameWindow().setWindowContent(game);
+        getGameWindow().setFrameContent(game);
 
     }
 }

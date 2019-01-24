@@ -78,8 +78,8 @@ public abstract class Player implements GameObject, CollisionListener {
         collider = new Collider(this, x * GameWindow.ZOOM, y * GameWindow.ZOOM, 14 * GameWindow.ZOOM,
                 14 * GameWindow.ZOOM);
 
-        currentFD = FacingDirection.left;
-        newFD = FacingDirection.left;
+        currentFD = FacingDirection.LEFT;
+        newFD = FacingDirection.LEFT;
         updateDirection();
         // playerBox = new Rectangle(x * GameWindow.ZOOM, y * GameWindow.ZOOM, 16, 21);
         playerBox.setColor(0x88FFFFFF);
@@ -173,7 +173,7 @@ public abstract class Player implements GameObject, CollisionListener {
         if (this.currentFD != newFD) {
             this.currentFD = newFD;
 
-            if (newFD == FacingDirection.left || newFD == FacingDirection.right)
+            if (newFD == FacingDirection.LEFT || newFD == FacingDirection.RIGHT)
                 updateDirection();
         }
         if (listener.bomb())
@@ -221,28 +221,28 @@ public abstract class Player implements GameObject, CollisionListener {
     public void moveUp() {
         collider.y -= speed;
 
-        newFD = FacingDirection.up;
+        newFD = FacingDirection.UP;
         moving = true;
     }
 
     public void moveDown() {
         collider.y += speed;
 
-        newFD = FacingDirection.down;
+        newFD = FacingDirection.DOWN;
         moving = true;
     }
 
     public void moveLeft() {
         collider.x -= speed;
 
-        newFD = FacingDirection.left;
+        newFD = FacingDirection.LEFT;
         moving = true;
     }
 
     public void moveRight() {
         collider.x += speed;
 
-        newFD = FacingDirection.right;
+        newFD = FacingDirection.RIGHT;
         moving = true;
     }
 
@@ -271,16 +271,16 @@ public abstract class Player implements GameObject, CollisionListener {
     @Override
     public void onCollisionEnter(CollisionEvent e) {
         switch (newFD) {
-        case left:
+        case LEFT:
             collider.x += e.intersection(collider).width;
             break;
-        case right:
+        case RIGHT:
             collider.x -= e.intersection(collider).width;
             break;
-        case up:
+        case UP:
             collider.y += e.intersection(collider).height;
             break;
-        case down:
+        case DOWN:
             collider.y -= e.intersection(collider).height;
             break;
         default:
@@ -323,7 +323,7 @@ public abstract class Player implements GameObject, CollisionListener {
      * integer value.
      */
     public enum FacingDirection {
-        left(0), right(1), up(2), down(3);
+        LEFT(0), RIGHT(1), UP(2), DOWN(3);
 
         private int value;
         private static Map<Integer, FacingDirection> map = new HashMap<>();

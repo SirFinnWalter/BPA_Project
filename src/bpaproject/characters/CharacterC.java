@@ -40,16 +40,16 @@ public class CharacterC extends Player {
     @Override
     public void onCollisionEnter(CollisionEvent e) {
         switch (newFD) {
-        case up:
+        case UP:
             collider.y += e.intersection(collider).height;
             break;
-        case down:
+        case DOWN:
             collider.y -= e.intersection(collider).height;
             break;
-        case left:
+        case LEFT:
             collider.x += e.intersection(collider).width;
             break;
-        case right:
+        case RIGHT:
             collider.x -= e.intersection(collider).width;
             break;
         default:

@@ -1,9 +1,8 @@
 package bpaproject.powerups;
 
 import bpaproject.*;
-import bpaproject.Tilemap.MappedTile;
 import bpaproject.characters.Player;
-import bpaproject.framecontent.Game;;
+import bpaproject.framecontent.Game;
 
 /**
  * @file Powerup.java

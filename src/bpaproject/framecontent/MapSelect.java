@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 import bpaproject.*;
 
@@ -18,10 +19,16 @@ import bpaproject.*;
  * @createdOn Saturday, 19 January, 2019
  */
 
+/**
+ * A {@code MapSelect} displays the avaliable maps that can be played. Each map
+ * is a button that when clicked will set the map of the game and move onto
+ * character selection.
+ */
 public class MapSelect extends FrameContent {
-    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
     private static final long serialVersionUID = 4049890020257627138L;
 
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+    private static final File BGM_FILE = new File("assets\\audio\\MenuSelc01.wav");
     private static final ImageIcon[] MS_IMAGES = new ImageIcon[] {
             new ImageIcon(GameWindow.loadImage(new File("assets\\select\\map0.png"), GameWindow.ZOOM)),
             new ImageIcon(GameWindow.loadImage(new File("assets\\select\\map1.png"), GameWindow.ZOOM)),
@@ -30,6 +37,8 @@ public class MapSelect extends FrameContent {
 
     public MapSelect(GameWindow gw) {
         super(gw);
+        gw.getAudioPlayer().setAudio(BGM_FILE);
+        gw.getAudioPlayer().loopAudio();
 
         JButton[] mapButtons = new JButton[MS_IMAGES.length];
         for (int i = 0; i < mapButtons.length; i++) {
@@ -52,31 +61,31 @@ public class MapSelect extends FrameContent {
         Tilemap map;
         switch (index) {
         case 0: {
-            BufferedImage image = GameWindow.loadImage(new File("assets\\tilesets\\ForestTileset.png"));
+            BufferedImage image = GameWindow.loadImage(new File("assets\\tilesets\\tileset0.png"));
             SpriteSheet sheet = new SpriteSheet(image, 16, 16);
-            Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
-            map = new Tilemap(new File("assets\\maps\\DefaultMap.bm"), tiles);
+            Tileset tiles = new Tileset(sheet);
+            map = new Tilemap(new File("assets\\maps\\map0"), tiles);
         }
             break;
         case 1: {
-            BufferedImage image = GameWindow.loadImage(new File("assets\\tilesets\\RuinsTileset.png"));
+            BufferedImage image = GameWindow.loadImage(new File("assets\\tilesets\\tileset1.png"));
             SpriteSheet sheet = new SpriteSheet(image, 16, 16);
-            Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
-            map = new Tilemap(new File("assets\\maps\\RuinsMap.bm"), tiles);
+            Tileset tiles = new Tileset(sheet);
+            map = new Tilemap(new File("assets\\maps\\map1"), tiles);
         }
             break;
         case 2: {
-            BufferedImage image = GameWindow.loadImage(new File("assets\\tilesets\\FireTileset.png"));
+            BufferedImage image = GameWindow.loadImage(new File("assets\\tilesets\\tileset2.png"));
             SpriteSheet sheet = new SpriteSheet(image, 16, 16);
-            Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
-            map = new Tilemap(new File("assets\\maps\\FireMap.bm"), tiles);
+            Tileset tiles = new Tileset(sheet);
+            map = new Tilemap(new File("assets\\maps\\map2"), tiles);
         }
             break;
         case 3: {
-            BufferedImage image = GameWindow.loadImage(new File("assets\\tilesets\\SnowTileset.png"));
+            BufferedImage image = GameWindow.loadImage(new File("assets\\tilesets\\tileset3.png"));
             SpriteSheet sheet = new SpriteSheet(image, 16, 16);
-            Tileset tiles = new Tileset(new File("assets\\maps\\DefaultTileset.bt"), sheet);
-            map = new Tilemap(new File("assets\\maps\\SnowMap.bm"), tiles);
+            Tileset tiles = new Tileset(sheet);
+            map = new Tilemap(new File("assets\\maps\\map3"), tiles);
         }
             break;
         default:
@@ -88,10 +97,10 @@ public class MapSelect extends FrameContent {
         if (map != null) {
             if (map.isValid()) {
                 CharacterSelect cs = new CharacterSelect(getGameWindow(), map);
-                getGameWindow().setWindowContent(cs);
-                getGameWindow().getAudioPlayer().setAudio(new File("assets\\audio\\MapSelc3D.wav"));
+                getGameWindow().setFrameContent(cs);
             } else {
                 LOGGER.log(Level.WARNING, "Tilemap is not a valid map!");
+                JOptionPane.showMessageDialog(null, "Could not parse map.");
             }
         }
     }

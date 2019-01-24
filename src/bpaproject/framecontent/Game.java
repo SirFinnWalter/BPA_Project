@@ -23,6 +23,9 @@ import bpaproject.*;
  * @createdOn Thursday, 13 December, 2018
  */
 
+/**
+ * The {@code Game} is what the project leads up to.
+ */
 public class Game extends FrameContent {
     private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
     private static final long serialVersionUID = 3570399387338681022L;
@@ -41,6 +44,8 @@ public class Game extends FrameContent {
 
     public Game(GameWindow gw) {
         super(gw);
+        getGameWindow().getAudioPlayer().endLoop();
+
         this.canvas = new Canvas();
         this.add(canvas);
 
@@ -51,7 +56,6 @@ public class Game extends FrameContent {
             LOGGER.log(Level.WARNING, ex.toString(), ex);
         }
 
-        // System.out.println(renderer.getWidth() + ", " + renderer.getHeight());
         players = new HashSet<>();
         gameObjects = new HashSet<>();
         gameObjectsBuffer = new HashSet<>();
@@ -65,7 +69,6 @@ public class Game extends FrameContent {
         gameObjects.forEach(object -> {
             object.init(this);
         });
-
         LOGGER.log(Level.FINER, "Game canvas creating buffer strategy.");
         canvas.createBufferStrategy(3);
         canvas.requestFocus();
@@ -96,7 +99,7 @@ public class Game extends FrameContent {
             JOptionPane.showMessageDialog(null, "Nobody wins!\nThanks for playing!");
             LOGGER.log(Level.INFO, "Game ended with nobody winning.");
             MainMenu mm = new MainMenu(getGameWindow());
-            getGameWindow().setWindowContent(mm);
+            getGameWindow().setFrameContent(mm);
 
         } else if (players.size() == 1) {
             render();
@@ -104,7 +107,7 @@ public class Game extends FrameContent {
             JOptionPane.showMessageDialog(null, "Player " + playerNum + " has won!\nThanks for playing!");
             LOGGER.log(Level.INFO, "Game ended with " + "player #" + playerNum + " winning.");
             MainMenu mm = new MainMenu(getGameWindow());
-            getGameWindow().setWindowContent(mm);
+            getGameWindow().setFrameContent(mm);
 
         }
     }

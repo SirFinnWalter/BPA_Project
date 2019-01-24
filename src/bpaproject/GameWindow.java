@@ -19,8 +19,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import bpaproject.framecontent.FrameContent;
-import bpaproject.framecontent.MainMenu;;
+import bpaproject.framecontent.*;
 
 /**
  * @file GameWindow.java
@@ -29,17 +28,20 @@ import bpaproject.framecontent.MainMenu;;
  */
 
 public class GameWindow extends JFrame implements Runnable {
+    private static final File LOG_FILE = new File("latest.log");
+
     public static void main(String[] args) {
         System.loadLibrary("xinput_java");
+        FileHandler fileHandler = null;
         try {
-            FileHandler fileHandler = new FileHandler(new File("latest.log").getAbsolutePath());
+            fileHandler = new FileHandler(LOG_FILE.getAbsolutePath());
             SimpleFormatter formatter = new SimpleFormatter();
             fileHandler.setFormatter(formatter);
             LOGGER.setLevel(Level.FINE);
             LOGGER.addHandler(fileHandler);
 
-        } catch (Exception e) {
-            // TODO: handle exception
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, ex.toString(), ex);
         }
 
         GameWindow gw = new GameWindow();
@@ -47,13 +49,15 @@ public class GameWindow extends JFrame implements Runnable {
         gwThread.start();
     }
 
-    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
-
     private static final long serialVersionUID = -2334127122097540833L;
-    public static final int ZOOM = 2;
+
+    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
     private static final BufferedImage ERROR_IMAGE = new BufferedImage(64, 32, BufferedImage.TYPE_INT_ARGB);
+    // public static final int ZOOM = 2;
+    public static final int ZOOM = Integer.parseInt(Options.getValue(Options.Setting.SCALE).trim());
     private final int TICKSPERSECOND = 60;
     private final double NANOSECONDS = 1000000000.0 / TICKSPERSECOND;
+
     private boolean running;
     private boolean hasContent;
     private FrameContent wc;
@@ -76,10 +80,11 @@ public class GameWindow extends JFrame implements Runnable {
             public void windowClosing(WindowEvent e) {
                 LOGGER.log(Level.INFO, "Closing game.");
                 running = false;
+                Options.writeToFile();
+                dispose();
                 System.exit(0);
             }
         });
-
         Graphics g = ERROR_IMAGE.getGraphics();
         int squareWidth = 8;
         for (int y = 0; y < ERROR_IMAGE.getHeight(); y += squareWidth) {
@@ -89,13 +94,14 @@ public class GameWindow extends JFrame implements Runnable {
             }
         }
 
-        // TEST CODE BEGIN:
         player = new AudioPlayer();
         MainMenu mm = new MainMenu(this);
-        setWindowContent(mm);
+        setFrameContent(mm);
 
-        // TEST CODE END
+        Options.write(Options.Setting.SCALE, Integer.toString(ZOOM));
+        Options.write(Options.Setting.VOLUME, Float.toString(player.getVolume()));
 
+        this.setVisible(true);
         this.toFront();
     }
 
@@ -124,13 +130,14 @@ public class GameWindow extends JFrame implements Runnable {
                     frames = 0;
                 }
             }
-            SwingUtilities.updateComponentTreeUI(this);
+            if (wc instanceof CharacterSelect)
+                SwingUtilities.updateComponentTreeUI(this);
         }
         System.exit(0);
     }
 
-    public void setWindowContent(FrameContent wc) {
-        LOGGER.log(Level.FINE, "Changing window content to " + wc.getClass().getSimpleName());
+    public void setFrameContent(FrameContent wc) {
+        LOGGER.log(Level.FINE, "Changing frame content to " + wc.getClass().getSimpleName());
         this.hasContent = false;
 
         this.wc = wc;
@@ -178,7 +185,7 @@ public class GameWindow extends JFrame implements Runnable {
 
     public KeyboardListener getListener(int playerNum) {
         if (playerNum > listeners.length || playerNum < 0) {
-            LOGGER.log(Level.WARNING, "Attempted get get controls for player #" + playerNum);
+            LOGGER.log(Level.WARNING, "Attempted to get controls for player #" + playerNum);
             return null;
         }
         return listeners[playerNum];

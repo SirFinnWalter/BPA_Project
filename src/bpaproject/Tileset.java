@@ -2,6 +2,7 @@ package bpaproject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.logging.Logger;
 
 public class Tileset {
     private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
+    private static final File DEFAULT_TILESET = new File("assets\\maps\\tileset");
 
     private SpriteSheet sheet;
     private ArrayList<Tile> tilesList = new ArrayList<Tile>();
@@ -24,10 +26,16 @@ public class Tileset {
 
     public Tileset(File file, SpriteSheet sheet) {
         this.sheet = sheet;
-        BufferedReader reader;
-        try {
-            reader = new BufferedReader(new FileReader(file));
+        parseTileset(file);
+    }
 
+    public Tileset(SpriteSheet sheet) {
+        this.sheet = sheet;
+        parseTileset(DEFAULT_TILESET);
+    }
+
+    private void parseTileset(File file) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String s = reader.readLine();
             while (s != null) {
                 if (!s.trim().startsWith("//")) {
@@ -43,11 +51,15 @@ public class Tileset {
                 }
                 s = reader.readLine();
             }
-            reader.close();
+        } catch (FileNotFoundException ex) {
+            LOGGER.log(Level.WARNING, ex.toString(), ex);
+            if (file == DEFAULT_TILESET)
+                throw new RuntimeException("Could not load default tileset! " + ex.toString());
+            parseTileset(DEFAULT_TILESET);
+
         } catch (IOException ex) {
-            // TODO: handle this properly
             LOGGER.log(Level.SEVERE, ex.toString(), ex);
-            throw new RuntimeException(ex.getMessage());
+            throw new RuntimeException(ex.toString());
         }
     }
 

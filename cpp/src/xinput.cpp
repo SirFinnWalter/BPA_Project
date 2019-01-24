@@ -5,7 +5,7 @@
 #include <ShlObj.h>
 #include <cstdio>
 
-#include "bpa_project_XInputNative.h"
+#include "bpaproject_XInputNative.h"
 
 // taken from https://github.com/speps/XInputDotNet/blob/master/XInputInterface/GamePad.cpp
 
