@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 import bpaproject.GameWindow;
 
@@ -63,6 +64,12 @@ public class MainMenu extends FrameContent {
 
         gbc.gridy++;
         JButton credits = new JButton("Credits");
+        credits.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Creators: Cognitive Thought Media");
+            }
+        });
         credits.setPreferredSize(new Dimension(150 * GameWindow.ZOOM, 25 * GameWindow.ZOOM));
         this.add(credits, gbc);
 
