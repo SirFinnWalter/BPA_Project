@@ -21,36 +21,75 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  * @createdOn Monday, 21 January, 2019
  */
 
+/**
+ * The class {@code AudioPlayer} is for playing and looping audio. As many audio
+ * can be played at once, but only one may be looping continously. The volume is
+ * retrieved from the VOLUME setting in {@code Options} and can be changed at
+ * anytime.
+ */
 public class AudioPlayer implements Runnable {
     private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
 
-    private float volume;
+    private float volume = 1.0f;
     private volatile boolean looping;
     private AudioInputStream audio;
 
+    /**
+     * Sets the volume of the AudioPlayer to the value of Setting.VOLUME
+     */
     public AudioPlayer() {
-        setVolume(Float.parseFloat(Options.getValue(Options.Setting.VOLUME).trim()));
+        setVolume(Integer.parseInt(Options.getValue(Options.Setting.VOLUME).trim()));
     }
 
+    /**
+     * Sets the volume of the AudioPlayer to the value of Setting.VOLUME and sets
+     * the looping audio to the file.
+     * 
+     * @param file
+     */
     public AudioPlayer(File file) {
         super();
         setAudio(file);
     }
 
-    public float getVolume() {
-        return this.volume;
+    /**
+     * Returns the volume converted to a scale of 0 to 100. Conversion makes it
+     * easier to compare volume values and easier to write as a percentage.
+     * 
+     * @return the volume on a scale of 0 to 100
+     */
+    public int getVolume() {
+        return Math.round(this.volume * 100);
     }
 
-    public void setVolume(float volume) {
-        LOGGER.log(Level.FINER, "Changing volume from " + this.volume + " to " + volume);
-        if (volume < 0f || volume > 1f) {
-            LOGGER.log(Level.WARNING, "Volume of " + volume + " is not in the range of 0.0 to 1.0");
+    /**
+     * Sets a volume in the range of 0 to 100 to the volume.
+     * <p>
+     * If the volume is outside of the range nothing is changed. Otherwise, converts
+     * the volume to a scale of 0.0 to 1.0 so it can be used properly by the
+     * {@code AudioPlayer}
+     * 
+     * @param volume the volume to set
+     */
+    public void setVolume(int volume) {
+        LOGGER.log(Level.FINER, "Changing volume from " + getVolume() + " to " + volume);
+        if (volume < 0 || volume > 100) {
+            LOGGER.log(Level.WARNING, "Volume of " + volume + " is not in the range of 0 to 100");
             return;
         }
+        this.volume = volume / 100.0f;
 
-        this.volume = volume;
+        synchronized (this) {
+            this.notify();
+        }
     }
 
+    /**
+     * Gets the {@code clip} gain control and sets it value to the volume convert
+     * into decibels.
+     * 
+     * @param clip The clip
+     */
     private void modifyVolume(Clip clip) {
         LOGGER.log(Level.FINEST, "Modifying volume of clip.");
 
@@ -58,91 +97,111 @@ public class AudioPlayer implements Runnable {
         gainControl.setValue(20f * (float) Math.log10(volume));
     }
 
+    /**
+     * Creates and starts a {@code Clip} based on the audio if it exist. Plays the
+     * audio on loop then waits until notified or the clip duration passed.
+     * <p>
+     * If the audio changes, then closes the current audio and starts the clip with
+     * the new audio. If the volume changes, then modifiy the clip volume.
+     */
     @Override
-    public synchronized void run() {
+    public void run() {
         try {
-            AudioInputStream audio = this.audio;
+            AudioInputStream audio = null;
             float volume = this.volume;
             Clip clip = AudioSystem.getClip();
-            clip.open(audio);
-            clip.start();
-            clip.loop(Clip.LOOP_CONTINUOUSLY);
-            modifyVolume(clip);
-            while (looping) {
-                this.wait(clip.getMicrosecondLength() / 1000);
 
-                if (this.audio != audio) {
+            while (looping) {
+                if (this.audio != audio && this.audio != null) {
                     audio = this.audio;
                     clip.close();
                     clip.open(audio);
                     clip.start();
                     clip.loop(Clip.LOOP_CONTINUOUSLY);
+                    modifyVolume(clip);
                 }
                 if (this.volume != volume) {
                     volume = this.volume;
                     modifyVolume(clip);
+                }
+
+                synchronized (this) {
+                    this.wait(clip.getMicrosecondLength() / 1000);
                 }
             }
 
             clip.stop();
             clip.close();
             audio.close();
-        } catch (FileNotFoundException ex) {
-            LOGGER.log(Level.WARNING, ex.toString(), ex);
-            ex.printStackTrace();
         } catch (LineUnavailableException | InterruptedException | IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.toString(), ex);
-            throw new RuntimeException(ex.getMessage());
+            LOGGER.log(Level.WARNING, ex.toString(), ex);
+        } catch (Exception ex) {
+            GameWindow.crash(ex);
         }
     }
 
-    public void playAudio(File file) {
-        LOGGER.log(Level.FINEST, "Playing " + file.getName());
-        try {
-            if (!file.exists())
-                throw new FileNotFoundException("Could not find file: " + file.getAbsolutePath());
-
-            AudioInputStream audio = AudioSystem.getAudioInputStream(file);
-            Clip clip = AudioSystem.getClip();
-            clip.open(audio);
-            clip.start();
-            modifyVolume(clip);
-            clip.addLineListener(new LineListener() {
-
-                @Override
-                public void update(LineEvent e) {
-                    if (e.getType() == LineEvent.Type.STOP) {
-                        clip.close();
+    /**
+     * Creates and starts a {@code Clip} based on the audio if it exist.
+     */
+    public void playAudio() {
+        if (getVolume() != 0 && audio != null) {
+            LOGGER.log(Level.FINER, "Playing audio.");
+            try {
+                Clip clip = AudioSystem.getClip();
+                clip.open(audio);
+                clip.start();
+                modifyVolume(clip);
+                clip.addLineListener(new LineListener() {
+                    @Override
+                    public void update(LineEvent e) {
+                        if (e.getType() == LineEvent.Type.STOP) {
+                            clip.close();
+                        }
                     }
-                }
-            });
-            audio.close();
-        } catch (UnsupportedAudioFileException | FileNotFoundException ex) {
-            LOGGER.log(Level.WARNING, ex.toString(), ex);
-        } catch (LineUnavailableException | IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.toString(), ex);
+                });
+            } catch (IOException | LineUnavailableException ex) {
+                LOGGER.log(Level.WARNING, ex.toString(), ex);
+            }
+
         }
     }
 
-    public void setLooping(boolean looping) {
-        this.looping = looping;
-    }
+    /**
+     * Creates and starts a {@code Clip} based on the file.
+     * 
+     * @param file The audio file to play.
+     */
+    public void playAudio(File file) {
+        if (getVolume() != 0) {
+            LOGGER.log(Level.FINEST, "Playing " + file.getName());
+            try {
+                if (!file.exists())
+                    throw new FileNotFoundException("Could not find file: " + file.getAbsolutePath());
 
-    public void setAudio(File file) {
-        LOGGER.log(Level.FINE, "Setting audio to " + file.getName());
-        try {
-            if (!file.exists())
-                throw new FileNotFoundException("Could not find file: " + file.getAbsolutePath());
-
-            AudioInputStream audio = AudioSystem.getAudioInputStream(file);
-            this.audio = audio;
-        } catch (UnsupportedAudioFileException | FileNotFoundException ex) {
-            LOGGER.log(Level.WARNING, ex.toString(), ex);
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.toString(), ex);
+                AudioInputStream audio = AudioSystem.getAudioInputStream(file);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audio);
+                clip.start();
+                modifyVolume(clip);
+                clip.addLineListener(new LineListener() {
+                    @Override
+                    public void update(LineEvent e) {
+                        if (e.getType() == LineEvent.Type.STOP) {
+                            clip.close();
+                        }
+                    }
+                });
+                audio.close();
+            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+                LOGGER.log(Level.WARNING, ex.toString(), ex);
+            }
         }
     }
 
+    /**
+     * If the audio is not looping, then starts a new Thread to continuously loop
+     * the audio.
+     */
     public void loopAudio() {
         if (!looping) {
             looping = true;
@@ -151,9 +210,33 @@ public class AudioPlayer implements Runnable {
         }
     }
 
-    public synchronized void endLoop() {
+    /**
+     * Sets the looping to false and notifies the AudioPlayer to close the audio.
+     */
+    public void endLoop() {
         LOGGER.log(Level.FINE, "Ending audio.");
         looping = false;
-        this.notify();
+        synchronized (this) {
+            this.notify();
+        }
+    }
+
+    /**
+     * Creates an {@code AudioInputStream} based on the file and sets it to the
+     * audio. The audio can either be looped or played.
+     * 
+     * @param file The audio file to set
+     */
+    public void setAudio(File file) {
+        LOGGER.log(Level.FINE, "Setting audio to " + file.getName());
+        try {
+            if (!file.exists())
+                throw new FileNotFoundException("Could not find file: " + file.getAbsolutePath());
+
+            AudioInputStream audio = AudioSystem.getAudioInputStream(file);
+            this.audio = audio;
+        } catch (UnsupportedAudioFileException | IOException ex) {
+            LOGGER.log(Level.WARNING, ex.toString(), ex);
+        }
     }
 }

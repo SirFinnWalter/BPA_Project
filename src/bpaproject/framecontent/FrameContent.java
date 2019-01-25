@@ -1,8 +1,6 @@
 package bpaproject.framecontent;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 
@@ -21,18 +19,12 @@ import bpaproject.GameWindow;
  * render() function for controlling the content displayed in the window.
  */
 public abstract class FrameContent extends JPanel {
-    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
     private static final long serialVersionUID = 8395917451549932189L;
 
     private GameWindow gw;
 
     public FrameContent(GameWindow gw) {
-        if (gw != null)
-            this.gw = gw;
-        else {
-            LOGGER.log(Level.SEVERE, "GameWindow cannot be null!");
-            throw new NullPointerException("GameWindow cannot be null!");
-        }
+        this.gw = gw;
     }
 
     public void init() {

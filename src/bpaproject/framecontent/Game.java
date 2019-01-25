@@ -121,19 +121,18 @@ public class Game extends FrameContent {
 
             Graphics gfx = bStrategy.getDrawGraphics();
 
-            map.render(renderer, GameWindow.ZOOM, GameWindow.ZOOM);
+            map.render(renderer, GameWindow.ZOOM);
             gameObjects.forEach(object -> {
-                object.render(renderer, GameWindow.ZOOM, GameWindow.ZOOM);
+                object.render(renderer, GameWindow.ZOOM);
             });
             renderer.render(gfx);
             gfx.dispose();
             bStrategy.show();
+
             renderer.clear(0xFF000000);
         } catch (IllegalStateException ex) {
             LOGGER.log(Level.SEVERE, ex.toString(), ex);
-            throw ex;
-        } catch (NullPointerException ex) {
-            LOGGER.log(Level.WARNING, ex.toString(), ex);
+            GameWindow.crash("Game preformed an illegal operation.");
         }
     }
 

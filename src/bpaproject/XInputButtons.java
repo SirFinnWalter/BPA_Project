@@ -6,6 +6,10 @@ package bpaproject;
  * @createdOn Wednesday, 05 December, 2018
  */
 
+/**
+ * The clas {@code XInputButtons} holds public booleans of all the buttons on a
+ * Xbox controller.
+ */
 public class XInputButtons {
     public boolean up;
     public boolean down;

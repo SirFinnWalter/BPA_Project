@@ -41,7 +41,7 @@ public class Bomb implements GameObject {
         this.length = length;
         animatedSprite = BOMB_ANIMATED_SPRITE.clone();
 
-        animatedSprite.setAnimationType(AnimatedSprite.AnimationType.destroy);
+        animatedSprite.setAnimationType(AnimatedSprite.AnimationType.DESTROY);
         collider = new Collider(this, x, y, 16 * GameWindow.ZOOM, 16 * GameWindow.ZOOM);
         collider.setBorder(1, 0xFFFF0000);
     }
@@ -50,9 +50,8 @@ public class Bomb implements GameObject {
      * {@inheritDoc}
      */
     @Override
-    public void render(RenderHandler renderer, int xZoom, int yZoom) {
-        // animatedSprite.render(renderer, xZoom, yZoom);
-        renderer.renderSprite(animatedSprite, collider.x, collider.y, xZoom, yZoom);
+    public void render(RenderHandler renderer, int zoom) {
+        renderer.renderSprite(animatedSprite, collider.x, collider.y, zoom);
         // renderer.renderRectangle(collider, 1, 1);
     }
 
@@ -77,7 +76,7 @@ public class Bomb implements GameObject {
      */
     @Override
     public void update(Game game) {
-        animatedSprite.update(game);
+        animatedSprite.update();
 
         if (animatedSprite.isDestroyed()) {
             Explosion.createExplosion(game, length, this.x, this.y);

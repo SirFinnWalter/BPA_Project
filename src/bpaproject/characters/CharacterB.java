@@ -6,6 +6,7 @@ import java.io.File;
 import bpaproject.*;
 import bpaproject.AnimatedSprite.AnimationType;
 import bpaproject.framecontent.Game;
+import bpaproject.powerups.BombUp;
 
 /**
  * @file CharacterB.java
@@ -15,19 +16,21 @@ import bpaproject.framecontent.Game;
 
 public class CharacterB extends Player {
     private static final AnimatedSprite CHARACTER_B_ANIMATED_SPRITE = new AnimatedSprite(
-            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\bombiboi.png")), 16, 16), 8);
-    private int initialX, initialY;
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\bombiboi.png")), 16, 16), 7);
+    private static final AnimatedSprite CHARACTER_B_ANIMATED_SPRITE_2 = new AnimatedSprite(
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\bombiboi_cooldown.png")), 16, 16), 7);
 
     public CharacterB(int x, int y, KeyboardListener listener) {
         super(x, y, CHARACTER_B_ANIMATED_SPRITE.clone(), listener);
-        this.initialX = x;
-        this.initialY = y;
-        animatedSprite.setAnimationType(AnimationType.destroy);
+        animatedSprite.setAnimationType(AnimationType.DESTROY);
+        cooldown = 200;
     }
 
+    /**
+     * {@code CharacterB} cannot place bombs
+     */
     @Override
     public void placeBomb(Game game) {
-
     }
 
     @Override
@@ -36,6 +39,7 @@ public class CharacterB extends Player {
 
     private boolean invicible;
     private int timer;
+    private int cooldown;
 
     @Override
     public void update(Game game) {
@@ -51,21 +55,32 @@ public class CharacterB extends Player {
 
             Explosion.createExplosion(game, bombLength, x, y);
 
-            this.collider.x = initialX * GameWindow.ZOOM;
-            this.collider.y = initialY * GameWindow.ZOOM;
+            animatedSprite = CHARACTER_B_ANIMATED_SPRITE_2.clone();
+            animatedSprite.setAnimationType(AnimationType.LOOPING);
             animatedSprite.reset();
-            this.setDestroyed(false);
+            super.updateDirection();
         }
         super.update(game);
+
         if (getListener().action() || getListener().bomb())
             moving = true;
+
         if (invicible) {
-            timer++;
             if (timer > 40) {
                 invicible = false;
+            }
+        }
+        if (animatedSprite.getAnimationType() == AnimationType.LOOPING) {
+            timer++;
+            if (timer > cooldown) {
+                animatedSprite = CHARACTER_B_ANIMATED_SPRITE.clone();
+                animatedSprite.setAnimationType(AnimationType.DESTROY);
+                animatedSprite.reset();
+                super.updateDirection();
                 timer = 0;
             }
         }
+
     }
 
     @Override
@@ -73,6 +88,10 @@ public class CharacterB extends Player {
         super.onCollisionEnter(e);
         if (invicible)
             setDestroyed(false);
+
+        if (e.getSource().getObject() instanceof BombUp) {
+            cooldown -= 20;
+        }
     }
 
     @Override

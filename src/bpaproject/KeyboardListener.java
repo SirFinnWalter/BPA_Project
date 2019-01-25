@@ -35,10 +35,16 @@ public class KeyboardListener implements KeyListener, FocusListener {
         Arrays.fill(keyStates, false);
     }
 
+    /**
+     * Must be implemented
+     */
     @Override
     public void focusGained(FocusEvent e) {
     }
 
+    /**
+     * Must be implemented
+     */
     @Override
     public void keyTyped(KeyEvent e) {
     }
@@ -110,21 +116,15 @@ public class KeyboardListener implements KeyListener, FocusListener {
     }
 
     /**
-     * Returns the key state of bomb. Has a cooldown of two frames before it may be
-     * actived again.
-     * 
-     * @return The key state of bomb.
+     * @return The key state of bomb
      */
     public boolean bomb() {
         return (keyStates[4]);
-        // counter++;
-        // if (keyStates[4] && counter >= cooldown) {
-        // counter = 0;
-        // return true;
-        // }
-        // return false;
     }
 
+    /**
+     * @return The key state of action
+     */
     public boolean action() {
         return (keyStates[5]);
     }

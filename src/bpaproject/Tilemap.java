@@ -3,7 +3,6 @@ package bpaproject;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +21,9 @@ import bpaproject.powerups.*;
  * @createdOn Sunday, 14 October, 2018
  */
 
+/**
+ * 
+ */
 public class Tilemap {
     private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
     private static final Random RANDOM = new Random(System.currentTimeMillis());
@@ -50,10 +52,17 @@ public class Tilemap {
         }
     };
 
+    /**
+     * Parses the {@code file} into a map with tile information from
+     * {@code tileset}. The Tilemap file must first have a width and height,
+     * followed by player positions and tiles positions. If no fill tile ID is
+     * provided, the default is -1
+     * 
+     * @param file    The tilemap file
+     * @param tileset The tileset
+     */
     public Tilemap(File file, Tileset tileset) {
         this.tileset = tileset;
-        this.width = 0;
-        this.height = 0;
 
         LOGGER.log(Level.FINE, "Parsing tilemap file: " + file.getAbsolutePath());
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -64,30 +73,30 @@ public class Tilemap {
                     switch (data[0]) {
                     case "Width": {
                         LOGGER.log(Level.FINER, "Parsing width.");
-                        this.width = Integer.parseInt(data[1].trim());
+                        width = Integer.parseInt(data[1].trim());
 
-                        if (this.width <= 0) {
+                        if (width <= 0) {
                             throw new RuntimeException("Tilemap width cannot be less than or equal to 0!");
                         }
                         break;
                     }
                     case "Height": {
                         LOGGER.log(Level.FINER, "Parsing height.");
-                        this.height = Integer.parseInt(data[1].trim());
+                        height = Integer.parseInt(data[1].trim());
 
-                        if (this.height <= 0) {
+                        if (height <= 0) {
                             throw new RuntimeException("Tilemap height cannot be less than or equal to 0!");
                         }
                         break;
                     }
                     case "Fill": {
                         LOGGER.log(Level.FINER, "Parsing fill.");
-                        this.fillTileID = Integer.parseInt(data[1].trim());
+                        fillTileID = Integer.parseInt(data[1].trim());
 
-                        if (this.fillTileID < -1 || this.fillTileID > tileset.getSize()) {
-                            LOGGER.log(Level.WARNING, "Fill TileID of " + this.fillTileID + " is not in the range of "
+                        if (fillTileID < -1 || fillTileID > tileset.getSize()) {
+                            LOGGER.log(Level.WARNING, "Fill TileID of " + fillTileID + " is not in the range of "
                                     + tileset.getSize() + "!");
-                            this.fillTileID = -1;
+                            fillTileID = -1;
                         }
                         break;
                     }
@@ -143,7 +152,7 @@ public class Tilemap {
                                         String[] coords = c.replaceAll("[^,\\d]", "").split(",");
                                         int x = Integer.parseInt(coords[0].trim());
                                         int y = Integer.parseInt(coords[1].trim());
-                                        addTile(tileID, x, y, x, y, 1, 1, false);
+                                        addTiles(tileID, x, y, x, y, 1, 1, false);
                                     } else if (!c.contains("%")) {
                                         boolean diagonal = c.contains("-d");
                                         c.replaceAll("-d", "-");
@@ -152,7 +161,7 @@ public class Tilemap {
                                         int y1 = Integer.parseInt(coords[1].trim());
                                         int x2 = Integer.parseInt(coords[2].trim());
                                         int y2 = Integer.parseInt(coords[3].trim());
-                                        addTile(tileID, x1, y1, x2, y2, 1, 1, diagonal);
+                                        addTiles(tileID, x1, y1, x2, y2, 1, 1, diagonal);
                                     } else {
                                         boolean diagonal = c.contains("-d");
                                         c.replaceAll("-d", "-");
@@ -163,7 +172,7 @@ public class Tilemap {
                                         int y2 = Integer.parseInt(coords[3].trim());
                                         int xMod = Integer.parseInt(coords[4].trim());
                                         int yMod = coords.length >= 6 ? Integer.parseInt(coords[5].trim()) : xMod;
-                                        addTile(tileID, x1, y1, x2, y2, xMod, yMod, diagonal);
+                                        addTiles(tileID, x1, y1, x2, y2, xMod, yMod, diagonal);
                                     }
                                 }
                             }
@@ -189,18 +198,31 @@ public class Tilemap {
 
             valid = true;
 
-        } catch (FileNotFoundException ex) {
+        } catch (RuntimeException | IOException ex) {
             LOGGER.log(Level.WARNING, ex.toString(), ex);
             valid = false;
-        } catch (RuntimeException | IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.toString(), ex);
-            valid = false;
-            throw new RuntimeException(ex.getMessage());
         }
-
     }
 
-    public void addTile(int tileID, int x1, int y1, int x2, int y2, int xMod, int yMod, boolean diagonal) {
+    /**
+     * Add a range of tile {@code tileID} starting from {@code x1, y1} to
+     * {@code x2, y2} skipping every {@code xPad} horizontally and {@code yPad}
+     * vertically. If {@code diagonal} is {@code true}, the add the range of tile
+     * {@code tile} diagonally.
+     * <p>
+     * Automatically swaps {@code x1} and {@code x2} if {@code x1 > x2}, same with
+     * the {@code y1} and {@code y2}.
+     * 
+     * @param tileID   The tileID
+     * @param x1       The starting x position
+     * @param y1       The starting y position
+     * @param x2       The ending x position
+     * @param y2       The ending y position
+     * @param xPad     The number of tiles to skip horizontally
+     * @param yPad     The number of tiles to skip vertically
+     * @param diagonal If the range is diagonal
+     */
+    public void addTiles(int tileID, int x1, int y1, int x2, int y2, int xPad, int yPad, boolean diagonal) {
         if (!diagonal) {
             if (x1 > x2) {
                 int temp = x1;
@@ -212,8 +234,8 @@ public class Tilemap {
                 y1 = y2;
                 y2 = temp;
             }
-            for (int y = y1; y <= y2; y += yMod) {
-                for (int x = x1; x <= x2; x += xMod) {
+            for (int y = y1; y <= y2; y += yPad) {
+                for (int x = x1; x <= x2; x += xPad) {
                     if (x + 1 > width || y + 1 > height) {
                         LOGGER.log(Level.WARNING, "Tile at {" + x + ", " + y + "} is outside the map size of [" + width
                                 + ", " + height + "]");
@@ -235,28 +257,28 @@ public class Tilemap {
             }
             if (y1 > y2) {
                 int y = y1;
-                for (int x = x1; x <= x2; x += xMod) {
+                for (int x = x1; x <= x2; x += xPad) {
                     if (x + 1 > width || y + 1 > height) {
                         LOGGER.log(Level.WARNING, "Tile at {" + x + ", " + y + "} is outside the map size of [" + width
                                 + ", " + height + "]");
                     } else {
                         MappedTile mappedTile = new MappedTile(tileID, x, y);
                         mappedTiles.put(mappedTile.getID(), mappedTile);
-                        y -= yMod;
+                        y -= yPad;
                         if (y < y2)
                             break;
                     }
                 }
             } else {
                 int y = y1;
-                for (int x = x1; x <= x2; x += xMod) {
+                for (int x = x1; x <= x2; x += xPad) {
                     if (x + 1 > width || y + 1 > height) {
                         LOGGER.log(Level.WARNING, "Tile at {" + x + ", " + y + "} is outside the map size of [" + width
                                 + ", " + height + "]");
                     } else {
                         MappedTile mappedTile = new MappedTile(tileID, x, y);
                         mappedTiles.put(mappedTile.getID(), mappedTile);
-                        y += yMod;
+                        y += yPad;
                         if (y > y2)
                             break;
                     }
@@ -267,20 +289,19 @@ public class Tilemap {
 
     /**
      * Renders the background tiles based off of the {@code fillTileID} then renders
-     * the tiles the map contains.
+     * the tiles the map contains over top.
      * 
      * @param renderer The renderer to handle rendering
-     * @param xZoom    The zoom stretch the hortizontal plane
-     * @param yZoom    The zoom stretch the verical plane
+     * @param zoom     The scale factor
      */
-    public void render(RenderHandler renderer, int xZoom, int yZoom) {
+    public void render(RenderHandler renderer, int zoom) {
         if (fillTileID > -1) {
             Tileset.Tile fillTile = tileset.getTile(fillTileID);
-            for (int y = 0; y < this.height * fillTile.sprite.getHeight() * yZoom; y += fillTile.sprite.getHeight()
-                    * yZoom) {
-                for (int x = 0; x < this.width * fillTile.sprite.getWidth() * xZoom; x += fillTile.sprite.getWidth()
-                        * xZoom) {
-                    tileset.renderTiles(renderer, fillTileID, x, y, xZoom, yZoom);
+            for (int y = 0; y < this.height * fillTile.sprite.getHeight() * zoom; y += fillTile.sprite.getHeight()
+                    * zoom) {
+                for (int x = 0; x < this.width * fillTile.sprite.getWidth() * zoom; x += fillTile.sprite.getWidth()
+                        * zoom) {
+                    tileset.renderTiles(renderer, fillTileID, x, y, zoom);
                 }
             }
         }
@@ -288,7 +309,7 @@ public class Tilemap {
             int width = v.getTile().sprite.getWidth();
             int height = v.getTile().sprite.getHeight();
             tileset.renderTiles(renderer, v.tileID, v.x * width * GameWindow.ZOOM, v.y * height * GameWindow.ZOOM,
-                    xZoom, yZoom);
+                    zoom);
         });
     }
 
@@ -307,7 +328,6 @@ public class Tilemap {
             }
         }
         for (MappedTile tile : tiles) {
-            // tile.collider.checkCollision(col);
             col.checkCollision(tile.getCollider());
         }
     }
@@ -336,6 +356,7 @@ public class Tilemap {
     public Point mapPointToTilemap(Point p) {
         int x = ((p.x * (width - 1)) / ((width - 1) * 16 * GameWindow.ZOOM));
         int y = ((p.y * (height - 1)) / ((height - 1) * 16 * GameWindow.ZOOM));
+
         if (x > width)
             x = -1;
         if (y > height)
@@ -437,88 +458,105 @@ public class Tilemap {
      */
     public class MappedTile {
         public int mappedTileID, tileID, x, y;
-        private boolean collidable;
         public Collider collider;
         private Powerup powerup;
-        // private Rectangle collisionBox;
 
+        /**
+         * Constructs a new {@code MappedTile} with the tile {@code tileID} at
+         * {@code x, y}
+         */
         public MappedTile(int tileID, int x, int y) {
             mappedTileID = x + (y * width);
             this.tileID = tileID;
             this.x = x;
             this.y = y;
-            this.collidable = this.getTile().getCollision();
-            if (collidable) {
+            if (isCollidable()) {
                 Point p = mapPointToScreen(x, y);
                 collider = new Collider(this, p.x, p.y, this.getWidth() * GameWindow.ZOOM,
                         this.getHeight() * GameWindow.ZOOM);
             }
         }
 
+        /**
+         * Moves the mapped tile to (-1, -1) and sets the powerup to visible if
+         * applicable.
+         */
         public void destroy() {
             if (powerup != null)
                 powerup.setVisible(true);
+            this.x = -1;
+            this.y = -1;
         }
 
+        /**
+         * Add the {@code powerup} inside of the mapped tile
+         * 
+         * @param powerup The powerup
+         */
         public void addPowerup(Powerup powerup) {
             if (this.powerup == null)
                 this.powerup = powerup;
         }
 
-        public Tileset.Tile getTile() {
-            return tileset.getTile(tileID);
+        /**
+         * @return {@code true} if the powerup is not {@code null}
+         */
+        public boolean hasPowerup() {
+            return (this.powerup != null);
         }
 
-        public int getID() {
-            return this.mappedTileID;
-        }
-
-        public boolean isCollidable() {
-            return this.collidable;
-        }
-
-        public boolean isBreakable() {
-            return this.getTile().isBreakable();
-        }
-
+        /**
+         * @return The powerup inside the mapped tile
+         */
         public Powerup getPowerup() {
             if (this.powerup == null)
                 LOGGER.log(Level.WARNING, "Returning a null power!");
             return this.powerup;
         }
 
-        public boolean hasPowerup() {
-            return (this.powerup != null);
+        /**
+         * @return The tile {@code tileID} from the map's tileset
+         */
+        public Tileset.Tile getTile() {
+            return tileset.getTile(tileID);
         }
 
+        /**
+         * @return The key of the mapped tile
+         */
+        public int getID() {
+            return this.mappedTileID;
+        }
+
+        public boolean isCollidable() {
+            return this.getTile().isCollidable();
+        }
+
+        public boolean isBreakable() {
+            return this.getTile().isBreakable();
+        }
+
+        /**
+         * @return The width of the sprite or 0 if the sprite is {@code null}
+         */
         public int getWidth() {
             if (this.getTile().sprite != null)
                 return this.getTile().sprite.getWidth();
             return 0;
         }
 
+        /**
+         * @return The height of the sprite or 0 if the sprite is {@code null}
+         */
         public int getHeight() {
             if (this.getTile().sprite != null)
                 return this.getTile().sprite.getHeight();
             return 0;
         }
 
-        public MappedTile getTileAbove() {
-            return Tilemap.this.getTile(x, y - 1);
-        }
-
-        public MappedTile getTileBelow() {
-            return Tilemap.this.getTile(x, y + 1);
-        }
-
-        public MappedTile getTileLeft() {
-            return Tilemap.this.getTile(x - 1, y);
-        }
-
-        public MappedTile getTileRight() {
-            return Tilemap.this.getTile(x + 1, y);
-        }
-
+        /**
+         * @return The collider
+         */
         public Collider getCollider() {
             return this.collider;
         }

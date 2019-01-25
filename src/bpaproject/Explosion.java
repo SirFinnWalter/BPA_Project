@@ -30,7 +30,7 @@ public class Explosion implements GameObject {
         collider = new Collider(this, x, y, 16 * GameWindow.ZOOM, 16 * GameWindow.ZOOM);
         collider.setBorder(1, 0xFFFF0000);
         this.animatedSprite = sprite;
-        this.animatedSprite.setAnimationType(AnimatedSprite.AnimationType.destroy);
+        this.animatedSprite.setAnimationType(AnimatedSprite.AnimationType.DESTROY);
     }
 
     @Override
@@ -39,14 +39,14 @@ public class Explosion implements GameObject {
     }
 
     @Override
-    public void render(RenderHandler renderer, int xZoom, int yZoom) {
-        renderer.renderSprite(animatedSprite, collider.x, collider.y, xZoom, yZoom);
+    public void render(RenderHandler renderer, int zoom) {
+        renderer.renderSprite(animatedSprite, collider.x, collider.y, zoom);
         // renderer.renderRectangle(collider, 1, 1);
     }
 
     @Override
     public void update(Game game) {
-        animatedSprite.update(game);
+        animatedSprite.update();
         if (animatedSprite.isDestroyed()) {
             game.removeGameObject(this);
         }
@@ -62,9 +62,9 @@ public class Explosion implements GameObject {
 
     /**
      * Creates an explosion at the center {@code (x, y)} until it reaches the
-     * {@code length}
+     * {@code length}. Uses the {@code game} to
      * 
-     * @param game
+     * @param game   The game
      * @param length
      * @param x
      * @param y

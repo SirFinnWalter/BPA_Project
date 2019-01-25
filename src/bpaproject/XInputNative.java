@@ -17,9 +17,11 @@ public class XInputNative {
     private final static int[] dwPacketNumber = new int[4];
 
     /**
+     * Reads the state of {@code playerNum} controller into a buffer. If the state
+     * is 0 then processes the buffer data into a {@code XInputButtons} class then
+     * returns that class. Otherwise returns {@code null}
      * 
      * @param playerNum
-     * @param data
      */
     public static XInputButtons getInput(int playerNum) {
         final ByteBuffer buffer = ByteBuffer.allocateDirect(16);
@@ -82,7 +84,6 @@ public class XInputNative {
         buffer.get();
         buffer.get();
         final short sThumbLX = buffer.getShort();
-        // if (sThumbLX > 26044)
         if (sThumbLX > 7849)
             buttons.right = true;
         else if (sThumbLX < -7849)
@@ -100,8 +101,20 @@ public class XInputNative {
 
     }
 
+    /**
+     * Gets the data of the {@code playerNum} controller and writes it to
+     * {@code data}. If successful, returns 0
+     * 
+     * @param playerNum The controller number
+     * @param data      The data to write to
+     * @return 0 if successful
+     */
     public static native int getState(int playerNum, ByteBuffer data);
 
+    /**
+     * Bitmask of the device digital buttons, as follows. A set bit indicates that
+     * the corresponding button is pressed.
+     */
     final static class XINPUT_GAMEPAD {
         final static short DPAD_UP = 0x0001;
         final static short DPAD_DOWN = 0x0002;

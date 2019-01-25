@@ -131,6 +131,15 @@ public class Collider extends Rectangle {
         }
     }
 
+    /**
+     * Creates a collision event based on the {@code col}.
+     * <p>
+     * Returns if the object is not a {@code CollisionListener}. Sends an
+     * {@code onCollisionEnter(e)} to the object if the object just enter the
+     * collider. Otherwise, send an {@code onCollisionStay(e)} to the object.
+     * 
+     * @param col
+     */
     public void fireCollision(Collider col) {
         CollisionEvent e = new CollisionEvent(col);
         boolean prevState = gameObjects.get(col.getObject());

@@ -1,6 +1,7 @@
 package bpaproject;
 
 import bpaproject.framecontent.Game;
+
 /**
  * @file GameObject.java
  * @author Dakota Taylor
@@ -26,11 +27,10 @@ public interface GameObject {
      * this does not render anything to the screen, consider not using this
      * interface.
      * 
-     * @param renderer renderer to handle the render
-     * @param xZoom    The zoom/stretch across the hortizontal plane
-     * @param yZoom    The zoom/stretch across the vertical plane
+     * @param renderer renderer to handle the rendering
+     * @param zoom     The zoom to render the object with
      */
-    public void render(RenderHandler renderer, int xZoom, int yZoom);
+    public void render(RenderHandler renderer, int zoom);
 
     /**
      * Every game object must update its state. If the class implementing this does
@@ -41,8 +41,8 @@ public interface GameObject {
     public void update(Game game);
 
     /**
-     * Configs the class needs set (but cannot do in its constructor) before
-     * updating.
+     * Configs the class needs set (but cannot do in its constructor) before it
+     * starts updating.
      * 
      * @param game The game window and info
      */

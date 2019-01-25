@@ -20,17 +20,20 @@ public class CollisionEvent {
     }
 
     /**
-     * Returns the cross-section between the triggering collider and another
-     * collider.
+     * Returns a new {@code Rectangle} from the intersection between the source and
+     * the {@code col}.
      * 
-     * @param col The collider to compare.
-     * @return The cross-section between the triggering collider and another
-     *         collider.
+     * @param col The collider
+     * @return A {@code Rectangle} from the intersection or an empty
+     *         {@code Rectangle} if the rectangles do not intersect
      */
     public Rectangle intersection(Collider col) {
         return source.intersection(col);
     }
 
+    /**
+     * @return The collider that triggered the event.
+     */
     public Collider getSource() {
         return source;
     }

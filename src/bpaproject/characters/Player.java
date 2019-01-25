@@ -92,13 +92,13 @@ public abstract class Player implements GameObject, CollisionListener {
      * {@inheritDoc}
      */
     @Override
-    public void render(RenderHandler renderer, int xZoom, int yZoom) {
+    public void render(RenderHandler renderer, int zoom) {
         if (animatedSprite != null)
-            renderer.renderSprite(animatedSprite, playerBox.x, playerBox.y, xZoom, yZoom);
+            renderer.renderSprite(animatedSprite, playerBox.x, playerBox.y, zoom);
         else if (sprite != null)
-            renderer.renderSprite(sprite, playerBox.x, playerBox.y, xZoom, yZoom);
+            renderer.renderSprite(sprite, playerBox.x, playerBox.y, zoom);
         else
-            renderer.renderRectangle(playerBox, xZoom, yZoom);
+            renderer.renderRectangle(playerBox, zoom);
         // renderer.renderRectangle(collider, 1, 1);
     }
 
@@ -106,11 +106,12 @@ public abstract class Player implements GameObject, CollisionListener {
      * If the {@code Player} has an {@code AnimatedSprite}, then updates what frames
      * to loop through for the direction the {@code Player} is facing.
      */
-    private void updateDirection() {
+    protected void updateDirection() {
         if (animatedSprite != null) {
+            int fd = (currentFD == FacingDirection.LEFT || currentFD == FacingDirection.RIGHT) ? currentFD.getValue()
+                    : FacingDirection.LEFT.getValue();
             int framesLength = (animatedSprite.getLength() / 2);
-            animatedSprite.setAnimationRange(currentFD.getValue() * framesLength,
-                    currentFD.getValue() * framesLength + (framesLength - 1));
+            animatedSprite.setAnimationRange(fd * framesLength, fd * framesLength + (framesLength - 1));
         }
     }
 
@@ -163,7 +164,7 @@ public abstract class Player implements GameObject, CollisionListener {
             game.checkCollision(collider);
 
             if (animatedSprite != null)
-                animatedSprite.update(game);
+                animatedSprite.update();
 
             playerBox.x = collider.x - ((playerBox.width * GameWindow.ZOOM - collider.width) / 2);
             playerBox.y = collider.y - ((playerBox.height * GameWindow.ZOOM - collider.height));
@@ -173,8 +174,7 @@ public abstract class Player implements GameObject, CollisionListener {
         if (this.currentFD != newFD) {
             this.currentFD = newFD;
 
-            if (newFD == FacingDirection.LEFT || newFD == FacingDirection.RIGHT)
-                updateDirection();
+            updateDirection();
         }
         if (listener.bomb())
             placeBomb(game);

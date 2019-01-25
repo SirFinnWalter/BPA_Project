@@ -13,16 +13,23 @@ package bpaproject;
 public interface CollisionListener {
 
     /**
-     * Notifies the class that a collsion has occurred. If the class does nothing
-     * upon recieving, consider not using this interface.
+     * Notifies the class that its collider just collided with another collider.
      * 
      * @param e The collision event
      */
-    // public void onCollision(CollisionEvent e);
-
     public void onCollisionEnter(CollisionEvent e);
 
+    /**
+     * Notifies the class that its collider is intersecting another collider.
+     * 
+     * @param e The collision event
+     */
     public void onCollisionStay(CollisionEvent e);
 
+    /**
+     * Notifies the class that its collider just left another collider.
+     * 
+     * @param e The collision event
+     */
     public void onCollisionLeave(CollisionEvent e);
 }

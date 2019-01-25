@@ -1,10 +1,6 @@
 package bpaproject;
 
 import java.awt.image.BufferedImage;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import bpaproject.framecontent.Game;
 
 /**
  * @file AnimatedSprite.java
@@ -12,39 +8,26 @@ import bpaproject.framecontent.Game;
  * @createdOn Saturday, 03 November, 2018
  */
 
+/**
+ * The class {@code AnimatedSprite} is a collection of sprites but only returns
+ * the active sprite. How often it changes depends on the {@code flipFrame}.
+ */
 public class AnimatedSprite extends Sprite {
-    private static final Logger LOGGER = Logger.getLogger(Class.class.getName());
 
     private Sprite[] sprites;
-    private int currentSprite = 0;
+    private int currentSprite = 0; // The current sprite index
     private int counter = 0;
     private int flipFrame;
-    private int start, end;
+    private int start, end; // The start and end index
     private int length;
-    private AnimationType animationType = AnimationType.looping;
-
-    @Override
-    public AnimatedSprite clone() {
-        return (AnimatedSprite) super.clone();
-    }
-
-    public AnimatedSprite(SpriteSheet sheet, Rectangle[] range, int flipFrame) {
-        sprites = new Sprite[range.length];
-        this.flipFrame = flipFrame;
-        this.start = 0;
-        this.end = range.length - 1;
-        this.length = range.length;
-        this.visible = true;
-        for (int i = 0; i < range.length; i++) {
-            sprites[i] = new Sprite(sheet, range[i].x, range[i].y, range[i].width, range[i].height);
-        }
-
-    }
+    private AnimationType animationType = AnimationType.LOOPING;
 
     /**
+     * Creates the sprite collection from the {@code images} and flips the sprites
+     * after it plays for {@code flipFrame} frames.
      * 
-     * @param images
-     * @param flipFrame the number of frames until sprites changes
+     * @param images    The image array
+     * @param flipFrame The number of frames until sprites changes
      */
     public AnimatedSprite(BufferedImage[] images, int flipFrame) {
         this.sprites = new Sprite[images.length];
@@ -59,15 +42,29 @@ public class AnimatedSprite extends Sprite {
         }
     }
 
+    /**
+     * Copies the {@code sheet} sprites into the sprite collection and flips the
+     * sprites after it plays for {@code flipFrame} frames.
+     * 
+     * @param sheet
+     * @param flipFrame
+     */
     public AnimatedSprite(SpriteSheet sheet, int flipFrame) {
         this.sprites = sheet.getSprites();
         this.flipFrame = flipFrame;
         this.start = 0;
-        this.end = this.sprites.length - 1;
+        this.end = sprites.length - 1;
         this.length = sprites.length;
         this.visible = true;
     }
 
+    /**
+     * Sets the range the AnimatedSprite should be playing from {@code start} to
+     * {@code end}. The current sprite frame position carries over to the new range.
+     * 
+     * @param start The start
+     * @param end   The end
+     */
     public void setAnimationRange(int start, int end) {
         int relativeSprite = this.currentSprite - this.start;
         this.start = start;
@@ -75,49 +72,95 @@ public class AnimatedSprite extends Sprite {
         this.currentSprite = this.start + relativeSprite;
     }
 
-    public void setAnimationType(AnimationType animationType) {
-        this.animationType = animationType;
-    }
-
-    public void render(RenderHandler renderer, int xZoom, int yZoom) {
-        LOGGER.log(Level.WARNING, "Called render() on an AnimatedSprite object.");
-    }
-
-    public void update(Game game) {
-        counter++;
-        if (counter >= flipFrame) {
+    /**
+     * Increments a counter. When the counter exceeds the flipFrame, then set the
+     * counter to 0 and runs {@link #incrementSprite()}
+     */
+    public void update() {
+        if (++counter >= flipFrame) {
             counter = 0;
             incrementSprite();
         }
     }
 
+    /**
+     * Sets the current sprite index to the start index
+     */
     public void reset() {
         counter = 0;
         currentSprite = start;
     }
 
+    /**
+     * Increments the current sprite index. Upon reaching the end, sets the current
+     * sprite index based on the AnimationType:
+     * <ul>
+     * <li>LOOPING will set the current sprite index to the start index</li>
+     * <li>PAUSE will set the current sprite index to the end index</li>
+     * <li>DESTROY will set the current sprite index to -1</li>
+     * </ul>
+     */
     public void incrementSprite() {
         if (currentSprite >= 0)
             currentSprite++;
         if (currentSprite > end) {
             switch (animationType) {
-            case pause: {
+            case PAUSE:
                 currentSprite = end;
-            }
                 break;
-            case destroy: {
+            case DESTROY:
                 currentSprite = -1;
-            }
                 break;
-            case looping:
-            default: {
+            case LOOPING:
+            default:
                 currentSprite = start;
-            }
                 break;
             }
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AnimatedSprite clone() {
+        return (AnimatedSprite) super.clone();
+    }
+
+    /**
+     * Sets the {@code animationType}.
+     * <ul>
+     * <li>LOOPING means the sprite will reset back to starting sprite upon reaching
+     * the last sprite</li>
+     * <li>PAUSE means the sprite will stay on the last sprite upon reaching it</li>
+     * <li>DESTROY means there will be no sprite after reaching the last sprite</li>
+     * </ul>
+     * 
+     * @param animationType The animationType
+     */
+
+    public void setAnimationType(AnimationType animationType) {
+        this.animationType = animationType;
+    }
+
+    /**
+     * @return the animationType
+     */
+    public AnimationType getAnimationType() {
+        return this.animationType;
+    }
+
+    /**
+     * @return if the sprite has ended and AnimatedType is DESTROY
+     */
+    public boolean isDestroyed() {
+        return (currentSprite == -1);
+    }
+
+    /**
+     * @return The width of the current sprite or 0 if the AnimatedSprite is
+     *         destroyed
+     */
     @Override
     public int getWidth() {
         if (currentSprite >= 0)
@@ -125,6 +168,10 @@ public class AnimatedSprite extends Sprite {
         return 0;
     }
 
+    /**
+     * @return The height of the current sprite or 0 if the AnimatedSprite is
+     *         destroyed
+     */
     @Override
     public int getHeight() {
         if (currentSprite >= 0)
@@ -132,37 +179,41 @@ public class AnimatedSprite extends Sprite {
         return 0;
     }
 
+    /**
+     * @return The current sprite's pixels or {@code null} if the AnimatedSprite is
+     *         destroyed
+     */
     @Override
     public int[] getPixels() {
-        if (!visible)
-            return null;
-
         if (currentSprite >= 0)
             return sprites[currentSprite].getPixels();
 
         return null;
     }
 
+    /**
+     * @return The index of the current sprite
+     */
     public int getCurrentSprite() {
         return this.currentSprite;
     }
 
+    /**
+     * @return The number of sprites
+     */
     public int getLength() {
         return this.length;
     }
 
-    public boolean isDestroyed() {
-        return (currentSprite == -1);
-    }
-
-    public void setDestroyed(boolean destroyed) {
-        if (destroyed)
-            currentSprite = -1;
-        else
-            currentSprite = 0;
-    }
-
+    /**
+     * <ul>
+     * <li>LOOPING means the sprite will reset back to starting sprite upon reaching
+     * the last sprite</li>
+     * <li>PAUSE means the sprite will stay on the last sprite upon reaching it</li>
+     * <li>DESTROY means there will be no sprite after reaching the last sprite</li>
+     * </ul>
+     */
     public enum AnimationType {
-        looping, pause, destroy;
+        LOOPING, PAUSE, DESTROY;
     }
 }

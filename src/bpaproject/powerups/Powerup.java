@@ -33,21 +33,21 @@ public abstract class Powerup implements GameObject {
     @Override
     public void update(Game game) {
         if (animatedSprite != null)
-            animatedSprite.update(game);
+            animatedSprite.update();
 
         if (destroyed)
             game.removeGameObject(this);
     }
 
     @Override
-    public void render(RenderHandler renderer, int xZoom, int yZoom) {
+    public void render(RenderHandler renderer, int zoom) {
         if (visible) {
             if (animatedSprite != null)
-                renderer.renderSprite(animatedSprite, collider.x, collider.y, xZoom, yZoom);
+                renderer.renderSprite(animatedSprite, collider.x, collider.y, zoom);
             else if (sprite != null)
-                renderer.renderSprite(sprite, collider.x, collider.y, xZoom, yZoom);
+                renderer.renderSprite(sprite, collider.x, collider.y, zoom);
             else
-                renderer.renderRectangle(collider, 1, 1);
+                renderer.renderRectangle(collider, 1);
         }
     }
 

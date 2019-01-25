@@ -23,13 +23,14 @@ import bpaproject.Options;
  */
 
 /**
- * A {@code OptionMenu} displays and allows changes to the settings. Settings
- * are remember throughout sessions via a config file.
+ * A {@code OptionMenu} displays and allows changes to a few settings. Settings
+ * changed are remember throughout the session, but none are save to the config
+ * file until Options.writeToFile() is called.
  */
 public class OptionsMenu extends FrameContent {
     private static final long serialVersionUID = 2282810072396078159L;
 
-    private static int volume = Math.round(Float.parseFloat(Options.getValue(Options.Setting.VOLUME)) * 100);
+    private static int volume = Math.round(Float.parseFloat(Options.getValue(Options.Setting.VOLUME)));
     private static int scale = Integer.parseInt(Options.getValue(Options.Setting.SCALE));
 
     public OptionsMenu(GameWindow gw) {
@@ -39,7 +40,7 @@ public class OptionsMenu extends FrameContent {
         main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
 
         // VOLUME GROUP
-        JLabel volumeTitle = new JLabel("Volume - " + volume, JLabel.CENTER);
+        JLabel volumeTitle = new JLabel("Volume - " + volume + "%", JLabel.CENTER);
         volumeTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         main.add(volumeTitle);
 
@@ -52,15 +53,12 @@ public class OptionsMenu extends FrameContent {
             public void stateChanged(ChangeEvent e) {
                 if (e.getSource() instanceof JSlider && !((JSlider) e.getSource()).getValueIsAdjusting()) {
                     JSlider slider = (JSlider) e.getSource();
-                    volumeTitle.setText("Volume - " + slider.getValue());
-                    if (slider.getValue() != Math.round(gw.getAudioPlayer().getVolume() * 100)) {
-                        synchronized (gw.getAudioPlayer()) {
-                            gw.getAudioPlayer().notify();
-                        }
-                        gw.getAudioPlayer().setVolume(slider.getValue() / 100.0f);
-                    }
-                    volume = Math.round(gw.getAudioPlayer().getVolume() * 100);
-                    Options.write(Options.Setting.VOLUME, Float.toString(slider.getValue() / 100.0f));
+                    volumeTitle.setText("Volume - " + slider.getValue() + "%");
+                    if (slider.getValue() != gw.getAudioPlayer().getVolume())
+                        gw.getAudioPlayer().setVolume(slider.getValue());
+
+                    volume = gw.getAudioPlayer().getVolume();
+                    Options.write(Options.Setting.VOLUME, Integer.toString(slider.getValue()));
                 }
             }
         });
@@ -88,7 +86,7 @@ public class OptionsMenu extends FrameContent {
                     JSlider slider = (JSlider) e.getSource();
 
                     scaleTitle.setText("Scale - " + slider.getValue());
-                    if (slider.getValue() != scale)
+                    if (slider.getValue() != GameWindow.ZOOM)
                         scaleWarning.setVisible(true);
                     else
                         scaleWarning.setVisible(false);
