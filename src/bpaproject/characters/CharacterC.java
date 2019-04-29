@@ -4,7 +4,6 @@ import java.io.File;
 
 import bpaproject.*;
 import bpaproject.powerups.Powerup;
-import bpaproject.framecontent.Game;
 
 /**
  * @file CharacterC.java
@@ -12,7 +11,7 @@ import bpaproject.framecontent.Game;
  * @createdOn Monday, 10 December, 2018
  */
 
-public class CharacterC extends Player {
+public class CharacterC extends CharacterBase {
     private static final AnimatedSprite CHARACTER_C_ANIMATED_SPRITE = new AnimatedSprite(
             new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\stego.png")), 16, 16), 12);
     private static final AnimatedSprite CHARACTER_C_ANIMATED_SPRITE_2 = new AnimatedSprite(
@@ -22,74 +21,77 @@ public class CharacterC extends Player {
     private boolean invincible;
     private boolean secondLife;
 
-    public CharacterC(int x, int y, KeyboardListener listener) {
-        super(x, y, CHARACTER_C_ANIMATED_SPRITE.clone(), listener);
+    public CharacterC() {
+        super(CHARACTER_C_ANIMATED_SPRITE.clone());
     }
 
     @Override
-    public void update(Game game) {
-        super.update(game);
-        if (invincible) {
-            timer++;
-            if (timer > 300) {
-                invincible = false;
+    public void updateBehaviors(Player player) {
+        player.behaviors.updateBehavior = (g, p) -> {
+            p.updateBehavior.preform(g, p);
+
+            if (invincible) {
+                timer++;
+                if (timer > 300) {
+                    invincible = false;
+                }
             }
-        }
-    }
+        };
 
-    @Override
-    public void onCollisionEnter(CollisionEvent e) {
-        switch (newFD) {
-        case UP:
-            collider.y += e.intersection(collider).height;
-            break;
-        case DOWN:
-            collider.y -= e.intersection(collider).height;
-            break;
-        case LEFT:
-            collider.x += e.intersection(collider).width;
-            break;
-        case RIGHT:
-            collider.x -= e.intersection(collider).width;
-            break;
-        default:
-            collider.x = playerBox.x;
-            collider.y = playerBox.y;
-            break;
-        }
-        Object source = e.getSource().getObject();
-        if (source instanceof Explosion) {
-            if (!secondLife) {
-                invincible = true;
-                secondLife = true;
-                animatedSprite.reset();
-                this.animatedSprite = CHARACTER_C_ANIMATED_SPRITE_2.clone();
-
-            } else {
-                if (!invincible)
-                    setDestroyed(true);
+        player.behaviors.enterBehavior = (e, p) -> {
+            Collider collider = p.getCollider();
+            Rectangle renderBox = p.getRenderBox();
+            switch (p.newFD) {
+            case UP:
+                collider.y += e.intersection(collider).height;
+                break;
+            case DOWN:
+                collider.y -= e.intersection(collider).height;
+                break;
+            case LEFT:
+                collider.x += e.intersection(collider).width;
+                break;
+            case RIGHT:
+                collider.x -= e.intersection(collider).width;
+                break;
+            default:
+                collider.x = renderBox.x;
+                collider.y = renderBox.y;
+                break;
             }
-        } else if (source instanceof Powerup) {
-            ((Powerup) source).applyPower(this);
-        } else if (source instanceof GameObject) {
-            this.collider.checkCollision(((GameObject) source).getCollider());
-        }
-    }
+            Object source = e.getSource().getObject();
+            if (source instanceof Explosion) {
+                if (!secondLife) {
+                    invincible = true;
+                    secondLife = true;
+                    animatedSprite.reset();
+                    this.animatedSprite = CHARACTER_C_ANIMATED_SPRITE_2.clone();
 
-    @Override
-    public void onCollisionStay(CollisionEvent e) {
-        Object source = e.getSource().getObject();
-        if (source instanceof Explosion) {
-            if (!secondLife) {
-                invincible = true;
-                secondLife = true;
-                animatedSprite.reset();
-                this.animatedSprite = (AnimatedSprite) CHARACTER_C_ANIMATED_SPRITE_2.clone();
-
-            } else {
-                if (!invincible)
-                    setDestroyed(true);
+                } else {
+                    if (!invincible)
+                        p.setAlive(false);
+                }
+            } else if (source instanceof Powerup) {
+                ((Powerup) source).applyPower(p);
+            } else if (source instanceof GameObject) {
+                collider.checkCollision(((GameObject) source).getCollider());
             }
-        }
+        };
+
+        player.behaviors.stayBehavior = (e, p) -> {
+            Object source = e.getSource().getObject();
+            if (source instanceof Explosion) {
+                if (!secondLife) {
+                    invincible = true;
+                    secondLife = true;
+                    animatedSprite.reset();
+                    this.animatedSprite = (AnimatedSprite) CHARACTER_C_ANIMATED_SPRITE_2.clone();
+
+                } else {
+                    if (!invincible)
+                        p.setAlive(false);
+                }
+            }
+        };
     }
 }

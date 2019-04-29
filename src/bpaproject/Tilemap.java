@@ -12,7 +12,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import bpaproject.characters.Player;
+import bpaproject.characters.CharacterBase;
 import bpaproject.powerups.*;
 
 /**
@@ -438,10 +438,11 @@ public class Tilemap {
     }
 
     public Point getPlayerPosition(int playerNum) {
-        if (playerNum > Player.MAX_PLAYERS || playerNum < 0) {
-            LOGGER.log(Level.WARNING, "Player #" + playerNum + " is not a valid player number!");
-            return null;
-        }
+        // if (playerNum > CharacterBase.MAX_PLAYERS || playerNum < 0) {
+        // LOGGER.log(Level.WARNING, "Player #" + playerNum + " is not a valid player
+        // number!");
+        // return null;
+        // }
         Point position = playerPositions.get(playerNum);
         if (position == null) {
             LOGGER.log(Level.WARNING, "No position for player #" + playerNum + " in tilemap!");

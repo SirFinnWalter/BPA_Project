@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 
 import bpaproject.characters.*;
 import bpaproject.GameWindow;
+import bpaproject.Player;
 import bpaproject.Tilemap;
 
 /**
@@ -136,23 +137,23 @@ public class CharacterSelect extends FrameContent {
             if (p == null)
                 continue;
 
-            Player character;
+            Player player;
             switch (characterValue) {
             case 1:
-                character = new CharacterA(16 * p.x, 16 * p.y, getGameWindow().getListener(i));
+                player = new Player(16 * p.x, 16 * p.y, new CharacterA(), getGameWindow().getListener(i));
                 break;
             case 2:
-                character = new CharacterB(16 * p.x, 16 * p.y, getGameWindow().getListener(i));
+                player = new Player(16 * p.x, 16 * p.y, new CharacterB(), getGameWindow().getListener(i));
                 break;
             case 3:
-                character = new CharacterC(16 * p.x, 16 * p.y, getGameWindow().getListener(i));
+                player = new Player(16 * p.x, 16 * p.y, new CharacterC(), getGameWindow().getListener(i));
                 break;
             default:
-                character = null;
+                player = null;
                 break;
             }
-            if (character != null)
-                game.addPlayer(character);
+            if (player != null)
+                game.addPlayer(player);
 
         }
         getGameWindow().setSize(map.getWidth() * 16, map.getHeight() * 16);

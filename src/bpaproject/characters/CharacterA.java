@@ -10,34 +10,40 @@ import bpaproject.framecontent.Game;
  * @author Dakota Taylor
  * @createdOn Wednesday, 05 December, 2018
  */
-public class CharacterA extends Player {
+public class CharacterA extends CharacterBase {
     private static final AnimatedSprite CHARACTER_A_ANIMATED_SPRITE = new AnimatedSprite(
             new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\d'erp.png")), 16, 16), 18);
+    private static final AnimatedSprite CHARACTER_A_ANIMATED_SPRITE_2 = new AnimatedSprite(
+            new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\d'erp_invisible.png")), 16, 16), 18);
 
-    //
-    public CharacterA(int x, int y, KeyboardListener listener) {
-        super(x, y, CHARACTER_A_ANIMATED_SPRITE.clone(), listener);
+    public CharacterA() {
+        super(CHARACTER_A_ANIMATED_SPRITE.clone());
     }
 
     @Override
-    public void update(Game game) {
-        super.update(game);
-        if (!sprite.isVisible() && current >= duration)
-            sprite.setVisible(true);
+    public void updateBehaviors(Player player) {
+        player.behaviors.updateBehavior = (g, p) -> {
+            p.updateBehavior.preform(g, p);
+            if (active && current >= duration) {
+                active = false;
+                animatedSprite = CHARACTER_A_ANIMATED_SPRITE.clone();
+                p.updateDirection();
+            }
+            current++;
+        };
 
-        current++;
+        player.behaviors.actionBehavior = (g, p) -> {
+            if (current >= cooldown) {
+                current = 0;
+                active = true;
+                animatedSprite = CHARACTER_A_ANIMATED_SPRITE_2.clone();
+                p.updateDirection();
+            }
+        };
     }
 
     boolean active = false;
-    int current = 500;
+    int current = 160;
     int duration = 80;
     int cooldown = 160;
-
-    @Override
-    public void useAction(Game game) {
-        if (current >= cooldown) {
-            current = 0;
-            sprite.setVisible(false);
-        }
-    }
 }

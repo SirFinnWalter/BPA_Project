@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import bpaproject.characters.Player;
+import bpaproject.characters.CharacterBase;
 
 import bpaproject.*;
 
@@ -45,6 +45,8 @@ public class Game extends FrameContent {
     public Game(GameWindow gw) {
         super(gw);
         getGameWindow().getAudioPlayer().endLoop();
+        getGameWindow().getContentPane().removeAll();
+        getGameWindow().repaint();
 
         this.canvas = new Canvas();
         this.add(canvas);
@@ -59,7 +61,7 @@ public class Game extends FrameContent {
         players = new HashSet<>();
         gameObjects = new HashSet<>();
         gameObjectsBuffer = new HashSet<>();
-        Player.PLAYER_COUNT = 0;
+        Player.playerCount = 0;
     }
 
     @Override
@@ -187,13 +189,15 @@ public class Game extends FrameContent {
         return this.map;
     }
 
-    public void addPlayer(Player character) {
-        LOGGER.log(Level.FINE, "Adding player #" + Player.PLAYER_COUNT + " as " + character.getClass().getSimpleName());
+    public void addPlayer(Player player) {
+        // LOGGER.log(Level.FINE,
+        // "Adding player #" + CharacterBase.PLAYER_COUNT + " as " +
+        // character.getClass().getSimpleName());
 
-        this.players.add(character);
-        this.addGameObject(character);
-        canvas.addKeyListener(character.getListener());
-        canvas.addFocusListener(character.getListener());
+        this.players.add(player);
+        this.addGameObject(player);
+        canvas.addKeyListener(player.getListener());
+        canvas.addFocusListener(player.getListener());
     }
 
     public Set<Player> getPlayers() {

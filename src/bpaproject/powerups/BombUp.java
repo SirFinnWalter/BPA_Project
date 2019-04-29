@@ -3,7 +3,7 @@ package bpaproject.powerups;
 import java.io.File;
 
 import bpaproject.*;
-import bpaproject.characters.Player;
+import bpaproject.characters.CharacterBase;
 
 /**
  * @file BombUp.java

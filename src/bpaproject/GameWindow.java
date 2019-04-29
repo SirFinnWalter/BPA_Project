@@ -77,8 +77,8 @@ public class GameWindow extends JFrame implements Runnable {
     private AudioPlayer player = new AudioPlayer();
     private FrameContent fc = new MainMenu(this);
 
-    private boolean running;
-    private boolean hasContent;
+    private volatile boolean running;
+    private volatile boolean hasContent;
 
     /**
      * Controls for 4 players on a keyboard
@@ -168,8 +168,8 @@ public class GameWindow extends JFrame implements Runnable {
                 }
 
                 // FIXME: find reason why game won't render properly without this call
-                if (fc instanceof CharacterSelect)
-                    SwingUtilities.updateComponentTreeUI(this);
+               //if (fc instanceof CharacterSelect)
+                //    SwingUtilities.updateComponentTreeUI(this);
             }
             synchronized (this) {
                 this.notify();

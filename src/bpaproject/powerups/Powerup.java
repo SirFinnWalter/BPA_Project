@@ -1,7 +1,7 @@
 package bpaproject.powerups;
 
 import bpaproject.*;
-import bpaproject.characters.Player;
+import bpaproject.characters.CharacterBase;
 import bpaproject.framecontent.Game;
 
 /**

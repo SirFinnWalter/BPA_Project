@@ -2,7 +2,6 @@ package bpaproject;
 
 import java.io.File;
 
-import bpaproject.characters.Player;
 import bpaproject.framecontent.Game;
 
 /**
