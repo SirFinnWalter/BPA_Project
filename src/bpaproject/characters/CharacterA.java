@@ -3,7 +3,6 @@ package bpaproject.characters;
 import java.io.File;
 
 import bpaproject.*;
-import bpaproject.framecontent.Game;
 
 /**
  * @file CharacterA.java
@@ -16,8 +15,18 @@ public class CharacterA extends CharacterBase {
     private static final AnimatedSprite CHARACTER_A_ANIMATED_SPRITE_2 = new AnimatedSprite(
             new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\d'erp_invisible.png")), 16, 16), 18);
 
+    private final AnimatedSprite characterAnimatedSprite;
+    private final AnimatedSprite characterAnimatedSpriteActive;
+
+    private boolean active = false;
+    private int duration = 160;
+    private int cooldown = duration + 80;
+    private int current = cooldown;
+
     public CharacterA() {
-        super(CHARACTER_A_ANIMATED_SPRITE.clone());
+        this.characterAnimatedSprite = CHARACTER_A_ANIMATED_SPRITE.clone();
+        this.characterAnimatedSpriteActive = CHARACTER_A_ANIMATED_SPRITE_2.clone();
+        this.currentSprite = this.characterAnimatedSprite;
     }
 
     @Override
@@ -26,7 +35,7 @@ public class CharacterA extends CharacterBase {
             p.updateBehavior.preform(g, p);
             if (active && current >= duration) {
                 active = false;
-                animatedSprite = CHARACTER_A_ANIMATED_SPRITE.clone();
+                currentSprite = characterAnimatedSprite;
                 p.updateDirection();
             }
             current++;
@@ -36,14 +45,10 @@ public class CharacterA extends CharacterBase {
             if (current >= cooldown) {
                 current = 0;
                 active = true;
-                animatedSprite = CHARACTER_A_ANIMATED_SPRITE_2.clone();
+                currentSprite = characterAnimatedSpriteActive;
                 p.updateDirection();
             }
         };
     }
 
-    boolean active = false;
-    int current = 160;
-    int duration = 80;
-    int cooldown = 160;
 }

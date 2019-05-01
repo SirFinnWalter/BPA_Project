@@ -5,7 +5,6 @@ import java.io.File;
 
 import bpaproject.*;
 import bpaproject.AnimatedSprite.AnimationType;
-import bpaproject.framecontent.Game;
 import bpaproject.powerups.BombUp;
 
 /**
@@ -20,14 +19,19 @@ public class CharacterB extends CharacterBase {
     private static final AnimatedSprite CHARACTER_B_ANIMATED_SPRITE_2 = new AnimatedSprite(
             new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\bombiboi_cooldown.png")), 16, 16), 7);
 
-    private boolean invicible;
-    private int timer;
-    private int cooldown;
+    private final AnimatedSprite characterAnimatedSprite;
+    private final AnimatedSprite characterAnimatedSprite2;
+
+    private boolean invicible = false;
+    private int timer = 500;
+    private int cooldown = 200;
 
     public CharacterB() {
-        super(CHARACTER_B_ANIMATED_SPRITE.clone());
-        animatedSprite.setAnimationType(AnimationType.DESTROY);
-        cooldown = 200;
+        this.characterAnimatedSprite = CHARACTER_B_ANIMATED_SPRITE.clone();
+        this.characterAnimatedSprite2 = CHARACTER_B_ANIMATED_SPRITE_2.clone();
+        this.currentSprite = characterAnimatedSprite;
+
+        currentSprite.setAnimationType(AnimationType.DESTROY);
     }
 
     @Override
@@ -35,7 +39,7 @@ public class CharacterB extends CharacterBase {
         player.behaviors.bombBehavior = (g, p) -> {
         };
         player.behaviors.updateBehavior = (g, p) -> {
-            if (animatedSprite.isDestroyed()) {
+            if (currentSprite.isDestroyed()) {
                 invicible = true;
                 timer = 0;
 
@@ -47,9 +51,8 @@ public class CharacterB extends CharacterBase {
 
                 Explosion.createExplosion(g, p.bombLength, x, y);
 
-                animatedSprite = CHARACTER_B_ANIMATED_SPRITE_2.clone();
-                animatedSprite.setAnimationType(AnimationType.LOOPING);
-                animatedSprite.reset();
+                currentSprite = characterAnimatedSprite2;
+                currentSprite.reset();
                 p.updateDirection();
             }
 
@@ -58,30 +61,27 @@ public class CharacterB extends CharacterBase {
             if (p.getListener().action() || p.getListener().bomb())
                 p.moving = true;
 
-            if (invicible) {
-                if (timer > 40) {
-                    invicible = false;
-                }
+            if (invicible && timer > 40)
+                invicible = false;
+
+            if (currentSprite == characterAnimatedSprite2 && timer > cooldown) {
+                currentSprite = characterAnimatedSprite;
+                currentSprite.reset();
+                p.updateDirection();
             }
-            if (animatedSprite.getAnimationType() == AnimationType.LOOPING) {
-                timer++;
-                if (timer > cooldown) {
-                    animatedSprite = CHARACTER_B_ANIMATED_SPRITE.clone();
-                    animatedSprite.setAnimationType(AnimationType.DESTROY);
-                    animatedSprite.reset();
-                    p.updateDirection();
-                    timer = 0;
-                }
-            }
+            timer++;
         };
 
-        player.behaviors.enterBehavior = (e, p) -> {
+        player.behaviors.enterBehavior = (e, p) ->
+
+        {
             p.enterBehavior.preform(e, p);
             if (invicible)
                 p.setAlive(true);
 
-            if (e.getSource().getObject() instanceof BombUp)
-                cooldown -= 20;
+            if (e.getSource().getObject() instanceof BombUp) {
+                cooldown -= cooldown > 40 ? 20 : 0;
+            }
         };
 
         player.behaviors.stayBehavior = (e, p) -> {

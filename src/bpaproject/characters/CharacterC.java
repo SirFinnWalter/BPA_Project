@@ -17,12 +17,17 @@ public class CharacterC extends CharacterBase {
     private static final AnimatedSprite CHARACTER_C_ANIMATED_SPRITE_2 = new AnimatedSprite(
             new SpriteSheet(GameWindow.loadImage(new File("assets\\sprites\\ghosty_gooster.png")), 16, 16), 12);
 
+    private final AnimatedSprite characterAnimatedSprite;
+    private final AnimatedSprite characterAnimatedSpriteActive;
+
     private int timer = 0;
     private boolean invincible;
     private boolean secondLife;
 
     public CharacterC() {
-        super(CHARACTER_C_ANIMATED_SPRITE.clone());
+        this.characterAnimatedSprite = CHARACTER_C_ANIMATED_SPRITE.clone();
+        this.characterAnimatedSpriteActive = CHARACTER_C_ANIMATED_SPRITE_2.clone();
+        this.currentSprite = characterAnimatedSprite;
     }
 
     @Override
@@ -64,8 +69,8 @@ public class CharacterC extends CharacterBase {
                 if (!secondLife) {
                     invincible = true;
                     secondLife = true;
-                    animatedSprite.reset();
-                    this.animatedSprite = CHARACTER_C_ANIMATED_SPRITE_2.clone();
+                    currentSprite.reset();
+                    this.currentSprite = characterAnimatedSpriteActive;
 
                 } else {
                     if (!invincible)
@@ -84,8 +89,8 @@ public class CharacterC extends CharacterBase {
                 if (!secondLife) {
                     invincible = true;
                     secondLife = true;
-                    animatedSprite.reset();
-                    this.animatedSprite = (AnimatedSprite) CHARACTER_C_ANIMATED_SPRITE_2.clone();
+                    currentSprite.reset();
+                    this.currentSprite = characterAnimatedSpriteActive;
 
                 } else {
                     if (!invincible)

@@ -15,7 +15,7 @@ import bpaproject.powerups.Powerup;
  * Date Created:  27 Apr 2019    *
  * Created By:    Dakota Taylor  *
  * * * * * * * * * * * * * * * * *
- * Last Modified: 28 Apr 2019    *
+ * Last Modified: 29 Apr 2019    *
  * Modified By:   Dakota Taylor  *
  * * * * * * * * * * * * * * * * */
 
@@ -82,14 +82,14 @@ public class Player implements GameObject, CollisionListener {
             g.checkCollision(collider);
 
             // TODO: check if null check is needed
-            if (character.getSprite() instanceof AnimatedSprite)
-                ((AnimatedSprite) character.getSprite()).update();
+
+            character.getSprite().update();
 
             renderBox.x = collider.x - ((renderBox.width * GameWindow.ZOOM - collider.width) / 2);
             renderBox.y = collider.y - ((renderBox.height * GameWindow.ZOOM - collider.height));
 
-        } else if (character.getSprite() instanceof AnimatedSprite)
-            ((AnimatedSprite) character.getSprite()).reset();
+        } else
+            character.getSprite().reset();
 
         if (currentFD != newFD) {
             currentFD = newFD;
@@ -184,14 +184,12 @@ public class Player implements GameObject, CollisionListener {
     }
 
     public void updateDirection() {
-        if (character.getSprite() instanceof AnimatedSprite) {
-            AnimatedSprite animatedSprite = (AnimatedSprite) character.getSprite();
+        AnimatedSprite animatedSprite = character.getSprite();
 
-            int fd = (currentFD == FacingDirection.LEFT || currentFD == FacingDirection.RIGHT) ? currentFD.getValue()
-                    : FacingDirection.LEFT.getValue();
-            int framesLength = (animatedSprite.getLength() / 2);
-            animatedSprite.setAnimationRange(fd * framesLength, fd * framesLength + (framesLength - 1));
-        }
+        int fd = (currentFD == FacingDirection.LEFT || currentFD == FacingDirection.RIGHT) ? currentFD.getValue()
+                : FacingDirection.LEFT.getValue();
+        int framesLength = (animatedSprite.getLength() / 2);
+        animatedSprite.setAnimationRange(fd * framesLength, fd * framesLength + (framesLength - 1));
     }
 
     @Override

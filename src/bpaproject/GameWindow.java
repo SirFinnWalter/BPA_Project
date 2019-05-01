@@ -18,7 +18,6 @@ import java.util.logging.SimpleFormatter;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import bpaproject.Options.Setting;
 import bpaproject.framecontent.*;
@@ -166,10 +165,6 @@ public class GameWindow extends JFrame implements Runnable {
                         frames = 0;
                     }
                 }
-
-                // FIXME: find reason why game won't render properly without this call
-               //if (fc instanceof CharacterSelect)
-                //    SwingUtilities.updateComponentTreeUI(this);
             }
             synchronized (this) {
                 this.notify();
